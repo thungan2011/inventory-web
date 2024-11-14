@@ -35,7 +35,7 @@ interface FormValues {
 const initialFormValues: FormValues = {
     code: '',
     receiverNam: '',
-    status: ImportMaterialStatus.PENDING_APPROVAL,
+    status: ImportMaterialStatus.COMPLETED,
     note: '',
 };
 

@@ -93,7 +93,7 @@ export const useDeleteCustomer = () => {
     });
 };
 /**
- * get customer by ID
+ * get customer by Code
  */
 const getCustomerByCode = (code: string): Promise<CustomerDetail> => {
     return httpRepository.get<CustomerDetail>(`/v1/customers/${code}`);
@@ -105,4 +105,38 @@ export const useCustomerByCode = (code: string) => {
         () => getCustomerByCode(code),
         {enabled: !!code}
     );
+};
+
+/**
+ * update customer
+ */
+interface UpdateCustomerPayload {
+    code?: string;
+    name: string;
+    phone: string;
+    address?: string;
+    ward?: string;
+    district?: string;
+    city?: string;
+    email?: string;
+    status: CustomerStatus;
+    note: string;
+}
+
+const updateCustomer = ({id, payload} : {payload: UpdateCustomerPayload, id: number}): Promise<void> => {
+    return httpRepository.put<void>(`/v1/customers/${id}`, payload);
+};
+
+export const useUpdateCustomer = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateCustomer,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [CUSTOMER_QUERY_KEY] });
+            toast.success('Cập nhật khách hàng thành công');
+        },
+        onError: () => {
+            toast.error('Cập nhật khách hàng không thành công. Thử lại sau.');
+        },
+    });
 };

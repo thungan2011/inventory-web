@@ -1,7 +1,7 @@
 import { LuLayoutGrid } from 'react-icons/lu';
 import React from 'react';
 import { RiMapPinUserLine, RiRoadMapLine } from 'react-icons/ri';
-import { FiCalendar, FiShoppingBag, FiUsers } from 'react-icons/fi';
+import { FiCalendar, FiUsers } from 'react-icons/fi';
 import { TbPackageExport, TbPackageImport, TbShoppingBagEdit, TbShoppingBagSearch } from 'react-icons/tb';
 import { MdOutlineCategory, MdOutlineInventory } from 'react-icons/md';
 import { FaCartFlatbedSuitcase } from 'react-icons/fa6';

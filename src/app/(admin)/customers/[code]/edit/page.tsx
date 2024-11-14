@@ -13,19 +13,15 @@ import Select from '@/components/Select';
 import TextArea from '@/components/TextArea';
 import DatePicker from '@/components/DatePicker';
 import { GenderStatus, GenderStatusVietnamese } from '@/components/Badge/GenderStatusBadge';
-import { useRouter } from 'next/navigation';
-import { useCreateCustomer } from '@/modules/customers/repository';
+import { useParams, useRouter } from 'next/navigation';
+import { useCustomerByCode, useUpdateCustomer } from '@/modules/customers/repository';
 import { CustomerStatus } from '@/modules/customers/interface';
-import { useAllDistricts, useAllProvinces, useAllWards } from '@/modules/provinces/repository';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
+import Loader from '@/components/Loader';
+import NotFound from '@/components/NotFound';
+import { useAllDistricts, useAllProvinces, useAllWards } from '@/modules/provinces/repository';
 
 const CustomerSchema = object({
-    code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length < 4) return this.createError({ message: 'Mã tối thiểu 4 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
     name: string().required('Tên không được để trống'),
     phone: string().required('Số điện thoại không được để trống'),
     address: string().required('Địa chỉ không được để trống'),
@@ -40,32 +36,17 @@ interface FormValues {
     name: string;
     phone: string;
     birthday?: Date;
-    address: string;
-    ward: string;
-    district: string;
-    city: string;
+    address?: string;
+    ward?: string;
+    district?: string;
+    city?: string;
     email?: string;
     status: CustomerStatus;
     note: string;
 }
 
-const initialFormValues: FormValues = {
-    code: '',
-    name: '',
-    phone: '',
-    birthday: new Date(),
-    address: '',
-    ward: '',
-    district: '',
-    city: '',
-    email: '',
-    status: CustomerStatus.INACTIVE,
-    note: '',
-};
-
 const NewCustomerPage = () => {
     const router = useRouter();
-    const createCustomer = useCreateCustomer();
 
     const [selectedProvince, setSelectedProvince] = useState<string | undefined>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>('');
@@ -73,16 +54,45 @@ const NewCustomerPage = () => {
     const { data: districts } = useAllDistricts(selectedProvince);
     const { data: wards } = useAllWards(selectedDistrict);
 
+    const { code } = useParams<{ code: string }>();
+    const { data: customer, isLoading } = useCustomerByCode(code);
+    const updateCustomer = useUpdateCustomer();
+
     useEffect(() => {
         document.title = 'Nut Garden - Thêm khách hàng';
     }, []);
+
+    if (isLoading) {
+        return <Loader />;
+    }
+
+    if (!customer) {
+        return <NotFound />;
+    }
+
+    const initialFormValues: FormValues = {
+        code: customer.code,
+        name: customer.name,
+        phone: customer.phone,
+        birthday: customer.birthday,
+        address: customer.address,
+        ward: customer.ward,
+        district: customer.district,
+        city: customer.city,
+        email: customer.email,
+        status: customer.status,
+        note: customer.note || '',
+    };
 
     const handleSubmit = async (values: FormValues) => {
         console.table(values);
 
         try {
-            await createCustomer.mutateAsync({
-                ...values,
+            await updateCustomer.mutateAsync({
+                id: customer.id,
+                payload: {
+                    ...values,
+                },
             });
             router.push('/customers');
         } catch (error) {
@@ -96,9 +106,11 @@ const NewCustomerPage = () => {
                     validationSchema={CustomerSchema}>
                 <Form>
                     <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã khách hàng</Typography.Title>
-                            <Input name="code" placeholder="Nếu không nhập mã khách hàng, hệ thống sẽ tự động tạo" />
+                        <Card className="p-[18px]">
+                            <div className="flex gap-1 text-xl font-nunito font-medium">
+                                <div>Mã khách hàng</div>
+                                <div className="text-brand-500">#{customer.code}</div>
+                            </div>
                         </Card>
                     </div>
                     <div className="mt-5">
@@ -186,8 +198,8 @@ const NewCustomerPage = () => {
                                 Hủy bỏ
                             </ButtonIcon>
                         </Link>
-                        <ButtonIcon icon={<FaSave />} type="submit" disabled={createCustomer.isPending}>
-                            {createCustomer.isPending ? 'Đang xử lý...' : 'Lưu'}
+                        <ButtonIcon icon={<FaSave />} type="submit" disabled={updateCustomer.isPending}>
+                            {updateCustomer.isPending ? 'Đang xử lý...' : 'Lưu'}
                         </ButtonIcon>
                     </div>
                 </Form>

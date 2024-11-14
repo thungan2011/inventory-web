@@ -81,9 +81,10 @@ const FormikContent = ({ onClose }: { onClose: () => void }) => {
     });
 
     const productQuery = useAllProducts({
+        origin: '', packing: '',
         page: 1,
-        name: search,
-        status: filters.status,
+        search: search,
+        status: filters.status
     });
 
     const {
