@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+@config '../../tailwind.config.ts';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        font-family: 'Nutito', 'DM Sans', sans-serif !important;
+        font-feature-settings: 'kern' !important;
+        -webkit-font-smoothing: antialiased;
+        letter-spacing: -0.2px;
+    }
+
+    input {
+        @apply outline-none;
+    }
+}
+
+@layer components {
+    .btn-default {
+        @apply bg-brand-500 h-9 text-white py-1.5 px-2 rounded flex items-center justify-center gap-x-2 text-sm;
+    }
+}
+
+@layer utilities {
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .scrollbar-thin {
+        scrollbar-width: thin;
+        scrollbar-color: gray white;
+
+        overflow: auto;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: white;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background-color: gray;
+        border-radius: 8px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-button {
+        display: none !important;
+        /*height: 0;*/
+        /*width: 0;*/
+    }
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
