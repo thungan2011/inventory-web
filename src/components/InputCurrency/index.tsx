@@ -84,7 +84,7 @@ const InputCurrency = ({
     };
 
     return (
-        <div className={wrapperClassName ? 'mb-3' : wrapperClassName}>
+        <div className={!wrapperClassName ? 'mb-3' : wrapperClassName}>
             {
                 label && (
                     <div className="mb-1 inline-flex gap-x-1 h-6">
@@ -98,7 +98,7 @@ const InputCurrency = ({
             }
             <div
                 onClick={handleContainerClick}
-                className={`border rounded-md h-10 px-3 dark:text-white dark:bg-navy-900 w-full text-[16px] focus-within:border-brand-500 flex items-center group`}>
+                className={`border rounded-md h-10 px-3 dark:text-white dark:bg-navy-900 w-full text-[14px] focus-within:border-brand-500 flex items-center group`}>
                 <input ref={inputRef}
                        id={id}
                        placeholder={placeholder}

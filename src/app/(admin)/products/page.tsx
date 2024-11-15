@@ -80,7 +80,7 @@ const ProductPage = () => {
             },
             {
                 accessorKey: 'name',
-                header: 'Tên sản phẩm',
+                header: 'Tên',
                 cell: ({ row }) => (
                     <div className="flex gap-2">
                         <div className="relative w-14 h-14 rounded overflow-hidden">
@@ -89,7 +89,7 @@ const ProductPage = () => {
                                    className="object-cover" />
                         </div>
                         <div className="flex flex-col justify-center">
-                            <div className="text-nowrap">{row.original.name}</div>
+                            <div className="w-72 max-w-72 line-clamp-2">{row.original.name}</div>
                             <div className="text-xs text-gray-700">{row.original.origin}</div>
                         </div>
                     </div>
@@ -97,12 +97,14 @@ const ProductPage = () => {
             },
             {
                 accessorKey: 'price',
-                cell: ({ row }) => row.original?.prices[0]?.price ? formatNumberToCurrency(row.original.prices[0].price) : 'Chưa cập nhật',
                 header: 'Giá hiện tại',
+                cell: ({ row }) => (
+                    <div className="text-nowrap">{row.original?.prices[0]?.price ? formatNumberToCurrency(row.original.prices[0].price) : 'Chưa cập nhật'}</div>
+                )
             },
             {
                 accessorKey: 'packing',
-                header: 'Bao bì/Đóng gói',
+                header: 'Đóng gói',
             },
             {
                 accessorKey: 'weight',

@@ -13,7 +13,7 @@ import { OrderStatus } from '@/modules/orders/interface';
 import InputCurrency from '@/components/InputCurrency';
 import TextArea from '@/components/TextArea';
 import { useAllDistricts, useAllProvinces, useAllWards } from '@/modules/provinces/repository';
-import Select from '@/components/Select';
+import Select, { SelectProps } from '@/components/Select';
 
 const ProductSchema = object({
     code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
@@ -63,6 +63,11 @@ const initialFormValues: FormValues = {
     note: '',
 };
 
+const DELIVERY_METHOD: SelectProps['options'] = [
+    { label: 'Tự đến lấy', value: 'Tự đến lấy' },
+    { label: 'Giao hàng tận nơi', value: 'Giao hàng tận nơi' },
+];
+
 const NewOrderPage = () => {
     const [selectedProvince, setSelectedProvince] = useState<string | undefined>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>('');
@@ -98,8 +103,11 @@ const NewOrderPage = () => {
                             <Card className={`p-[18px] mt-5`}>
                                 <Typography.Title level={4}>Nhận hàng và vận chuyển</Typography.Title>
                                 <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
-                                    <Input name="deliveryMethod" label="Hình thức nhận hàng"
-                                           placeholder="Chọn hình thức nhận hàng" />
+                                    <Select name="deliveryMethod"
+                                            options={DELIVERY_METHOD}
+                                            label="Hình thức nhận hàng"
+                                            placeholder="Chọn hình thức nhận hàng"
+                                    />
                                     <Input name="receiverName" label="Tên người nhận" placeholder="Nhập tên người nhận"
                                            required />
                                     <Input name="receiverPhone" label="Số điện thoại" placeholder="Nhập số điện thoại"

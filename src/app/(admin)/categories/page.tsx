@@ -93,6 +93,9 @@ const CategoryPage = () => {
             {
                 accessorKey: 'name',
                 header: 'Tên danh mục',
+                cell: ({ row }) => (
+                    <div className="text-nowrap">{row.original.name}</div>
+                )
             },
             {
                 id: 'quantity',
@@ -107,6 +110,11 @@ const CategoryPage = () => {
             {
                 accessorKey: 'description',
                 header: 'Mô tả',
+                cell: ({ row }) => (
+                    <div className="w-72 max-w-72 line-clamp-2">
+                        {row.original.description}
+                    </div>
+                )
             },
             {
                 accessorKey: 'status',

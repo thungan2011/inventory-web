@@ -21,12 +21,6 @@ import Loader from '@/components/Loader';
 import { CategoryType } from '@/modules/categories/interface';
 
 const ProductSchema = object({
-    sku: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length < 4) return this.createError({ message: 'Mã tối thiểu 4 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
     name: string().required('Tên không được để trống'),
     categories: array().required('Chọn danh mục').min(1, 'Chọn tối thiểu 1 danh mục'),
     origin: string().required('Nơi nhập khẩu không được để trống'),
@@ -104,12 +98,12 @@ const NewProductPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
                 <Form>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã sản phẩm</Typography.Title>
-                            <Input name="sku" placeholder="Nếu không nhập mã sản phẩm, hệ thống sẽ tự động tạo" />
-                        </Card>
-                    </div>
+                    {/*<div className="mt-5">*/}
+                    {/*    <Card className={`p-[18px] col-span-3`}>*/}
+                    {/*        <Typography.Title level={4}>Mã sản phẩm</Typography.Title>*/}
+                    {/*        <Input name="sku" placeholder="Nếu không nhập mã sản phẩm, hệ thống sẽ tự động tạo" />*/}
+                    {/*    </Card>*/}
+                    {/*</div>*/}
                     <div className="grid grid-cols-2 gap-x-3 mt-5">
                         <Card className={`p-[18px] col-span-1`}>
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>
