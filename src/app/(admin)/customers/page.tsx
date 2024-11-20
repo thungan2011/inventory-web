@@ -84,10 +84,10 @@ const CustomerPage = () => {
 
             {
                 accessorKey: 'name_customer',
-                header: 'Tên khách hàng',
+                header: 'Tên',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{row.original.name}</div>
+                        <div className="w-72 max-w-36 line-clamp-2">{row.original.name}</div>
                         <div className="text-xs text-gray-700">{row.original.phone}</div>
                     </div>
                 ),

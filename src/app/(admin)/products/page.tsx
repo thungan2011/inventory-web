@@ -17,6 +17,7 @@ import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
+import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 
 interface ProductFilter extends PaginationState {
     search: string;
@@ -83,8 +84,8 @@ const ProductPage = () => {
                 header: 'Tên',
                 cell: ({ row }) => (
                     <div className="flex gap-2">
-                        <div className="relative w-14 h-14 rounded overflow-hidden">
-                            <Image src={'/img/avatar/logo.png'}
+                        <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
+                            <Image src={row.original.image || LOGO_IMAGE_FOR_NOT_FOUND}
                                    alt={`Ảnh của sản phẩm ${row.original.name}`} fill
                                    className="object-cover" />
                         </div>

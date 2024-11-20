@@ -41,3 +41,38 @@ export interface ImportProductOverview {
         fullName: string;
     }
 }
+export interface ImportProductDetail{
+    id: string;
+    code: string;
+    createdAt: Date;
+    type: ImportProductType;
+    note: string;
+    status: ImportProductStatus;
+    provider: {
+        id: number;
+        code: string;
+        name: string;
+        address: string;
+        city: string;
+        ward: string;
+        district: string;
+        phone: string;
+        email: string;
+    };
+    creator: {
+        full_name: string;
+        email: string;
+    };
+    details: {
+        quantity: number;
+        price: number;
+        product: {
+            sku: string;
+            name: string;
+            weight: number;
+            packing: string;
+            unit:string;
+            image: string;
+        }
+    }[]
+}

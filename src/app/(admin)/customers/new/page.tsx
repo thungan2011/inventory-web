@@ -20,12 +20,12 @@ import { useAllDistricts, useAllProvinces, useAllWards } from '@/modules/provinc
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
 
 const CustomerSchema = object({
-    code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length < 4) return this.createError({ message: 'Mã tối thiểu 4 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
+    // code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
+    //     if (!value) return true;
+    //     if (value.length < 4) return this.createError({ message: 'Mã tối thiểu 4 ký tự' });
+    //     if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
+    //     return true;
+    // }),
     name: string().required('Tên không được để trống'),
     phone: string().required('Số điện thoại không được để trống'),
     address: string().required('Địa chỉ không được để trống'),
@@ -95,12 +95,12 @@ const NewCustomerPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={CustomerSchema}>
                 <Form>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã khách hàng</Typography.Title>
-                            <Input name="code" placeholder="Nếu không nhập mã khách hàng, hệ thống sẽ tự động tạo" />
-                        </Card>
-                    </div>
+                    {/*<div className="mt-5">*/}
+                    {/*    <Card className={`p-[18px] col-span-3`}>*/}
+                    {/*        <Typography.Title level={4}>Mã khách hàng</Typography.Title>*/}
+                    {/*        <Input name="code" placeholder="Nếu không nhập mã khách hàng, hệ thống sẽ tự động tạo" />*/}
+                    {/*    </Card>*/}
+                    {/*</div>*/}
                     <div className="mt-5">
                         <Card className={`p-[18px]`}>
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>

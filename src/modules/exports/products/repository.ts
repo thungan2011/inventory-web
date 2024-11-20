@@ -1,7 +1,8 @@
 import httpRepository from '@/core/repository/http';
 import { useQuery } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import { ExportProductOverview } from '@/modules/exports/products/interface';
+import { ExportProductDetail, ExportProductOverview } from '@/modules/exports/products/interface';
+import useDataFetching from '@/hook/useDataFetching';
 
 export const EXPORT_PRODUCT_QUERY_KEY = 'export_products';
 
@@ -25,4 +26,19 @@ export const useAllExportProducts = (params: FetchAllExportProductParams) => {
         placeholderData: previousData => previousData,
         staleTime: 5000,
     });
+};
+
+/**
+ * get export Product by Code
+ */
+const getExportProductByCode = (code: string): Promise<ExportProductDetail> => {
+    return httpRepository.get<ExportProductDetail>(`/v1/product_export_receipts/${code}`);
+};
+
+export const useImportProductByCode = (code: string) => {
+    return useDataFetching(
+        [EXPORT_PRODUCT_QUERY_KEY, code],
+        () => getExportProductByCode(code),
+        { enabled: !!code },
+    );
 };

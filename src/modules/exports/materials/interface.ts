@@ -40,3 +40,27 @@ export interface ExportMaterialOverview {
         fullName: string;
     },
 }
+
+export interface ExportMaterialDetail{
+    id: string;
+    code: string;
+    createdAt: Date;
+    type: ExportMaterialType;
+    note: string;
+    status: ExportMaterialStatus;
+    creator: {
+        full_name: string;
+        email: string;
+    };
+    details: {
+        quantity: number;
+        price: number;
+        material: {
+            sku: string;
+            name: string;
+            weight: number;
+            packing: string;
+            unit:string;
+        }
+    }[]
+}

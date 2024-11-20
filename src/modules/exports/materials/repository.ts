@@ -1,7 +1,8 @@
 import httpRepository from '@/core/repository/http';
 import { useQuery } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import { ExportMaterialOverview } from '@/modules/exports/materials/interface';
+import { ExportMaterialDetail, ExportMaterialOverview } from '@/modules/exports/materials/interface';
+import useDataFetching from '@/hook/useDataFetching';
 
 export const EXPORT_MATERIAL_QUERY_KEY = 'export_materials';
 
@@ -25,4 +26,19 @@ export const useAllExportMaterials = (params: FetchAllExportMaterialParams) => {
         placeholderData: previousData => previousData,
         staleTime: 5000,
     });
+};
+
+/**
+ * get export material by Code
+ */
+const getExportMaterialByCode = (code: string): Promise<ExportMaterialDetail> => {
+    return httpRepository.get<ExportMaterialDetail>(`/v1/material_export_receipts/${code}`);
+};
+
+export const useExportMaterialByCode = (code: string) => {
+    return useDataFetching(
+        [EXPORT_MATERIAL_QUERY_KEY, code],
+        () => getExportMaterialByCode(code),
+        {enabled: !!code}
+    );
 };
