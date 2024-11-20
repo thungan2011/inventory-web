@@ -77,17 +77,8 @@ const ImportProductPage = () => {
                 ),
             },
             {
-                accessorKey: 'full_name',
-                header: 'Người thực hiện',
-                cell: ({ row }) => (
-                    <div className="flex flex-col gap-2">
-                        <div>{row.original.receiver.fullName}</div>
-                    </div>
-                ),
-            },
-            {
                 accessorKey: 'createdAt',
-                header: 'Ngày giao dịch',
+                header: 'Ngày lập phiếu',
                 cell: ({ row }) => {
                     return formatDateToLocalDate(row.original.createdAt);
                 },
@@ -111,7 +102,7 @@ const ImportProductPage = () => {
                 header: () => '',
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
-                        <ButtonAction.View href={`/imports/products/${row.original.id}`} />
+                        <ButtonAction.View href={`/imports/products/${row.original.code}`} />
                         <ButtonAction.Update />
                     </div>
                 ),
