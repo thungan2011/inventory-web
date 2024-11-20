@@ -49,6 +49,9 @@ export const useAllDistricts = (provinceId?: string) => {
     return useDataFetching(
         ['districts', provinceId],
         () => getAllDistricts(provinceId),
+        {
+            enabled: !!provinceId,
+        }
     );
 };
 
@@ -70,5 +73,8 @@ export const useAllWards = (districtId?: string) => {
     return useDataFetching(
         ['wards', districtId],
         () => getAllWards(districtId),
+        {
+            enabled: !!districtId,
+        }
     );
 };
