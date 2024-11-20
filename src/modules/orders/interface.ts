@@ -18,6 +18,11 @@ export enum PaymentMethod {
     CASH = 'CASH',
 }
 
+export const PaymentMethodVietnamese: Record<PaymentMethod, string> = {
+    [PaymentMethod.BANK_TRANSFER]: 'Chuyển khoản',
+    [PaymentMethod.CASH]: 'Tiền mặt',
+};
+
 export interface OrderOverview {
     id: string;
     code: string;
@@ -32,7 +37,7 @@ export interface OrderOverview {
     totalPrice: number;
     note: string;
     paymentStatus: PaymentStatus,
-    paymentMethod: "BANK_TRANSFER",
+    paymentMethod: PaymentMethod,
     customer: {
         id: number;
         code: string;

@@ -7,10 +7,10 @@ export enum ExportProductType {
     OTHER = 'OTHER',
 }
 
-export const ExportProductTypeVietnamese : Record<ExportProductType, string> = {
-    [ExportProductType.NORMAL]: "Bán hàng",
-    [ExportProductType.CANCEL]: "Xuất hủy",
-    [ExportProductType.OTHER]: "Khác",
+export const ExportProductTypeVietnamese: Record<ExportProductType, string> = {
+    [ExportProductType.NORMAL]: 'Bán hàng',
+    [ExportProductType.CANCEL]: 'Xuất hủy',
+    [ExportProductType.OTHER]: 'Khác',
 };
 
 /**
@@ -21,9 +21,9 @@ export enum ExportProductStatus {
     COMPLETED = 'COMPLETED'
 }
 
-export const ExportProductStatusVietnamese : Record<ExportProductStatus, string> = {
+export const ExportProductStatusVietnamese: Record<ExportProductStatus, string> = {
     [ExportProductStatus.TEMPORARY]: 'Phiếu tạm',
-    [ExportProductStatus.COMPLETED]: 'Đã xuất'
+    [ExportProductStatus.COMPLETED]: 'Đã xuất',
 };
 
 export interface ExportProductOverview {
@@ -37,4 +37,28 @@ export interface ExportProductOverview {
     creator: {
         fullName: string;
     },
+}
+
+export interface ExportProductDetail {
+    id: string;
+    code: string;
+    createdAt: Date;
+    type: ExportProductType;
+    note: string;
+    status: ExportProductStatus;
+    creator: {
+        full_name: string;
+        email: string;
+    };
+    details: {
+        quantity: number;
+        price: number;
+        product: {
+            sku: string;
+            name: string;
+            weight: number;
+            packing: string;
+            unit: string;
+        }
+    }[];
 }

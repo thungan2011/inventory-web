@@ -76,10 +76,6 @@ const ExportProductPage = () => {
                 ),
             },
             {
-                accessorKey: 'id',
-                header: 'Người thực hiện',
-            },
-            {
                 accessorKey: 'createdAt',
                 header: 'Ngày lập phiếu',
                 cell: ({ row }) => {
@@ -91,10 +87,6 @@ const ExportProductPage = () => {
                 cell: ({ row }) => <ExportProductTypeBadge type={row.original.type} />,
                 header: 'Loại giao dịch',
             },
-            // {
-            //     accessorKey: 'note',
-            //     header: 'Ghi chú',
-            // },
             {
                 accessorKey: 'status',
                 header: () => <span>Trạng thái</span>,

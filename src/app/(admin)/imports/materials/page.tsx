@@ -58,7 +58,7 @@ const ImportMaterialPage = () => {
         () => [
             {
                 accessorKey: 'code',
-                header: 'Mã',
+                header: 'Mã phiếu',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{row.original.code}</div>
@@ -75,18 +75,8 @@ const ImportMaterialPage = () => {
                 ),
             },
             {
-                accessorKey: 'provider',
-                header: 'Nhà cung cấp',
-                cell: ({ row }) => (
-                    <div className="flex flex-col gap-2">
-                        <div>{row.original.provider.name}</div>
-                        <div className="text-xs text-gray-700">{row.original.provider.phone}</div>
-                    </div>
-                ),
-            },
-            {
                 accessorKey: 'createdAt',
-                header: () => <span>Ngày giao dịch</span>,
+                header: () => <span>Ngày lập phiếu</span>,
                 cell: ({ row }) => {
                     return formatDateToLocalDate(row.original.createdAt);
                 },
@@ -96,10 +86,6 @@ const ImportMaterialPage = () => {
                 cell: ({ row }) => <ImportMaterialTypeBadge type={row.original.type} />,
                 header: () => <span>Loại giao dịch</span>,
             },
-            // {
-            //     accessorKey: 'note',
-            //     header: 'Ghi chú',
-            // },
             {
                 accessorKey: 'status',
                 header: () => <span>Trạng thái</span>,
@@ -110,7 +96,7 @@ const ImportMaterialPage = () => {
                 header: () => '',
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
-                        <ButtonAction.View href={`/imports/materials/${row.original.id}`} />
+                        <ButtonAction.View href={`/imports/materials/${row.original.code}`} />
                         <ButtonAction.Update />
                     </div>
                 ),

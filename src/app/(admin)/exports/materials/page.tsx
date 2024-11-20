@@ -61,7 +61,7 @@ const ExportMaterialPage = () => {
         () => [
             {
                 accessorKey: 'code',
-                header: 'Mã',
+                header: 'Mã phiếu',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{row.original.code}</div>
@@ -78,12 +78,8 @@ const ExportMaterialPage = () => {
                 ),
             },
             {
-                accessorKey: 'id',
-                header: 'Người thực hiện',
-            },
-            {
                 accessorKey: 'createdAt',
-                header: 'Ngày giao dịch',
+                header: 'Ngày lập phiếu',
                 cell: ({ row }) => {
                     return formatDateToLocalDate(row.original.createdAt);
                 },

@@ -217,8 +217,8 @@ export const breadcrumbs: IBreadcrumb[] = [
         link: '^/imports/materials$',
         breadcrumbTrail: [
             { label: 'Nhập kho' },
+            { label: 'Danh sách nhập kho' },
             { label: 'Nguyên vật liệu' },
-            { label: 'Danh sách nhập kho nguyên vật liệu' },
         ],
     },
     {
@@ -244,8 +244,8 @@ export const breadcrumbs: IBreadcrumb[] = [
         link: '^/imports/products$',
         breadcrumbTrail: [
             { label: 'Nhập kho' },
+            { label: 'Danh sách nhập kho' },
             { label: 'Thành phẩm' },
-            { label: 'Danh sách nhập kho thành phẩm' },
         ],
     },
     {
@@ -271,8 +271,8 @@ export const breadcrumbs: IBreadcrumb[] = [
         link: '^/exports/materials$',
         breadcrumbTrail: [
             { label: 'Xuất kho' },
+            { label: 'Danh sách xuất kho' },
             { label: 'Nguyên vật liệu' },
-            { label: 'Danh sách xuất kho nguyên vật liệu' },
         ],
     },
     {
@@ -298,8 +298,8 @@ export const breadcrumbs: IBreadcrumb[] = [
         link: '^/exports/products$',
         breadcrumbTrail: [
             { label: 'Xuất kho' },
+            { label: 'Danh sách xuất kho' },
             { label: 'Thành phẩm' },
-            { label: 'Danh sách xuất kho thành phẩm' },
         ],
     },
     {

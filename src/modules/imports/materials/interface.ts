@@ -7,10 +7,10 @@ export enum ImportMaterialType {
     OTHER = 'OTHER'
 }
 
-export const ImportMaterialTypeVietnamese : Record<ImportMaterialType, string> = {
-    [ImportMaterialType.NORMAL]: "Từ nhà cung cấp",
-    [ImportMaterialType.RETURN]: "Nguyên vật liệu thừa",
-    [ImportMaterialType.OTHER]: "Khác"
+export const ImportMaterialTypeVietnamese: Record<ImportMaterialType, string> = {
+    [ImportMaterialType.NORMAL]: 'Từ nhà cung cấp',
+    [ImportMaterialType.RETURN]: 'Nguyên vật liệu thừa',
+    [ImportMaterialType.OTHER]: 'Khác',
 };
 
 /**
@@ -23,11 +23,11 @@ export enum ImportMaterialStatus {
     COMPLETED = 'COMPLETED'
 }
 
-export const ImportMaterialStatusVietnamese : Record<ImportMaterialStatus, string> = {
+export const ImportMaterialStatusVietnamese: Record<ImportMaterialStatus, string> = {
     [ImportMaterialStatus.PENDING_APPROVED]: 'Chờ duyệt',
     [ImportMaterialStatus.APPROVED]: 'Đã duyệt',
     [ImportMaterialStatus.REJECTED]: 'Bị từ chối',
-    [ImportMaterialStatus.COMPLETED]: 'Đã nhập'
+    [ImportMaterialStatus.COMPLETED]: 'Đã nhập',
 };
 
 export interface ImportMaterialOverview {
@@ -40,8 +40,43 @@ export interface ImportMaterialOverview {
     provider: {
         name: string;
         phone: string;
-    }
+    };
     creator: {
         fullName: string;
-    }
+    };
+}
+
+export interface ImportMaterialDetail{
+    id: string;
+    code: string;
+    createdAt: Date;
+    type: ImportMaterialType;
+    note: string;
+    status: ImportMaterialStatus;
+    provider: {
+        id: number;
+        code: string;
+        name: string;
+        address: string;
+        city: string;
+        ward: string;
+        district: string;
+        phone: string;
+        email: string;
+    };
+    creator: {
+        full_name: string;
+        email: string;
+    };
+    details: {
+        quantity: number;
+        price: number;
+        material: {
+            sku: string;
+            name: string;
+            weight: number;
+            packing: string;
+            unit:string;
+        }
+    }[]
 }
