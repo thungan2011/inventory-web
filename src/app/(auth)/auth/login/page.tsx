@@ -38,7 +38,9 @@ const Login = () => {
                     className="relative overflow-hidden px-24 py-16 text-center h-full rounded-br-[200px] rounded-tl-[200px]"
                 >
                     <div className="absolute inset-0 z-0">
-                        <Image src={'/img/bg.jpg'} alt={'B&Q Cinema'} fill className="object-cover" quality={100} />
+                        <div className="relative w-full h-full">
+                            <Image src={'/img/bg.jpg'} alt={'B&Q Cinema'} fill className="object-cover" sizes='100vw' />
+                        </div>
                     </div>
                     <div className="relative z-20">
                         <div className="flex items-center justify-center text-white">
