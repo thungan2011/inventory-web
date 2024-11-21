@@ -156,7 +156,7 @@ const FormContent = () => {
         setFieldValue('city', selectedProvinceName);
         setFieldValue('district', selectedDistrictName);
         setFieldValue('ward', selectedWardName);
-    }, [selectedProvinceName, selectedDistrictName, selectedWardName]);
+    }, [selectedProvinceName, selectedDistrictName, selectedWardName, setFieldValue]);
 
     // Customer
     const [customerFilters, setCustomerFilters] = useState<CustomerFilter>({
@@ -268,7 +268,7 @@ const FormContent = () => {
             setFieldValue('district', customer.district || '');
             setFieldValue('ward', customer.ward || '');
         }
-    }, [values.customerId]);
+    }, [values.customerId, setFieldValue, customers]);
 
     const renderDeliverySection = () => {
         const isSelfPickup = values.deliveryMethod === DELIVERY_METHODS.SELF_PICKUP;

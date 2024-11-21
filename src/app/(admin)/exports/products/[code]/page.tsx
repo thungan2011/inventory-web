@@ -42,7 +42,7 @@ const ExportProductDetail = () => {
                     <div className="flex flex-col gap-3">
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Người lập phiếu"
-                                  value={exportProduct.creator.full_name || 'Chưa cập nhật'} />
+                                  value={exportProduct.creator.fullName || 'Chưa cập nhật'} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Ngày lập phiếu" value={formatDateToLocalDate(exportProduct.createdAt)} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"

@@ -65,7 +65,7 @@ export interface ImportMaterialDetail{
         email: string;
     };
     creator: {
-        full_name: string;
+        fullName: string;
         email: string;
     };
     details: {

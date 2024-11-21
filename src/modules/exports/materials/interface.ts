@@ -49,7 +49,7 @@ export interface ExportMaterialDetail{
     note: string;
     status: ExportMaterialStatus;
     creator: {
-        full_name: string;
+        fullName: string;
         email: string;
     };
     details: {

@@ -10,3 +10,15 @@ export interface StorageAreaOverview {
     description: string;
     status: StorageAreaStatus;
 }
+
+export interface StorageAreaDetail extends StorageAreaOverview {
+    productStorageHistories: {
+        expiryDate: Date;
+        quantity: number;
+        quantityAvailable: number;
+        product: {
+            sku: string;
+            name: string;
+        }
+    } []
+}

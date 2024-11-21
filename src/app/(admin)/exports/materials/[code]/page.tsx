@@ -42,7 +42,7 @@ const ExportMaterialDetail = () => {
                     <div className="flex flex-col gap-3">
                         <ItemInfo
                             label="Người lập phiếu"
-                            value={exportMaterial.creator.full_name || 'Chưa cập nhật'} />
+                            value={exportMaterial.creator.fullName || 'Chưa cập nhật'} />
                         <ItemInfo
                             label="Ngày lập phiếu" value={formatDateToLocalDate(exportMaterial.createdAt)} />
                         <ItemInfo

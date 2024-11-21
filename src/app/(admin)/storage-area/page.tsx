@@ -115,6 +115,7 @@ const StorageAreaPage = () => {
                 header: () => '',
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
+                        <ButtonAction.View href={`/storage-area/${row.original.code}`} />
                         <ButtonAction.Update onClick={() => setStorageAreaToUpdate(row.original)} />
                         <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
                     </div>
