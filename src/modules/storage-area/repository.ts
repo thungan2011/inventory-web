@@ -1,8 +1,9 @@
 import { PageObject } from '@/core/pagination/interface';
 import httpRepository from '@/core/repository/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { StorageAreaOverview, StorageAreaStatus } from '@/modules/storage-area/interface';
+import { StorageAreaDetail, StorageAreaOverview, StorageAreaStatus } from '@/modules/storage-area/interface';
 import { toast } from 'react-toastify';
+import useDataFetching from '@/hook/useDataFetching';
 
 
 export const STORAGE_AREA_QUERY_KEY = 'storage-area-list';
@@ -88,7 +89,7 @@ export const useDeleteStorageArea = () => {
 };
 
 /**
- * update category
+ * update storage area
  */
 interface UpdateStorageAreaPayload {
     name: string;
@@ -97,7 +98,7 @@ interface UpdateStorageAreaPayload {
     description: string;
 }
 
-const updateStorageArea = ({id, payload} : {payload: UpdateStorageAreaPayload, id: number}): Promise<void> => {
+const updateStorageArea = ({ id, payload }: { payload: UpdateStorageAreaPayload, id: number }): Promise<void> => {
     return httpRepository.put<void>(`/v1/storage_areas/${id}`, payload);
 };
 
@@ -113,5 +114,20 @@ export const useUpdateStorageArea = () => {
             toast.error('Cập nhật khu vực lưu kho không thành công. Thử lại sau.');
         },
     });
+};
+
+/**
+ * get storage area by Code
+ */
+const getStorageAreaByCode = (code: string): Promise<StorageAreaDetail> => {
+    return httpRepository.get<StorageAreaDetail>(`/v1/storage_areas/content/${code}`);
+};
+
+export const useStorageAreaByCode = (code: string) => {
+    return useDataFetching(
+        [STORAGE_AREA_QUERY_KEY, code],
+        () => getStorageAreaByCode(code),
+        { enabled: !!code },
+    );
 };
 

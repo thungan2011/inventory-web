@@ -1,45 +1,74 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Formik } from 'formik';
-import Input from '@/components/Input';
 import Card from '@/components/Card';
-import { object, string } from 'yup';
+import { object } from 'yup';
 import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import Select from '@/components/Select';
-import DatePicker from '@/components/DatePicker';
 import TextArea from '@/components/TextArea';
-import { ImportMaterialStatus, ImportMaterialStatusVietnamese } from '@/modules/imports/materials/interface';
+import {
+    ImportMaterialStatus,
+    ImportMaterialStatusVietnamese,
+    ImportMaterialType,
+    ImportMaterialTypeVietnamese,
+} from '@/modules/imports/materials/interface';
 import UploadImage from '@/components/UploadImage';
+import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
+import { BaseStatus } from '@/modules/base/interface';
+import { useAllProviders } from '@/modules/providers/repository';
 
-const ProductSchema = object({
-    code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length !== 8) return this.createError({ message: 'Mã phải có đúng 8 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
-    receiverNam: string().required('Tên người nhận không được để trống'),
-});
+const ProductSchema = object({});
 
 interface FormValues {
     code?: string;
     status: ImportMaterialStatus;
-    receiverNam: string;
     note: string;
+    type: ImportMaterialType;
 }
 
 const initialFormValues: FormValues = {
     code: '',
-    receiverNam: '',
     status: ImportMaterialStatus.COMPLETED,
     note: '',
+    type: ImportMaterialType.NORMAL,
 };
 
+interface ProviderFilter extends PaginationState {
+    name: string;
+    code: string;
+    status: BaseStatus | 'ALL';
+    phone: string;
+}
+
 const NewProductPage = () => {
+
+    const [filters, setFilters] = useState<ProviderFilter>({
+        page: 1,
+        name: '',
+        code: '',
+        status: 'ALL',
+        phone: '',
+    });
+
+    const providerQuery = useAllProviders({
+        page: filters.page,
+        name: filters.name,
+        code: filters.code,
+        phone: filters.phone,
+        status: filters.status === 'ALL' ? undefined : filters.status,
+    });
+
+    const {
+        data: providers,
+    } = useFilterPagination({
+        queryResult: providerQuery,
+        initialFilters: filters,
+        onFilterChange: setFilters,
+    });
 
     useEffect(() => {
         document.title = 'Nut Garden - Phiếu nhập';
@@ -54,21 +83,23 @@ const NewProductPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
                 <Form>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã phiếu</Typography.Title>
-                            <Input name="code" placeholder="Nếu không nhập mã phiếu, hệ thống sẽ tự động tạo" />
-                        </Card>
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-3 mt-5">
-                        <Card className={`p-[18px] col-span-1`}>
+                    <div className="grid gap-x-3 mt-5">
+                        <Card className={`p-[18px]`}>
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>
                             <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
-                                <Input name="receiverNam" label="Tên người nhận" placeholder="Chọn tên người nhận"
-                                       required />
-                                <DatePicker name="receivedDate" label="Ngày nhận" required />
-                                <Select name="status" label="Trạng thái" tooltip="Trạng thái mặc định là Chờ duyệt"
-                                        readOnly
+                                <Select name="provider" label="Nhà cung cấp"
+                                        options={(providers || []).map(provider => ({ label: `${provider.code} - ${provider.name}`, value: provider.id }))}
+                                />
+                                <Select name="type" label="Loại giao dịch"
+                                        options={[
+                                            ...Object.keys(ImportMaterialType).map(type => (
+                                                {
+                                                    label: ImportMaterialTypeVietnamese[type as ImportMaterialType],
+                                                    value: type,
+                                                }
+                                            )),
+                                        ]} />
+                                <Select name="status" label="Trạng thái"
                                         options={[
                                             ...Object.keys(ImportMaterialStatus).map(status => (
                                                 {
@@ -80,27 +111,12 @@ const NewProductPage = () => {
                                 <TextArea name="note" label="Ghi chú" />
                             </div>
                         </Card>
-
-                        <Card className={`p-[18px] col-span-1`}>
-                            <Typography.Title level={4}>Thông tin nhà cung cấp</Typography.Title>
-                            <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 text-xs">
-                                <Input name="providerNam" label="Tên nhà cung cấp" placeholder="Chọn nhà cung cấp"
-                                       required />
-                                <Input name="contactName" label="Người liên hệ" placeholder="Người liên hệ" readOnly />
-                                <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại" readOnly />
-                                <Input name="email" label="Email" placeholder="Email" readOnly />
-                            </div>
-                        </Card>
                     </div>
 
                     <div className="mt-5">
                         <Card className={`p-[18px] col-span-3`}>
                             <Typography.Title level={4}>Thông tin chi tiết</Typography.Title>
-                            <p>
-                                Bảng danh sách chi tiết các nguyên vật liệu: id, sku, name, weight, packing, unit,
-                                price, note,
-                                ...
-                            </p>
+
                         </Card>
                     </div>
 

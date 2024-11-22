@@ -103,7 +103,7 @@ const ImportProductPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/imports/products/${row.original.code}`} />
-                        <ButtonAction.Update />
+                        {/*<ButtonAction.Update />*/}
                     </div>
                 ),
                 enableSorting: false,

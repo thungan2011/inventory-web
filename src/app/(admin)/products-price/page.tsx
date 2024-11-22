@@ -105,7 +105,7 @@ const ProductPricePage = () => {
                 header: 'Tên sản phẩm',
                 cell: ({ row }) => (
                     <div className="flex gap-2">
-                        <div className="relative w-14 h-14 rounded overflow-hidden">
+                        <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
                             <Image src={'/img/avatar/logo.png'}
                                    alt={`Ảnh của sản phẩm ${row.original.product.name}`} fill
                                    className="object-cover" />

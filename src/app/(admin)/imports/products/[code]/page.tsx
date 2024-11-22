@@ -14,7 +14,6 @@ import { formatDateToLocalDate } from '@/utils/formatDate';
 import { ImportProductStatusVietnamese, ImportProductTypesVietnamese } from '@/modules/imports/products/interface';
 import TableCore from '@/components/Tables/TableCore';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
-import { formatNumberToCurrency } from '@/utils/formatNumber';
 
 const ImportProductDetail = () => {
     const { code } = useParams<{ code: string }>();
@@ -70,9 +69,8 @@ const ImportProductDetail = () => {
                                 <TableCore.Head>Thành phẩm</TableCore.Head>
                                 <TableCore.Head>Kho</TableCore.Head>
                                 <TableCore.Head>Ngày hết hạn</TableCore.Head>
-                                <TableCore.Head>Đơn giá</TableCore.Head>
+                                {/*<TableCore.Head>Đơn giá</TableCore.Head>*/}
                                 <TableCore.Head>Số lượng</TableCore.Head>
-                                <TableCore.Head>Thành tiền</TableCore.Head>
                             </TableCore.RowHeader>
                         </TableCore.Header>
                         <TableCore.Body>
@@ -106,9 +104,7 @@ const ImportProductDetail = () => {
                                                 </div>
                                             </TableCore.Cell>
                                             <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price)}</TableCore.Cell>
                                             <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price * detail.quantity)}</TableCore.Cell>
                                         </TableCore.RowBody>
 
                                         <TableCore.RowBody>
@@ -121,9 +117,7 @@ const ImportProductDetail = () => {
                                                 </div>
                                             </TableCore.Cell>
                                             <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price)}</TableCore.Cell>
                                             <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price * detail.quantity)}</TableCore.Cell>
                                         </TableCore.RowBody>
 
                                         <TableCore.RowBody className="font-bold">
@@ -131,9 +125,7 @@ const ImportProductDetail = () => {
                                             <TableCore.Cell />
                                             <TableCore.Cell />
                                             <TableCore.Cell />
-                                            <TableCore.Cell />
                                             <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price * detail.quantity)}</TableCore.Cell>
                                         </TableCore.RowBody>
                                     </React.Fragment>
                                 ))

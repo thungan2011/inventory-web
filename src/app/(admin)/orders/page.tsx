@@ -15,6 +15,7 @@ import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
+import DatePicker from '@/components/DatePicker';
 
 interface OrderFilter extends PaginationState {
     search: string;
@@ -143,8 +144,8 @@ const OrderPage = () => {
                                     <Input name="country" placeholder="Số điện thoại" />
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
-                                    <Input name="search" placeholder="Ngày đặt" />
-                                    <Input name="country" placeholder="Ngày giao" />
+                                    <DatePicker name="orderDate" label="Ngày đặt"/>
+                                    <DatePicker name="orderDate" label="Ngày giao"/>
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

@@ -13,7 +13,6 @@ import { ExportMaterialStatusVietnamese, ExportMaterialTypeVietnamese } from '@/
 import TableCore from '@/components/Tables/TableCore';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
-import { formatNumberToCurrency } from '@/utils/formatNumber';
 
 const ExportMaterialDetail = () => {
     const { code } = useParams<{ code: string }>();
@@ -42,7 +41,7 @@ const ExportMaterialDetail = () => {
                     <div className="flex flex-col gap-3">
                         <ItemInfo
                             label="Người lập phiếu"
-                            value={exportMaterial.creator.full_name || 'Chưa cập nhật'} />
+                            value={exportMaterial.creator.fullName || 'Chưa cập nhật'} />
                         <ItemInfo
                             label="Ngày lập phiếu" value={formatDateToLocalDate(exportMaterial.createdAt)} />
                         <ItemInfo
@@ -67,9 +66,7 @@ const ExportMaterialDetail = () => {
                                 <TableCore.Head>Nguyên vật liệu</TableCore.Head>
                                 <TableCore.Head>Kho</TableCore.Head>
                                 <TableCore.Head>Ngày hết hạn</TableCore.Head>
-                                <TableCore.Head>Đơn giá</TableCore.Head>
                                 <TableCore.Head>Số lượng</TableCore.Head>
-                                <TableCore.Head>Thành tiền</TableCore.Head>
                             </TableCore.RowHeader>
                         </TableCore.Header>
                         <TableCore.Body>
@@ -103,9 +100,7 @@ const ExportMaterialDetail = () => {
                                                 </div>
                                             </TableCore.Cell>
                                             <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price)}</TableCore.Cell>
                                             <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price * detail.quantity)}</TableCore.Cell>
                                         </TableCore.RowBody>
 
                                         <TableCore.RowBody>
@@ -118,9 +113,7 @@ const ExportMaterialDetail = () => {
                                                 </div>
                                             </TableCore.Cell>
                                             <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price)}</TableCore.Cell>
                                             <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price * detail.quantity)}</TableCore.Cell>
                                         </TableCore.RowBody>
 
                                         <TableCore.RowBody className="font-bold">
@@ -128,9 +121,7 @@ const ExportMaterialDetail = () => {
                                             <TableCore.Cell />
                                             <TableCore.Cell />
                                             <TableCore.Cell />
-                                            <TableCore.Cell />
                                             <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                            <TableCore.Cell>{formatNumberToCurrency(detail.price * detail.quantity)}</TableCore.Cell>
                                         </TableCore.RowBody>
                                     </React.Fragment>
                                 ))

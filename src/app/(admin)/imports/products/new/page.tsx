@@ -1,35 +1,31 @@
 'use client';
 import React, { useEffect } from 'react';
 import { Form, Formik } from 'formik';
-import Input from '@/components/Input';
 import Card from '@/components/Card';
-import { object, string } from 'yup';
+import { object } from 'yup';
 import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import Select from '@/components/Select';
-import DatePicker from '@/components/DatePicker';
 import TextArea from '@/components/TextArea';
 import UploadImage from '@/components/UploadImage';
-import { ImportProductStatus, ImportProductStatusVietnamese } from '@/modules/imports/products/interface';
+import {
+    ImportProductStatus,
+    ImportProductStatusVietnamese,
+    ImportProductType,
+    ImportProductTypesVietnamese,
+} from '@/modules/imports/products/interface';
 
-const ProductSchema = object({
-    code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length !== 8) return this.createError({ message: 'Mã phải có đúng 8 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
-    receiverNam: string().required('Tên người nhận không được để trống'),
-});
+const ProductSchema = object({});
 
 interface FormValues {
     code?: string;
     status: ImportProductStatus;
     receiverNam: string;
     note: string;
+    type: ImportProductType;
 }
 
 const initialFormValues: FormValues = {
@@ -37,6 +33,7 @@ const initialFormValues: FormValues = {
     receiverNam: '',
     status: ImportProductStatus.COMPLETED,
     note: '',
+    type: ImportProductType.NORMAL,
 };
 
 const NewProductPage = () => {
@@ -54,20 +51,19 @@ const NewProductPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
                 <Form>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã phiếu</Typography.Title>
-                            <Input name="code" placeholder="Nếu không nhập mã phiếu, hệ thống sẽ tự động tạo" />
-                        </Card>
-                    </div>
-                    <Card className={`p-[18px] col-span-1 mt-5`}>
+                    <Card className={`p-[18px] mt-5`}>
                         <Typography.Title level={4}>Thông tin chung</Typography.Title>
                         <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
-                            <Input name="receiverNam" label="Tên người nhập" placeholder="Chọn tên người nhận"
-                                   required />
-                            <DatePicker name="receivedDate" label="Ngày nhập" required />
+                            <Select name="type" label="Loại giao dịch"
+                                    options={[
+                                        ...Object.keys(ImportProductType).map(type => (
+                                            {
+                                                label: ImportProductTypesVietnamese[type as ImportProductType],
+                                                value: type,
+                                            }
+                                        )),
+                                    ]} />
                             <Select name="status" label="Trạng thái"
-                                    readOnly
                                     options={[
                                         ...Object.keys(ImportProductStatus).map(status => (
                                             {
