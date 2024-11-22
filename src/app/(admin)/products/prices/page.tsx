@@ -6,9 +6,7 @@ import Table from '@/components/Tables';
 import ButtonAction from '@/components/ButtonAction';
 import { ProductPriceOverview, ProductPriceStatus } from '@/modules/product-price/interface';
 import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
-import ProductPriceStatusBadge, {
-    ProductPriceStatusVietnamese,
-} from '../../../components/Badge/ProductPriceStatusBadge';
+
 import Image from 'next/image';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
@@ -22,6 +20,7 @@ import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import ModalUpdateProductPrice from '@/components/Pages/ProductPrice/ModalUpdateProductPrice';
 import ModalAddProductPrice from '@/components/Pages/ProductPrice/ModalAddProductPrice';
+import ProductPriceStatusBadge, { ProductPriceStatusVietnamese } from '@/components/Badge/ProductPriceStatusBadge';
 
 interface ProductPriceFilter extends PaginationState {
     search: string;

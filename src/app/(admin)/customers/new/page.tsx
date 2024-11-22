@@ -17,15 +17,9 @@ import { useRouter } from 'next/navigation';
 import { useCreateCustomer } from '@/modules/customers/repository';
 import { CustomerStatus } from '@/modules/customers/interface';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
-import { useAddress } from '@/hook/useAddress';
+import AddressForm from '@/components/AddressForm';
 
 const CustomerSchema = object({
-    // code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-    //     if (!value) return true;
-    //     if (value.length < 4) return this.createError({ message: 'Mã tối thiểu 4 ký tự' });
-    //     if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-    //     return true;
-    // }),
     name: string().required('Tên không được để trống'),
     phone: string().required('Số điện thoại không được để trống'),
     address: string().required('Địa chỉ không được để trống'),
@@ -63,26 +57,12 @@ const initialFormValues: FormValues = {
     note: '',
 };
 
-const FormContent = ({isLoading} : {isLoading: boolean}) => {
+interface FormContentProps {
+    isLoading: boolean;
+}
+
+const FormContent = ({ isLoading }: FormContentProps) => {
     const { setFieldValue } = useFormikContext<FormValues>();
-
-    const {
-        provinceOptions,
-        districtOptions,
-        wardOptions,
-        selectedProvinceName,
-        selectedDistrictName,
-        selectedWardName,
-        handleProvinceChange,
-        handleDistrictChange,
-        handleWardChange,
-    } = useAddress();
-
-    useEffect(() => {
-        setFieldValue('city', selectedProvinceName);
-        setFieldValue('district', selectedDistrictName);
-        setFieldValue('ward', selectedWardName);
-    }, [selectedProvinceName, selectedDistrictName, selectedWardName, setFieldValue]);
 
     return (
         <Form>
@@ -116,26 +96,7 @@ const FormContent = ({isLoading} : {isLoading: boolean}) => {
                             </div>
                         </div>
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                        <div className="grid grid-cols-3 gap-x-3">
-                            <div className="col-span-1">
-                                <Select name="city" label="Tỉnh/thành phố"
-                                        options={provinceOptions}
-                                        onChange={handleProvinceChange}
-                                />
-                            </div>
-                            <div className="col-span-1">
-                                <Select name="district" label="Quận/huyện"
-                                        options={districtOptions}
-                                        onChange={handleDistrictChange}
-                                />
-                            </div>
-                            <div className="col-span-1">
-                                <Select name="ward" label="Xã/phường"
-                                        options={wardOptions}
-                                        onChange={handleWardChange}
-                                />
-                            </div>
-                        </div>
+                        <AddressForm city="" district="" ward="" setFieldValue={setFieldValue}/>
                         <Select name="status" label="Trạng thái" options={[
                             ...Object.keys(CustomerStatus).map(status => (
                                 { label: CustomerStatusVietnamese[status as CustomerStatus], value: status }

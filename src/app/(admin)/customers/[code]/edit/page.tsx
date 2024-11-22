@@ -1,6 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { Form, Formik } from 'formik';
+import React, { useEffect } from 'react';
+import { Form, Formik, useFormikContext } from 'formik';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
 import { object, string } from 'yup';
@@ -15,11 +15,11 @@ import DatePicker from '@/components/DatePicker';
 import { GenderStatus, GenderStatusVietnamese } from '@/components/Badge/GenderStatusBadge';
 import { useParams, useRouter } from 'next/navigation';
 import { useCustomerByCode, useUpdateCustomer } from '@/modules/customers/repository';
-import { CustomerStatus } from '@/modules/customers/interface';
+import { CustomerOverview, CustomerStatus } from '@/modules/customers/interface';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
-import { useAllDistricts, useAllProvinces, useAllWards } from '@/modules/provinces/repository';
+import AddressForm from '@/components/AddressForm';
 
 const CustomerSchema = object({
     name: string().required('Tên không được để trống'),
@@ -45,14 +45,85 @@ interface FormValues {
     note: string;
 }
 
+interface FormContentProps {
+    customer: CustomerOverview;
+    isLoading: boolean;
+}
+
+const FormContent = ({ isLoading, customer } : FormContentProps) => {
+    const { setFieldValue } = useFormikContext<FormValues>();
+
+    return (
+        <Form>
+            <div className="mt-5">
+                <Card className="p-[18px]">
+                    <div className="flex gap-1 text-xl font-nunito font-medium">
+                        <div>Mã khách hàng</div>
+                        <div className="text-brand-500">#{customer.code}</div>
+                    </div>
+                </Card>
+            </div>
+            <div className="mt-5">
+                <Card className={`p-[18px]`}>
+                    <Typography.Title level={4}>Thông tin chung</Typography.Title>
+                    <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
+                        <div className="grid grid-cols-2 gap-x-3">
+                            <div className="col-span-1">
+                                <Input name="name" label="Tên khách hàng" placeholder="Nhập tên khách hàng"
+                                       required />
+                            </div>
+                            <div className="col-span-1">
+                                <Input name="email" label="Email" placeholder="Email" />
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-x-3">
+                            <div className="col-span-1">
+                                <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại"
+                                       required />
+                            </div>
+                            <div className="col-span-1">
+                                <DatePicker name="birthday" label="Sinh nhật" maxDate={new Date()} />
+                            </div>
+                            <div className="col-span-1">
+                                <Select name="gender" label="Giới tính" options={[
+                                    ...Object.keys(GenderStatus).map(status => (
+                                        { label: GenderStatusVietnamese[status as GenderStatus], value: status }
+                                    )),
+                                ]} />
+                            </div>
+                        </div>
+                        <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
+                        <AddressForm city={customer.city || ''}
+                                     district={customer.district || ''}
+                                     ward={customer.ward || ''}
+                                     setFieldValue={setFieldValue}
+                        />
+                        <Select name="status" label="Trạng thái" options={[
+                            ...Object.keys(CustomerStatus).map(status => (
+                                { label: CustomerStatusVietnamese[status as CustomerStatus], value: status }
+                            )),
+                        ]} />
+                        <TextArea name="note" label="Ghi chú" />
+                    </div>
+                </Card>
+            </div>
+
+            <div className="mt-5 mb-10 flex justify-end items-center gap-4">
+                <Link href={'/customers'}>
+                    <ButtonIcon icon={<TiArrowBackOutline />} variant="secondary">
+                        Hủy bỏ
+                    </ButtonIcon>
+                </Link>
+                <ButtonIcon icon={<FaSave />} type="submit" disabled={isLoading}>
+                    {isLoading ? 'Đang xử lý...' : 'Lưu'}
+                </ButtonIcon>
+            </div>
+        </Form>
+    );
+};
+
 const NewCustomerPage = () => {
     const router = useRouter();
-
-    const [selectedProvince, setSelectedProvince] = useState<string | undefined>('');
-    const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>('');
-    const { data: provinces } = useAllProvinces();
-    const { data: districts } = useAllDistricts(selectedProvince);
-    const { data: wards } = useAllWards(selectedDistrict);
 
     const { code } = useParams<{ code: string }>();
     const { data: customer, isLoading } = useCustomerByCode(code);
@@ -104,105 +175,7 @@ const NewCustomerPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={CustomerSchema}>
-                <Form>
-                    <div className="mt-5">
-                        <Card className="p-[18px]">
-                            <div className="flex gap-1 text-xl font-nunito font-medium">
-                                <div>Mã khách hàng</div>
-                                <div className="text-brand-500">#{customer.code}</div>
-                            </div>
-                        </Card>
-                    </div>
-                    <div className="mt-5">
-                        <Card className={`p-[18px]`}>
-                            <Typography.Title level={4}>Thông tin chung</Typography.Title>
-                            <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
-                                <div className="grid grid-cols-2 gap-x-3">
-                                    <div className="col-span-1">
-                                        <Input name="name" label="Tên khách hàng" placeholder="Nhập tên khách hàng"
-                                               required />
-                                    </div>
-                                    <div className="col-span-1">
-                                        <Input name="email" label="Email" placeholder="Email" />
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-3 gap-x-3">
-                                    <div className="col-span-1">
-                                        <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại"
-                                               required />
-                                    </div>
-                                    <div className="col-span-1">
-                                        <DatePicker name="birthday" label="Sinh nhật" maxDate={new Date()} />
-                                    </div>
-                                    <div className="col-span-1">
-                                        <Select name="gender" label="Giới tính" options={[
-                                            ...Object.keys(GenderStatus).map(status => (
-                                                { label: GenderStatusVietnamese[status as GenderStatus], value: status }
-                                            )),
-                                        ]} />
-                                    </div>
-                                </div>
-                                <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                                <div className="grid grid-cols-3 gap-x-3">
-                                    <div className="col-span-1">
-                                        <Select name="city" label="Tỉnh/thành phố"
-                                                options={
-                                                    provinces ? provinces.map(province => ({
-                                                        label: province.province_name,
-                                                        value: province.province_name,
-                                                        id: province.province_id,
-                                                    })) : []
-                                                }
-                                                onChange={(option) => {
-                                                    setSelectedProvince(option.id);
-                                                    setSelectedDistrict(undefined);
-                                                }}
-                                        />
-                                    </div>
-                                    <div className="col-span-1">
-                                        <Select name="district" label="Quận/huyện"
-                                                options={
-                                                    districts ? districts.map(district => ({
-                                                        label: district.district_name,
-                                                        value: district.district_name,
-                                                        id: district.district_id,
-                                                    })) : []
-                                                }
-                                                onChange={(option) => setSelectedDistrict(option.id)}
-                                        />
-                                    </div>
-                                    <div className="col-span-1">
-                                        <Select name="ward" label="Xã/phường"
-                                                options={
-                                                    selectedDistrict && wards ? wards.map(ward => ({
-                                                        label: ward.ward_name,
-                                                        value: ward.ward_name,
-                                                    })) : []
-                                                }
-                                        />
-                                    </div>
-                                </div>
-                                <Select name="status" label="Trạng thái" options={[
-                                    ...Object.keys(CustomerStatus).map(status => (
-                                        { label: CustomerStatusVietnamese[status as CustomerStatus], value: status }
-                                    )),
-                                ]} />
-                                <TextArea name="note" label="Ghi chú" />
-                            </div>
-                        </Card>
-                    </div>
-
-                    <div className="mt-5 mb-10 flex justify-end items-center gap-4">
-                        <Link href={'/customers'}>
-                            <ButtonIcon icon={<TiArrowBackOutline />} variant="secondary">
-                                Hủy bỏ
-                            </ButtonIcon>
-                        </Link>
-                        <ButtonIcon icon={<FaSave />} type="submit" disabled={updateCustomer.isPending}>
-                            {updateCustomer.isPending ? 'Đang xử lý...' : 'Lưu'}
-                        </ButtonIcon>
-                    </div>
-                </Form>
+                <FormContent isLoading={updateCustomer.isPending} customer={customer}/>
             </Formik>
         </div>
     );
