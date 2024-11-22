@@ -7,7 +7,6 @@ import { MdOutlineCategory, MdOutlineInventory } from 'react-icons/md';
 import { FaCartFlatbedSuitcase } from 'react-icons/fa6';
 import { PiWarehouse } from 'react-icons/pi';
 import { AiOutlineContainer } from 'react-icons/ai';
-import { IoPricetagsOutline } from 'react-icons/io5';
 
 export type IAdminRoute = {
     name: string;
@@ -36,17 +35,16 @@ const adminRoutes: IAdminRoute[] = [
         name: 'Thành phẩm',
         path: '/products',
         icon: <TbShoppingBagSearch />,
+        children: [
+            { name: 'Tất cả thành phẩm', path: '/products' },
+            { name: 'Bảng giá', path: '/products/prices' },
+        ]
     },
     // {
     //     name: 'Combos',
     //     path: '/combos',
     //     icon: <FiShoppingBag />,
     // },
-    {
-        name: 'Bảng giá',
-        path: '/products-price',
-        icon: <IoPricetagsOutline />,
-    },
     {
         name: 'Nguyên vật liệu',
         path: '/materials',

@@ -100,7 +100,7 @@ const ExportMaterialPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/exports/materials/${row.original.code}`} />
-                        <ButtonAction.Update />
+                        {/*<ButtonAction.Update />*/}
                     </div>
                 ),
                 enableSorting: false,

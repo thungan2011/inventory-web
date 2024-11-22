@@ -55,6 +55,14 @@ export const breadcrumbs: IBreadcrumb[] = [
         ],
     },
     {
+        label: 'Bảng giá',
+        link: '^/products/prices$',
+        breadcrumbTrail: [
+            { label: 'Thành phẩm' },
+            { label: 'Bảng giá' },
+        ],
+    },
+    {
         label: 'Thêm thành phẩm',
         link: '^/products/new$',
         breadcrumbTrail: [
@@ -105,23 +113,6 @@ export const breadcrumbs: IBreadcrumb[] = [
         breadcrumbTrail: [
             { label: 'Combo - Hộp quà tết' },
             { label: 'Danh sách Combo', link: "/combos" },
-            { label: 'Chi tiết' },
-        ],
-    },
-    {
-        label: 'Quản lý bảng giá',
-        link: '^/products-price$',
-        breadcrumbTrail: [
-            { label: 'Bảng giá' },
-            { label: 'Danh sách bảng giá' },
-        ],
-    },
-    {
-        label: 'Chi tiết bảng giá',
-        link: '^/products-price/[^/]+$',
-        breadcrumbTrail: [
-            { label: 'Bảng giá' },
-            { label: 'Danh sách bảng giá', link: "/products-price" },
             { label: 'Chi tiết' },
         ],
     },

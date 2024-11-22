@@ -47,7 +47,7 @@ export interface ExportProductDetail {
     note: string;
     status: ExportProductStatus;
     creator: {
-        full_name: string;
+        fullName: string;
         email: string;
     };
     details: {

@@ -37,9 +37,6 @@ const Breadcrumb = () => {
                     ))
                 }
             </div>
-            <p className="shrink text-[33px] font-nunito font-bold text-navy-700 dark:text-white ">
-                {matchedBreadcrumb?.label}
-            </p>
         </div>
     );
 };

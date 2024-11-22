@@ -25,7 +25,7 @@ import { FaPlus } from 'react-icons/fa6';
 import { MdRemoveCircleOutline } from 'react-icons/md';
 import useClickOutside from '@/hook/useClickOutside';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
-import { useAddress } from '@/hook/useAddress';
+import AddressForm from '@/components/AddressForm';
 
 const DELIVERY_METHODS = {
     SELF_PICKUP: 'Tự đến lấy',
@@ -140,24 +140,6 @@ const FormContent = () => {
     const dropdownRef = useRef<HTMLDivElement>(null);
     useClickOutside(dropdownRef, () => setShowListProduct(false));
 
-    const {
-        provinceOptions,
-        districtOptions,
-        wardOptions,
-        selectedProvinceName,
-        selectedDistrictName,
-        selectedWardName,
-        handleProvinceChange,
-        handleDistrictChange,
-        handleWardChange,
-    } = useAddress();
-
-    useEffect(() => {
-        setFieldValue('city', selectedProvinceName);
-        setFieldValue('district', selectedDistrictName);
-        setFieldValue('ward', selectedWardName);
-    }, [selectedProvinceName, selectedDistrictName, selectedWardName]);
-
     // Customer
     const [customerFilters, setCustomerFilters] = useState<CustomerFilter>({
         page: 1,
@@ -268,7 +250,7 @@ const FormContent = () => {
             setFieldValue('district', customer.district || '');
             setFieldValue('ward', customer.ward || '');
         }
-    }, [values.customerId]);
+    }, [values.customerId, setFieldValue, customers]);
 
     const renderDeliverySection = () => {
         const isSelfPickup = values.deliveryMethod === DELIVERY_METHODS.SELF_PICKUP;
@@ -288,26 +270,7 @@ const FormContent = () => {
                     !isSelfPickup && (
                         <>
                             <Input name="receiverAddress" label="Địa chỉ" placeholder="Nhập địa chỉ" required />
-                            <div className="grid grid-cols-3 gap-x-3">
-                                <div className="col-span-1">
-                                    <Select name="city" label="Tỉnh/thành phố"
-                                            options={provinceOptions}
-                                            onChange={handleProvinceChange}
-                                    />
-                                </div>
-                                <div className="col-span-1">
-                                    <Select name="district" label="Quận/huyện"
-                                            options={districtOptions}
-                                            onChange={handleDistrictChange}
-                                    />
-                                </div>
-                                <div className="col-span-1">
-                                    <Select name="ward" label="Xã/phường"
-                                            options={wardOptions}
-                                            onChange={handleWardChange}
-                                    />
-                                </div>
-                            </div>
+                            <AddressForm city="" district="" ward="" setFieldValue={setFieldValue} />
                         </>
                     )
                 }
@@ -326,10 +289,10 @@ const FormContent = () => {
                                 <div className="flex-1">
                                     <Select name="customerId" label="Mã khách hàng"
                                             options={
-                                                customers ? customers.map(customer => ({
+                                                (customers || []).map(customer => ({
                                                     label: `${customer.code} - ${customer.name} - ${customer.phone}`,
                                                     value: customer.id,
-                                                })) : []
+                                                }))
                                             }
                                             placeholder="Chọn mã khách hàng"
                                     />
