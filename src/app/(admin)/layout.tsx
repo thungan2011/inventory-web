@@ -22,7 +22,7 @@ export default function AdminLayout({
         <div className="w-full h-full flex bg-background-100 dark:bg-background-900">
             <Sidebar />
             <div className="h-full w-full font-dm dark:bg-navy-900">
-                <main className="mx-2.5 flex-none transition-all dark:bg-navy-900 md:pr-2 xl:ml-[260px]">
+                <main className="mx-2.5 flex-none transition-all dark:bg-navy-900 md:pr-2 xl:ml-[240px] xl:mr-0">
                     <div>
                         <Navbar />
                         <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">

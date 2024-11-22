@@ -103,11 +103,6 @@ const ProviderPage = () => {
                     }
                 },
             },
-            // {
-            //     accessorKey: 'email',
-            //     header: 'Email',
-            //     cell: ({ row }) => row.original.email || 'Chưa cập nhật',
-            // },
             {
                 accessorKey: 'status',
                 cell: ({ row }) => <BaseStatusBadge status={row.original.status} />,

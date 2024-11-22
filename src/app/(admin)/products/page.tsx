@@ -85,7 +85,7 @@ const ProductPage = () => {
                 cell: ({ row }) => (
                     <div className="flex gap-2">
                         <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
-                            <Image src={row.original.image || LOGO_IMAGE_FOR_NOT_FOUND}
+                            <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
                                    alt={`Ảnh của sản phẩm ${row.original.name}`} fill
                                    className="object-cover" />
                         </div>

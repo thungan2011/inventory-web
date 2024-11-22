@@ -41,19 +41,19 @@ export const useAddress = () : UseAddressReturn => {
 
     const provinceOptions = provinces?.map(province => ({
         label: province.province_name,
-        value: province.province_id,
+        value: province.province_name,
         id: province.province_id,
     })) || [];
 
     const districtOptions = districts?.map(district => ({
         label: district.district_name,
-        value: district.district_id,
+        value: district.district_name,
         id: district.district_id
     })) || [];
 
     const wardOptions = wards?.map(ward => ({
         label: ward.ward_name,
-        value: ward.ward_id,
+        value: ward.ward_name,
         id: ward.ward_id
     })) || [];
 
