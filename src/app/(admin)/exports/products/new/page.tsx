@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
 import { Form, Formik } from 'formik';
-import Input from '@/components/Input';
 import Card from '@/components/Card';
 import { object, string } from 'yup';
 import Typography from '@/components/Typography';
@@ -12,6 +11,13 @@ import Link from '@/components/Link';
 import TextArea from '@/components/TextArea';
 import UploadImage from '@/components/UploadImage';
 import { ExportProductStatus } from '@/modules/exports/products/interface';
+import Select from '@/components/Select';
+import {
+    ExportMaterialStatus,
+    ExportMaterialStatusVietnamese,
+    ExportMaterialType,
+    ExportMaterialTypeVietnamese,
+} from '@/modules/exports/materials/interface';
 
 const ProductSchema = object({
     code: string().test('valid-code', 'Mã không hợp lệ', function(value) {
@@ -52,14 +58,38 @@ const NewProductPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
                 <Form>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã phiếu</Typography.Title>
-                            <Input name="code" placeholder="Nếu không nhập mã phiếu, hệ thống sẽ tự động tạo" />
+                    <div className="grid gap-x-3 mt-5">
+                        <Card className={`p-[18px]`}>
+                            <Typography.Title level={4}>Thông tin chung</Typography.Title>
+                            <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
+                                {/*<Select name="provider" label="Nhà cung cấp"*/}
+                                {/*        options={(providers || []).map(provider => ({*/}
+                                {/*            label: `${provider.code} - ${provider.name}`,*/}
+                                {/*            value: provider.id,*/}
+                                {/*        }))}*/}
+                                {/*/>*/}
+                                <Select name="type" label="Loại giao dịch"
+                                        options={[
+                                            ...Object.keys(ExportMaterialType).map(type => (
+                                                {
+                                                    label: ExportMaterialTypeVietnamese[type as ExportMaterialType],
+                                                    value: type,
+                                                }
+                                            )),
+                                        ]} />
+                                <Select name="status" label="Trạng thái"
+                                        options={[
+                                            ...Object.keys(ExportMaterialStatus).map(status => (
+                                                {
+                                                    label: ExportMaterialStatusVietnamese[status as ExportMaterialStatus],
+                                                    value: status,
+                                                }
+                                            )),
+                                        ]} />
+                                <TextArea name="note" label="Ghi chú" />
+                            </div>
                         </Card>
                     </div>
-
-
                     <div className="mt-5">
                         <Card className={`p-[18px] col-span-3`}>
                             <Typography.Title level={4}>Thông tin chi tiết</Typography.Title>
@@ -71,15 +101,6 @@ const NewProductPage = () => {
                             </p>
                         </Card>
                     </div>
-
-                    <div className="mt-5">
-                        <Card className={`p-[18px]`}>
-                            <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
-                                <TextArea name="note" label="Ghi chú" />
-                            </div>
-                        </Card>
-                    </div>
-
                     <div className="mt-5">
                         <Card className={`p-[18px]`}>
                             <Typography.Title level={4}>Hình ảnh</Typography.Title>

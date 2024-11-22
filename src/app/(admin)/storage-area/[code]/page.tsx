@@ -86,7 +86,7 @@ const StorageAreaDetail = () => {
                                                     <div className="flex-col flex justify-center">
                                                         <div className="font-medium">{detail.product.name}</div>
                                                         <div
-                                                            className="text-gray-800">{detail.product.name}{detail.product.name}</div>
+                                                            className="text-gray-800">{detail.product.weight}{detail.product.unit} - {detail.product.packing}</div>
                                                     </div>
                                                 </div>
                                             </TableCore.Cell>

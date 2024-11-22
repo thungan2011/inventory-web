@@ -19,6 +19,9 @@ export interface StorageAreaDetail extends StorageAreaOverview {
         product: {
             sku: string;
             name: string;
+            weight: number;
+            unit: string;
+            packing: string;
         }
     } []
 }
