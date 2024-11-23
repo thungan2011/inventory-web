@@ -74,5 +74,9 @@ export interface ImportProductDetail{
             unit:string;
             image: string;
         }
+        storageArea: {
+            name: string;
+            code: string;
+        }
     }[]
 }

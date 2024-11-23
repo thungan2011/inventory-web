@@ -12,12 +12,13 @@ import Link from '@/components/Link';
 import Select from '@/components/Select';
 import TextArea from '@/components/TextArea';
 import DatePicker from '@/components/DatePicker';
-import { GenderStatus, GenderStatusVietnamese } from '@/components/Badge/GenderStatusBadge';
 import { useRouter } from 'next/navigation';
 import { useCreateCustomer } from '@/modules/customers/repository';
 import { CustomerStatus } from '@/modules/customers/interface';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
 import AddressForm from '@/components/AddressForm';
+import { Gender, GenderVietnamese } from '@/modules/base/interface';
+import { useGroupCustomerList } from '@/modules/group-customers/repository';
 
 const CustomerSchema = object({
     name: string().required('Tên không được để trống'),
@@ -39,6 +40,7 @@ interface FormValues {
     district: string;
     city: string;
     email?: string;
+    gender: Gender;
     status: CustomerStatus;
     note: string;
 }
@@ -51,6 +53,7 @@ const initialFormValues: FormValues = {
     address: '',
     ward: '',
     district: '',
+    gender: Gender.MALE,
     city: '',
     email: '',
     status: CustomerStatus.INACTIVE,
@@ -63,6 +66,7 @@ interface FormContentProps {
 
 const FormContent = ({ isLoading }: FormContentProps) => {
     const { setFieldValue } = useFormikContext<FormValues>();
+    const { data: groupCustomer } = useGroupCustomerList();
 
     return (
         <Form>
@@ -70,6 +74,12 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                 <Card className={`p-[18px]`}>
                     <Typography.Title level={4}>Thông tin chung</Typography.Title>
                     <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
+                        <Select name="groupCustomer" label="Nhóm khách hàng" options={
+                            (groupCustomer || []).map(groupCustomer => ({
+                                label: groupCustomer.name,
+                                value: groupCustomer.id,
+                            }))
+                        } />
                         <div className="grid grid-cols-2 gap-x-3">
                             <div className="col-span-1">
                                 <Input name="name" label="Tên khách hàng" placeholder="Nhập tên khách hàng"
@@ -88,20 +98,22 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                 <DatePicker name="birthday" label="Sinh nhật" maxDate={new Date()} />
                             </div>
                             <div className="col-span-1">
-                                <Select name="gender" label="Giới tính" options={[
-                                    ...Object.keys(GenderStatus).map(status => (
-                                        { label: GenderStatusVietnamese[status as GenderStatus], value: status }
-                                    )),
-                                ]} />
+                                <Select name="gender" label="Giới tính" options={
+                                    Object.values(Gender).map(gender => ({
+                                        label: GenderVietnamese[gender],
+                                        value: gender,
+                                    }))
+                                } />
                             </div>
                         </div>
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                        <AddressForm city="" district="" ward="" setFieldValue={setFieldValue}/>
+                        <AddressForm city="" district="" ward="" setFieldValue={setFieldValue} />
                         <Select name="status" label="Trạng thái" options={[
                             ...Object.keys(CustomerStatus).map(status => (
                                 { label: CustomerStatusVietnamese[status as CustomerStatus], value: status }
                             )),
                         ]} />
+
                         <TextArea name="note" label="Ghi chú" />
                     </div>
                 </Card>
@@ -135,6 +147,7 @@ const NewCustomerPage = () => {
         try {
             await createCustomer.mutateAsync({
                 ...values,
+                gender: values.gender === Gender.MALE ? 1 : 0,
             });
             router.push('/customers');
         } catch (error) {

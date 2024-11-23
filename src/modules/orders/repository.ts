@@ -1,8 +1,9 @@
 import { PageObject } from '@/core/pagination/interface';
 import httpRepository from '@/core/repository/http';
-import { useQuery } from '@tanstack/react-query';
-import { OrderDetail, OrderOverview } from '@/modules/orders/interface';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { OrderDetail, OrderOverview, OrderStatus, PaymentMethod } from '@/modules/orders/interface';
 import useDataFetching from '@/hook/useDataFetching';
+import { toast } from 'react-toastify';
 
 export const ORDER_QUERY_KEY = 'orders';
 
@@ -41,4 +42,41 @@ export const useOrderByCode = (code: string) => {
         () => getOrderByCode(code),
         { enabled: !!code },
     );
+};
+
+/**
+ * Create order
+ */
+interface AddOrderPayload {
+    customerId: number;
+    status: OrderStatus;
+    phone: string;
+    address: string;
+    city: string;
+    district: string;
+    ward: string;
+    deliveryDate: Date;
+    paymentMethod: PaymentMethod;
+    product: {
+        productId: number;
+        quantity: number;
+    }[]
+}
+
+const createOrder = (payload: AddOrderPayload): Promise<void> => {
+    return httpRepository.post<void>('/v1/orders', payload);
+};
+
+export const useCreateOrder = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: createOrder,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY] });
+            toast.success('Thêm đơn hàng thành công');
+        },
+        onError: () => {
+            toast.error('Thêm đơn hàng không thành công. Thử lại sau.');
+        },
+    });
 };

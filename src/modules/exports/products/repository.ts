@@ -1,8 +1,9 @@
 import httpRepository from '@/core/repository/http';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import { ExportProductDetail, ExportProductOverview } from '@/modules/exports/products/interface';
+import { ExportProductDetail, ExportProductOverview, ExportProductType } from '@/modules/exports/products/interface';
 import useDataFetching from '@/hook/useDataFetching';
+import { toast } from 'react-toastify';
 
 export const EXPORT_PRODUCT_QUERY_KEY = 'export_products';
 
@@ -41,4 +42,32 @@ export const useImportProductByCode = (code: string) => {
         () => getExportProductByCode(code),
         { enabled: !!code },
     );
+};
+
+/**
+ * Create export product
+ */
+interface AddExportProductPayload {
+    sku?: string;
+    name: string;
+    type: ExportProductType;
+    note: string;
+}
+
+const createExportProduct = (payload: AddExportProductPayload): Promise<void> => {
+    return httpRepository.post<void>('/v1/export/products', payload);
+};
+
+export const useCreateExportProduct = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: createExportProduct,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [EXPORT_PRODUCT_QUERY_KEY] });
+            toast.success('Xuất kho thành phẩm thành công');
+        },
+        onError: () => {
+            toast.error('Xuất kho thành phẩm không thành công. Thử lại sau.');
+        },
+    });
 };

@@ -15,6 +15,7 @@ import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
+import GroupCustomerBadge from '@/components/Badge/GroupCustomerBadge';
 
 interface CustomerFilter extends PaginationState {
     name: string;
@@ -103,15 +104,10 @@ const CustomerPage = () => {
                     }
                 },
             },
-            // {
-            //     accessorKey: 'birthday',
-            //     header: 'Sinh nhật',
-            //     cell: ({ row }) => row.original?.birthday ? formatDateToLocalDate(row.original.birthday) : 'Chưa cập nhật',
-            // },
             {
-                accessorKey: 'email',
-                header: 'Email',
-                cell: ({ row }) => row.original.email || 'Chưa cập nhật',
+                accessorKey: 'group_customer',
+                cell: ({ row }) => <GroupCustomerBadge data={row.original.groupCustomer.name} />,
+                header: 'Nhóm khách hàng',
             },
             {
                 accessorKey: 'status',

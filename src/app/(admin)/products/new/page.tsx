@@ -98,12 +98,6 @@ const NewProductPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
                 <Form>
-                    {/*<div className="mt-5">*/}
-                    {/*    <Card className={`p-[18px] col-span-3`}>*/}
-                    {/*        <Typography.Title level={4}>Mã sản phẩm</Typography.Title>*/}
-                    {/*        <Input name="sku" placeholder="Nếu không nhập mã sản phẩm, hệ thống sẽ tự động tạo" />*/}
-                    {/*    </Card>*/}
-                    {/*</div>*/}
                     <div className="grid grid-cols-2 gap-x-3 mt-5">
                         <Card className={`p-[18px] col-span-1`}>
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>

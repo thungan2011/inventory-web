@@ -9,8 +9,8 @@ import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
 import { useCustomerByCode } from '@/modules/customers/repository';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
-import { GenderStatusVietnamese } from '@/components/Badge/GenderStatusBadge';
 import { formatDateToLocalDate } from '@/utils/formatDate';
+import { formatGender } from '@/utils/formatString';
 
 const CustomerDetail = () => {
 
@@ -45,7 +45,7 @@ const CustomerDetail = () => {
                                   label="Sinh nhật"
                                   value={customer.birthday ? formatDateToLocalDate(customer.birthday) : 'Chưa cập nhật'} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                  label="Giới tính" value={GenderStatusVietnamese[customer.gender]} />
+                                  label="Giới tính" value={formatGender(customer.gender)} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Số điện thoại"
                                   value={customer.phone} />

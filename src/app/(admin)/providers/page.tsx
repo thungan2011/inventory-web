@@ -114,7 +114,7 @@ const ProviderPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/providers/${row.original.code}`} />
-                        <ButtonAction.Update />
+                        <ButtonAction.Update href={`/providers/${row.original.code}/edit`} />
                         <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
                     </div>
                 ),

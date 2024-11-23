@@ -5,6 +5,8 @@ export enum WarehouseAreaProductStatus {
 
 export interface WarehouseAreaProductOverview {
     quantity: number;
+    expiryDate: Date;
+    status: WarehouseAreaProductStatus;
     storageArea: {
         code: string;
         name: string;
@@ -14,5 +16,7 @@ export interface WarehouseAreaProductOverview {
         sku: string;
         name: string;
         packing: string;
+        unit: string;
+        weight: number;
     }
 }

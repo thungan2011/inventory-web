@@ -67,12 +67,6 @@ const ProviderDetail = () => {
                     </div>
                 </Card>
             </div>
-            <Card className="col-span-2 p-[18px]">
-                <Typography.Title level={3}>Danh sách các mặt hàng cung cấp</Typography.Title>
-                <p className="text-justify">
-                    Hiển thị dạng bảng?
-                </p>
-            </Card>
         </div>
     );
 };

@@ -15,7 +15,7 @@ interface FetchAllWarehouseAreaMaterialParams {
 }
 
 const getAllWarehouseAreaMaterials = (params: FetchAllWarehouseAreaMaterialParams) : Promise<PageObject<WarehouseAreaMaterialOverview>> => {
-    return httpRepository.get<PageObject<WarehouseAreaMaterialOverview>>('/v1/material_storage_locations', {
+    return httpRepository.get<PageObject<WarehouseAreaMaterialOverview>>('/v1/material_storage_history', {
         page: params.page || 1,
     });
 };

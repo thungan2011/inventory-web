@@ -111,3 +111,41 @@ export const useProviderByCode = (code: string) => {
         {enabled: !!code}
     );
 };
+
+/**
+ * update provider
+ */
+interface UpdateProviderPayload {
+    code?: string;
+    name: string;
+    phone: string;
+    address?: string;
+    ward?: string;
+    district?: string;
+    city?: string;
+    email?: string;
+    website?: string;
+    status: BaseStatus;
+    representative_name: string;
+    representative_phone: string;
+    representative_email?: string;
+    note: string;
+}
+
+const updateProvider = ({id, payload} : {payload: UpdateProviderPayload, id: number}): Promise<void> => {
+    return httpRepository.put<void>(`/v1/providers/${id}`, payload);
+};
+
+export const useUpdateProvider = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateProvider,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [PROVIDER_QUERY_KEY] });
+            toast.success('Cập nhật nhà cung cấp thành công');
+        },
+        onError: () => {
+            toast.error('Cập nhật nhà cung cấp không thành công. Thử lại sau.');
+        },
+    });
+};

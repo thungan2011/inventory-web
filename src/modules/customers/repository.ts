@@ -51,6 +51,7 @@ interface AddCustomerPayload {
     email?: string;
     status: CustomerStatus;
     note: string;
+    gender: number;
 }
 
 const createCustomer = (payload: AddCustomerPayload): Promise<void> => {

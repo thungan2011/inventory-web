@@ -3,7 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
 import Card from '@/components/Card';
 import Table from '@/components/Tables';
-import { WarehouseAreaMaterialOverview } from '@/modules/warehouse-area/materials/interface';
+import {
+    WarehouseAreaMaterialOverview,
+    WarehouseAreaMaterialStatus,
+} from '@/modules/warehouse-area/materials/interface';
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
 import { useAllWarehouseAreaMaterials } from '@/modules/warehouse-area/materials/repository';
@@ -11,6 +14,12 @@ import { Form, Formik } from 'formik';
 import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
+import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
+import DatePicker from '@/components/DatePicker';
+import WarehouseAreaMaterialBadge, {
+    WarehouseAreaMaterialStatusVietnamese,
+} from '@/components/Badge/WarehouseAreaMaterialBadge';
+import Select from '@/components/Filters/Select';
 
 interface WarehouseAreaMaterialFilter extends PaginationState {
     search: string;
@@ -52,17 +61,29 @@ const WarehouseAreaMaterialPage = () => {
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{row.original.storageArea.name}</div>
-                        <div className="text-xs text-gray-700">{`ID: `}{row.original.storageArea.code}</div>
+                        <div className="text-xs text-gray-700">{`Mã: `}{row.original.storageArea.code}</div>
                     </div>
                 ),
             },
             {
-                accessorKey: 'nameMaterial',
+                accessorKey: 'material',
                 header: 'Nguyên vật liệu',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{row.original.material.name}</div>
-                        <div className="text-xs text-gray-700">{`SKU: `}{row.original.material.sku}</div>
+                        <div className="text-nowrap text-ellipsis overflow-hidden max-w-80"
+                             title={row.original.material.name}>{`#${row.original.material.sku} - ${row.original.material.name}`}</div>
+                        <div
+                            className="text-xs text-gray-700">{`${row.original.material.weight}${row.original.material.unit}/${row.original.material.packing}`} </div>
+                    </div>
+                ),
+            },
+            {
+                accessorKey: 'expiryDate',
+                header: 'Ngày hết hạn',
+                cell: ({ row }) => (
+                    <div className="flex flex-col gap-2">
+                        <div>{formatDateInOrder(row.original.expiryDate)}</div>
+                        <div className="text-xs text-gray-700">{timeFromNow(row.original.expiryDate)}</div>
                     </div>
                 ),
             },
@@ -70,6 +91,11 @@ const WarehouseAreaMaterialPage = () => {
                 accessorKey: 'quantity',
                 cell: ({ row }) => <div>{`${row.original.quantity} ${row.original.material.packing}`}</div>,
                 header: 'Số lượng',
+            },
+            {
+                accessorKey: 'status',
+                cell: ({ row }) => <WarehouseAreaMaterialBadge status={row.original.status} />,
+                header: () => <span>Trạng thái</span>,
             },
             {
                 accessorKey: 'actions',
@@ -81,7 +107,7 @@ const WarehouseAreaMaterialPage = () => {
                 ),
                 enableSorting: false,
             },
-        ], []
+        ], [],
     );
 
     const handleExportExcel = () => {
@@ -106,10 +132,19 @@ const WarehouseAreaMaterialPage = () => {
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-4 gap-4">
-                                    <Input name="search" placeholder="Tên khu vực lưu trữ" />
-                                    <Input name="search" placeholder="Tên sản phẩm" />
-                                    <Input name="search" placeholder="Số lượng từ" />
-                                    <Input name="search" placeholder="Số lượng" />
+                                    <Input name="search" placeholder="Mã hoặc tên khu vực lưu trữ" />
+                                    <Input name="search" placeholder="SKU hoặc tên nguyên vật liệu" />
+                                    <DatePicker name="expiryDate" />
+                                    <Select name="status"
+                                            placeholder="Lọc theo trạng thái"
+                                            options={[
+                                                { label: 'Tất cả trạng thái', value: 'ALL' },
+                                                ...Object.values(WarehouseAreaMaterialStatus).map(value => ({
+                                                    label: WarehouseAreaMaterialStatusVietnamese[value],
+                                                    value,
+                                                })),
+                                            ]}
+                                    />
                                 </div>
                             </div>
                             <AutoSubmitForm />
