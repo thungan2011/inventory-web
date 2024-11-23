@@ -12,14 +12,16 @@ import Link from '@/components/Link';
 import Select from '@/components/Select';
 import TextArea from '@/components/TextArea';
 import DatePicker from '@/components/DatePicker';
-import { GenderStatus, GenderStatusVietnamese } from '@/components/Badge/GenderStatusBadge';
 import { useParams, useRouter } from 'next/navigation';
 import { useCustomerByCode, useUpdateCustomer } from '@/modules/customers/repository';
 import { CustomerOverview, CustomerStatus } from '@/modules/customers/interface';
-import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
 import AddressForm from '@/components/AddressForm';
+import dayjs from 'dayjs';
+import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
+import { Gender, GenderVietnamese } from '@/modules/base/interface';
+import { useGroupCustomerList } from '@/modules/group-customers/repository';
 
 const CustomerSchema = object({
     name: string().required('Tên không được để trống'),
@@ -35,6 +37,7 @@ interface FormValues {
     code?: string;
     name: string;
     phone: string;
+    gender: Gender;
     birthday?: Date;
     address?: string;
     ward?: string;
@@ -50,8 +53,9 @@ interface FormContentProps {
     isLoading: boolean;
 }
 
-const FormContent = ({ isLoading, customer } : FormContentProps) => {
+const FormContent = ({ isLoading, customer }: FormContentProps) => {
     const { setFieldValue } = useFormikContext<FormValues>();
+    const { data: groupCustomer } = useGroupCustomerList();
 
     return (
         <Form>
@@ -67,6 +71,12 @@ const FormContent = ({ isLoading, customer } : FormContentProps) => {
                 <Card className={`p-[18px]`}>
                     <Typography.Title level={4}>Thông tin chung</Typography.Title>
                     <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
+                        <Select name="groupCustomer" label="Nhóm khách hàng"  options={
+                            (groupCustomer || []).map(groupCustomer => ({
+                                label: groupCustomer.name,
+                                value: groupCustomer.id,
+                            }))
+                        } />
                         <div className="grid grid-cols-2 gap-x-3">
                             <div className="col-span-1">
                                 <Input name="name" label="Tên khách hàng" placeholder="Nhập tên khách hàng"
@@ -85,11 +95,12 @@ const FormContent = ({ isLoading, customer } : FormContentProps) => {
                                 <DatePicker name="birthday" label="Sinh nhật" maxDate={new Date()} />
                             </div>
                             <div className="col-span-1">
-                                <Select name="gender" label="Giới tính" options={[
-                                    ...Object.keys(GenderStatus).map(status => (
-                                        { label: GenderStatusVietnamese[status as GenderStatus], value: status }
-                                    )),
-                                ]} />
+                                <Select name="gender" label="Giới tính" options={
+                                    Object.values(Gender).map(gender => ({
+                                        label: GenderVietnamese[gender],
+                                        value: gender,
+                                    }))
+                                } />
                             </div>
                         </div>
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
@@ -130,7 +141,7 @@ const NewCustomerPage = () => {
     const updateCustomer = useUpdateCustomer();
 
     useEffect(() => {
-        document.title = 'Nut Garden - Thêm khách hàng';
+        document.title = 'Nut Garden - Cập nhật khách hàng';
     }, []);
 
     if (isLoading) {
@@ -145,7 +156,7 @@ const NewCustomerPage = () => {
         code: customer.code,
         name: customer.name,
         phone: customer.phone,
-        birthday: customer.birthday,
+        birthday: dayjs(customer.birthday).toDate() || undefined,
         address: customer.address,
         ward: customer.ward,
         district: customer.district,
@@ -153,6 +164,7 @@ const NewCustomerPage = () => {
         email: customer.email,
         status: customer.status,
         note: customer.note || '',
+        gender: customer.gender == 0 ? Gender.FEMALE : Gender.MALE,
     };
 
     const handleSubmit = async (values: FormValues) => {
@@ -175,7 +187,7 @@ const NewCustomerPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={CustomerSchema}>
-                <FormContent isLoading={updateCustomer.isPending} customer={customer}/>
+                <FormContent isLoading={updateCustomer.isPending} customer={customer} />
             </Formik>
         </div>
     );

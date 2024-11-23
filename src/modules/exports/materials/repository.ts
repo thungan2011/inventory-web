@@ -1,8 +1,13 @@
 import httpRepository from '@/core/repository/http';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import { ExportMaterialDetail, ExportMaterialOverview } from '@/modules/exports/materials/interface';
+import {
+    ExportMaterialDetail,
+    ExportMaterialOverview,
+    ExportMaterialType,
+} from '@/modules/exports/materials/interface';
 import useDataFetching from '@/hook/useDataFetching';
+import { toast } from 'react-toastify';
 
 export const EXPORT_MATERIAL_QUERY_KEY = 'export_materials';
 
@@ -39,6 +44,34 @@ export const useExportMaterialByCode = (code: string) => {
     return useDataFetching(
         [EXPORT_MATERIAL_QUERY_KEY, code],
         () => getExportMaterialByCode(code),
-        {enabled: !!code}
+        { enabled: !!code },
     );
+};
+
+/**
+ * Create export material
+ */
+interface AddExportMaterialPayload {
+    sku?: string;
+    name: string;
+    type: ExportMaterialType;
+    note: string;
+}
+
+const createExportMaterial = (payload: AddExportMaterialPayload): Promise<void> => {
+    return httpRepository.post<void>('/v1/export/materials', payload);
+};
+
+export const useCreatExportMaterial = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: createExportMaterial,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [EXPORT_MATERIAL_QUERY_KEY] });
+            toast.success('Xuất kho nguyên vật liệu thành công');
+        },
+        onError: () => {
+            toast.error('Xuất kho nguyên vật liệu không thành công. Thử lại sau.');
+        },
+    });
 };

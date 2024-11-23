@@ -9,7 +9,7 @@ import { InputMask } from '@react-input/mask';
 
 type DatePickerProps = {
     name: string;
-    label: string;
+    label?: string;
     required?: boolean;
     tooltip?: string;
     format?: 'YYYY-MM-DD';
@@ -195,13 +195,17 @@ const DatePicker = ({
 
     return (
         <div className="mb-3">
-            <div className="mb-1 inline-flex gap-x-1 h-6">
-                <label className="font-normal text-sm cursor-pointer after:content-[':']"
-                       htmlFor={id} title={label}>{label}</label>
-                {required && <span className="text-red-500">*</span>}
+            {
+                label && (
+                    <div className="mb-1 inline-flex gap-x-1 h-6">
+                        <label className="font-normal text-sm cursor-pointer after:content-[':']"
+                               htmlFor={id} title={label}>{label}</label>
+                        {required && <span className="text-red-500">*</span>}
 
-                {tooltip && <Tooltip text={tooltip} />}
-            </div>
+                        {tooltip && <Tooltip text={tooltip} />}
+                    </div>
+                )
+            }
             <div
                 className={`relative border rounded-md h-10 px-3 dark:text-white dark:bg-navy-900 text-[16px] focus-within:border-brand-500 flex items-center`}>
                 <InputMask mask="DD/MM/YYYY"

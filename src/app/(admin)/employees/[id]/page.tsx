@@ -10,9 +10,9 @@ import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
 import { useEmployeeByID } from '@/modules/employees/repository';
 import { formatDateToLocalDate } from '@/utils/formatDate';
-import { GenderStatusVietnamese } from '@/components/Badge/GenderStatusBadge';
 import { EmployeeStatusVietnamese } from '@/components/Badge/EmployeeStatusBadge';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
+import { formatGender } from '@/utils/formatString';
 
 const EmployeeDetail = () => {
 
@@ -52,7 +52,7 @@ const EmployeeDetail = () => {
                                   label="Sinh nhật"
                                   value={employee.birthday ? formatDateToLocalDate(employee.birthday) : 'Chưa cập nhật'} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                  label="Giới tính" value={GenderStatusVietnamese[employee.gender]} />
+                                  label="Giới tính" value={formatGender(employee.gender)} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Số điện thoại"
                                   value={employee.phone} />
