@@ -19,6 +19,7 @@ import DatePicker from '@/components/DatePicker';
 
 interface OrderFilter extends PaginationState {
     search: string;
+    status: 'ALL' | OrderStatus;
 }
 
 const OrderPage = () => {
@@ -30,10 +31,12 @@ const OrderPage = () => {
     const [filters, setFilters] = useState<OrderFilter>({
         page: 1,
         search: '',
+        status: 'ALL',
     });
 
     const orderQuery = useAllOrders({
         page: filters.page,
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {

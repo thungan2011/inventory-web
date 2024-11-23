@@ -66,7 +66,7 @@ interface FormContentProps {
 
 const FormContent = ({ isLoading }: FormContentProps) => {
     const { setFieldValue } = useFormikContext<FormValues>();
-    const { data: groupCustomer } = useGroupCustomerList();
+    const { data: groupCustomers } = useGroupCustomerList();
 
     return (
         <Form>
@@ -75,7 +75,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                     <Typography.Title level={4}>Thông tin chung</Typography.Title>
                     <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
                         <Select name="groupCustomer" label="Nhóm khách hàng" options={
-                            (groupCustomer || []).map(groupCustomer => ({
+                            (groupCustomers || []).map(groupCustomer => ({
                                 label: groupCustomer.name,
                                 value: groupCustomer.id,
                             }))
