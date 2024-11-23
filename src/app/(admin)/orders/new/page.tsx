@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 import { number, object, string } from 'yup';
 import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
-import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import { OrderStatus, PaymentMethod, PaymentMethodVietnamese } from '@/modules/orders/interface';
@@ -26,6 +25,11 @@ import { MdRemoveCircleOutline } from 'react-icons/md';
 import useClickOutside from '@/hook/useClickOutside';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import AddressForm from '@/components/AddressForm';
+import { useCreateOrder } from '@/modules/orders/repository';
+import ButtonAction from '@/components/ButtonAction';
+import dayjs from 'dayjs';
+import DatePicker from '@/components/DatePicker';
+import { router } from 'next/client';
 
 const DELIVERY_METHODS = {
     SELF_PICKUP: 'Tự đến lấy',
@@ -78,7 +82,7 @@ const ProductSchema = object({
 });
 
 interface FormValues {
-    customerId?: number;
+    customerId: number;
     receiverName: string;
     receiverPhone: string;
     receiverAddress: string;
@@ -89,6 +93,7 @@ interface FormValues {
     totalPayment: number;
     totalPrice: number;
     deliveryMethod: string;
+    deliveryDate: Date;
     vat: number;
     status: OrderStatus;
     note: string;
@@ -105,6 +110,7 @@ interface FormValues {
 }
 
 const initialFormValues: FormValues = {
+    customerId: 0,
     receiverName: '',
     receiverPhone: '',
     receiverAddress: '',
@@ -115,6 +121,7 @@ const initialFormValues: FormValues = {
     totalPayment: 0,
     totalPrice: 0,
     deliveryMethod: DELIVERY_METHOD_OPTIONS[0].value.toString(),
+    deliveryDate: new Date(),
     vat: 10,
     status: OrderStatus.PROCESSED,
     note: '',
@@ -133,7 +140,11 @@ interface ProductFilter extends PaginationState {
     packing: string;
 }
 
-const FormContent = () => {
+interface FormContentProps {
+    isLoading: boolean;
+}
+
+const FormContent = ({ isLoading } : FormContentProps) => {
     const { values, setFieldValue, errors, touched } = useFormikContext<FormValues>();
     const [search, setSearch] = useState<string>('');
     const [showListProduct, setShowListProduct] = useState<boolean>(false);
@@ -262,6 +273,7 @@ const FormContent = () => {
                         label="Hình thức nhận hàng"
                         placeholder="Chọn hình thức nhận hàng"
                 />
+                <DatePicker name="deliveryDate" label="Ngày giao hàng dự kiến" />
                 <Input name="receiverName" label="Tên người nhận" placeholder="Nhập tên người nhận"
                        required />
                 <Input name="receiverPhone" label="Số điện thoại" placeholder="Nhập số điện thoại"
@@ -454,7 +466,7 @@ const FormContent = () => {
                         <InputCurrency name="totalPrice" label="Tổng tiền sản phẩm" unit="VND" readOnly />
                         <InputCurrency name="totalShipping" label="Phí vận chuyển" unit="VND"
                                        tooltip="Nếu bạn không nhập phí vận chuyển, hệ thống sẽ mặc định là 0 VND." />
-                        <Input name="vat" label="Thuế GTGT" placeholder="Nhập thuế GTGT"
+                        <Input name="vat" label="Chiết khấu" placeholder="Nhập thuế GTGT"
                                tooltip="Nếu không nhập thuế GTGT sẽ tự động tính toán với tỷ lệ 10% trên tổng hóa đơn." />
                         <InputCurrency name="totalPayment" label="Thanh toán" placeholder="Thanh toán" readOnly
                                        unit="VND" />
@@ -468,16 +480,14 @@ const FormContent = () => {
                         Hủy bỏ
                     </ButtonIcon>
                 </Link>
-                <ButtonIcon icon={<FaSave />} type="submit">
-                    Lưu
-                </ButtonIcon>
+                <ButtonAction.Submit isLoading={isLoading} />
             </div>
         </Form>
     );
 };
 
 const NewOrderPage = () => {
-    // const createOrder = useCreateOrder();
+    const createOrder = useCreateOrder();
 
     useEffect(() => {
         document.title = 'Nut Garden - Tạo đơn hàng';
@@ -486,13 +496,30 @@ const NewOrderPage = () => {
     const handleSubmit = async (values: FormValues) => {
         console.log(values);
         console.table(values);
+        try {
+            await createOrder.mutateAsync({
+                address: values.receiverAddress,
+                delivery_date: dayjs(values.deliveryDate).format('YYYY-MM-DD'),
+                payment_method: PaymentMethod.CASH,
+                phone: values.receiverPhone,
+                products: values.products.map(product => ({ product_id: product.id, quantity: product.quantity })),
+                customer_id: values.customerId || 1,
+                city: values.city,
+                district: values.district,
+                ward: values.ward,
+                status: OrderStatus.PENDING,
+            });
+            router.push('/orders');
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
-                <FormContent />
+                <FormContent isLoading={createOrder.isPending} />
             </Formik>
         </div>
     );
