@@ -67,7 +67,7 @@ const ImportProductDetail = () => {
                             <TableCore.RowHeader>
                                 <TableCore.Head>SKU</TableCore.Head>
                                 <TableCore.Head>Thành phẩm</TableCore.Head>
-                                <TableCore.Head>Kho</TableCore.Head>
+                                <TableCore.Head>Lưu kho</TableCore.Head>
                                 <TableCore.Head>Ngày hết hạn</TableCore.Head>
                                 {/*<TableCore.Head>Đơn giá</TableCore.Head>*/}
                                 <TableCore.Head>Số lượng</TableCore.Head>
@@ -99,8 +99,8 @@ const ImportProductDetail = () => {
                                             </TableCore.Cell>
                                             <TableCore.Cell>
                                                 <div>
-                                                    <div>Kho lạnh lẽo</div>
-                                                    <div>#KHO123</div>
+                                                    <div>{detail.storageArea.name}</div>
+                                                    <div>#{detail.storageArea.code}</div>
                                                 </div>
                                             </TableCore.Cell>
                                             <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>

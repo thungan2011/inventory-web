@@ -12,9 +12,12 @@ import Link from '@/components/Link';
 import Select from '@/components/Select';
 import { BaseStatus, BaseStatusVietnamese } from '@/modules/base/interface';
 import TextArea from '@/components/TextArea';
-import { useCreateProvider } from '@/modules/providers/repository';
-import { useRouter } from 'next/navigation';
+import { useProviderByCode, useUpdateProvider } from '@/modules/providers/repository';
+import { useParams, useRouter } from 'next/navigation';
 import AddressForm from '@/components/AddressForm';
+import { ProviderOverview } from '@/modules/providers/interface';
+import Loader from '@/components/Loader';
+import NotFound from '@/components/NotFound';
 
 const ProductSchema = object({
     name: string().required('Tên không được để trống'),
@@ -28,6 +31,7 @@ const ProductSchema = object({
 });
 
 interface FormValues {
+    code?: string;
     name: string;
     phone: string;
     address: string;
@@ -43,31 +47,24 @@ interface FormValues {
     note: string;
 }
 
-const initialFormValues: FormValues = {
-    name: '',
-    phone: '',
-    address: '',
-    ward: '',
-    district: '',
-    city: '',
-    email: '',
-    website: '',
-    representative_name: '',
-    representative_phone: '',
-    representative_email: '',
-    status: BaseStatus.INACTIVE,
-    note: '',
-};
-
 interface FormContentProps {
+    provider: ProviderOverview;
     isLoading: boolean;
 }
 
-const FormContent = ({ isLoading }: FormContentProps) => {
+const FormContent = ({ isLoading, provider }: FormContentProps) => {
     const { setFieldValue } = useFormikContext<FormValues>();
 
     return (
         <Form>
+            <div className="mt-5">
+                <Card className="p-[18px]">
+                    <div className="flex gap-1 text-xl font-nunito font-medium">
+                        <div>Mã nhà cung cấp</div>
+                        <div className="text-brand-500">#{provider.code}</div>
+                    </div>
+                </Card>
+            </div>
             <div className="grid grid-cols-6 gap-x-3 mt-5">
                 <Card className={`p-[18px] col-span-4`}>
                     <Typography.Title level={4}>Thông tin chung</Typography.Title>
@@ -76,7 +73,11 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                required />
                         <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại" required />
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                        <AddressForm city="" district="" ward="" setFieldValue={setFieldValue} />
+                        <AddressForm city={provider.city || ''}
+                                     district={provider.district || ''}
+                                     ward={provider.ward || ''}
+                                     setFieldValue={setFieldValue}
+                        />
                         <Input name="email" label="Email" placeholder="Nhập Email nhà cung cấp" />
                         <Input name="website" label="Website" placeholder="Nhập Website nhà cung cấp" />
                         <Select name="status" label="Trạng thái" options={[
@@ -117,16 +118,49 @@ const FormContent = ({ isLoading }: FormContentProps) => {
 
 const NewProviderPage = () => {
     const router = useRouter();
-    const createProvider = useCreateProvider();
+
+    const { code } = useParams<{ code: string }>();
+    const { data: provider, isLoading } = useProviderByCode(code);
+    const updateProvider = useUpdateProvider();
 
     useEffect(() => {
-        document.title = 'Nut Garden - Thêm nhà cung cấp';
+        document.title = 'Nut Garden - Cập nhật nhà cung cấp';
     }, []);
 
+    if (isLoading) {
+        return <Loader />;
+    }
+
+    if (!provider) {
+        return <NotFound />;
+    }
+
+    const initialFormValues: FormValues = {
+        code: provider.code,
+        name: provider.name,
+        phone: provider.phone,
+        address: provider.address,
+        ward: provider.ward,
+        district: provider.district,
+        city: provider.city,
+        email: provider.email,
+        website: provider.website,
+        representative_name: provider.representativeName,
+        representative_phone: provider.representativePhone,
+        representative_email: provider.representativeEmail,
+        status: provider.status,
+        note: provider.note,
+    };
+
     const handleSubmit = async (values: FormValues) => {
+        console.table(values);
+
         try {
-            await createProvider.mutateAsync({
-                ...values,
+            await updateProvider.mutateAsync({
+                id: provider.id,
+                payload: {
+                    ...values,
+                }
             });
             router.push('/providers');
         } catch (error) {
@@ -138,7 +172,7 @@ const NewProviderPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
-                <FormContent isLoading={createProvider.isPending} />
+                <FormContent isLoading={updateProvider.isPending} provider={provider} />
             </Formik>
         </div>
     );

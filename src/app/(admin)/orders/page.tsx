@@ -144,8 +144,8 @@ const OrderPage = () => {
                                     <Input name="country" placeholder="Số điện thoại" />
                                 </div>
                                 <div className="grid grid-cols-3 gap-4">
-                                    <DatePicker name="orderDate" label="Ngày đặt"/>
-                                    <DatePicker name="orderDate" label="Ngày giao"/>
+                                    <DatePicker name="orderDate"/>
+                                    <DatePicker name="orderDate" />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

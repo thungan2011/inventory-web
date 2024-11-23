@@ -1,8 +1,9 @@
 import httpRepository from '@/core/repository/http';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import { ImportProductDetail, ImportProductOverview } from '@/modules/imports/products/interface';
+import { ImportProductDetail, ImportProductOverview, ImportProductType } from '@/modules/imports/products/interface';
 import useDataFetching from '@/hook/useDataFetching';
+import { toast } from 'react-toastify';
 
 export const IMPORT_PRODUCT_QUERY_KEY = 'import_products';
 
@@ -38,6 +39,35 @@ export const useImportProductByCode = (code: string) => {
     return useDataFetching(
         [IMPORT_PRODUCT_QUERY_KEY, code],
         () => getImportProductByCode(code),
-        {enabled: !!code}
+        { enabled: !!code },
     );
+};
+
+/**
+ * Create import product
+ */
+interface AddImportProductPayload {
+    sku?: string;
+    name: string;
+    category_id: number[];
+    type: ImportProductType;
+    note: string;
+}
+
+const createImportProduct = (payload: AddImportProductPayload): Promise<void> => {
+    return httpRepository.post<void>('/v1/import/products', payload);
+};
+
+export const useCreateImportProduct = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: createImportProduct,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [IMPORT_PRODUCT_QUERY_KEY] });
+            toast.success('Nhập kho thành phẩm thành công');
+        },
+        onError: () => {
+            toast.error('Nhập kho thành phẩm không thành công. Thử lại sau.');
+        },
+    });
 };

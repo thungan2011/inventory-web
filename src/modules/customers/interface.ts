@@ -1,5 +1,3 @@
-import { GenderStatus } from '@/components/Badge/GenderStatusBadge';
-
 export enum CustomerStatus {
     ACTIVE = 'ACTIVE',
     INACTIVE = 'INACTIVE',
@@ -10,7 +8,7 @@ export interface CustomerOverview {
     code: string;
     name: string;
     phone: string;
-    gender: GenderStatus;
+    gender: number;
     birthday?: Date;
     email?: string;
     address?: string;
@@ -19,6 +17,9 @@ export interface CustomerOverview {
     ward?: string;
     status: CustomerStatus,
     note: string;
+    groupCustomer: {
+        name: string;
+    }
 }
 
 export type CustomerDetail = CustomerOverview

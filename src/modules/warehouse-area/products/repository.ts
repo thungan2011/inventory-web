@@ -15,7 +15,7 @@ interface FetchAllWarehouseAreaProductParams {
 }
 
 const getAllWarehouseAreaProducts = (params: FetchAllWarehouseAreaProductParams): Promise<PageObject<WarehouseAreaProductOverview>> => {
-    return httpRepository.get<PageObject<WarehouseAreaProductOverview>>('/v1/product_storage_locations', {
+    return httpRepository.get<PageObject<WarehouseAreaProductOverview>>('/v1/product_storage_history', {
         page: params.page || 1,
     });
 };
