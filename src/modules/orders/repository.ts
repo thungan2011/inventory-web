@@ -12,11 +12,13 @@ export const ORDER_QUERY_KEY = 'orders';
  */
 interface FetchAllOrderParams {
     page?: number;
+    status?: OrderStatus;
 }
 
 const getAllOrders = (params: FetchAllOrderParams): Promise<PageObject<OrderOverview>> => {
     return httpRepository.get<PageObject<OrderOverview>>('/v1/orders', {
         page: params.page || 1,
+        status: params.status,
     });
 };
 
@@ -48,17 +50,17 @@ export const useOrderByCode = (code: string) => {
  * Create order
  */
 interface AddOrderPayload {
-    customerId: number;
+    customer_id: number;
     status: OrderStatus;
     phone: string;
     address: string;
     city: string;
     district: string;
     ward: string;
-    deliveryDate: Date;
-    paymentMethod: PaymentMethod;
-    product: {
-        productId: number;
+    delivery_date: string;
+    payment_method: PaymentMethod;
+    products: {
+        product_id: number;
         quantity: number;
     }[]
 }
@@ -73,7 +75,7 @@ export const useCreateOrder = () => {
         mutationFn: createOrder,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY] });
-            toast.success('Thêm đơn hàng thành công');
+            toast.success('Tạo đơn hàng thành công');
         },
         onError: () => {
             toast.error('Thêm đơn hàng không thành công. Thử lại sau.');
