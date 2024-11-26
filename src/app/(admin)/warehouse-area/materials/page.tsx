@@ -100,9 +100,8 @@ const WarehouseAreaMaterialPage = () => {
             {
                 accessorKey: 'actions',
                 header: () => '',
-                cell: ({ row }) => (
+                cell: ({}) => (
                     <div className="inline-flex gap-2 items-center">
-                        <ButtonAction.View href={`/warehouse-area/materials/${row.original.storageArea.code}`} />
                     </div>
                 ),
                 enableSorting: false,

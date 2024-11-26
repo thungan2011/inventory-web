@@ -62,15 +62,15 @@ const ModalUpdateCategory = ({ onClose, category }: ModalAddCategoryProps) => {
         return (
             <Form>
                 <Input name="name" label="Tên danh mục" placeholder="Nhập tên danh mục" required />
-                <Select name="status" label="Trạng thái"
-                        options={[
-                            { value: BaseStatus.ACTIVE, label: BaseStatusVietnamese[BaseStatus.ACTIVE] },
-                            { value: BaseStatus.INACTIVE, label: BaseStatusVietnamese[BaseStatus.INACTIVE] },
-                        ]} />
                 <Select name="type" label="Loại"
                         options={[
                             { value: CategoryType.PRODUCT, label: CategoryTypeVietnamese[CategoryType.PRODUCT] },
                             { value: CategoryType.MATERIAL, label: CategoryTypeVietnamese[CategoryType.MATERIAL] },
+                        ]} />
+                <Select name="status" label="Trạng thái"
+                        options={[
+                            { value: BaseStatus.ACTIVE, label: BaseStatusVietnamese[BaseStatus.ACTIVE] },
+                            { value: BaseStatus.INACTIVE, label: BaseStatusVietnamese[BaseStatus.INACTIVE] },
                         ]} />
                 <TextArea name="description" label="Mô tả" placeholder="Nhập mô tả ..." />
                 <div className="flex justify-end items-center gap-3">

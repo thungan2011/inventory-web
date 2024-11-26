@@ -70,7 +70,7 @@ const adminRoutes: IAdminRoute[] = [
         path: '/warehouse-area',
         icon: <FiCalendar />,
         children: [
-            { name: 'Nguyên vật lệu', path: '/warehouse-area/materials' },
+            { name: 'Nguyên vật liệu', path: '/warehouse-area/materials' },
             { name: 'Thành phẩm', path: '/warehouse-area/products' },
         ],
     },

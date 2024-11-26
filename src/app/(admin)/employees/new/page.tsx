@@ -108,12 +108,6 @@ const NewEmployeePage = () => {
                 <Form>
                     <div className="mt-5">
                         <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã nhân viên</Typography.Title>
-                            <Input name="user_id" placeholder="Nếu không nhập mã nhân viên, hệ thống sẽ tự động tạo" />
-                        </Card>
-                    </div>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
                             <Typography.Title level={4}>Tài khoản đăng nhập</Typography.Title>
                             <div className="grid grid-cols-2 gap-x-3">
                                 <div className="col-span-1">

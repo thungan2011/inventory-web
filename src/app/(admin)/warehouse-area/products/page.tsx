@@ -5,7 +5,9 @@ import { exportToExcel } from '@/utils/exportToExcel';
 import Card from '@/components/Card';
 import Table from '@/components/Tables';
 import { WarehouseAreaProductOverview, WarehouseAreaProductStatus } from '@/modules/warehouse-area/products/interface';
-import WarehouseAreaProductStatusBadge, { WarehouseAreaProductStatusVietnamese } from '@/components/Badge/WarehouseAreaProductBadge';
+import WarehouseAreaProductStatusBadge, {
+    WarehouseAreaProductStatusVietnamese,
+} from '@/components/Badge/WarehouseAreaProductBadge';
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
 import { useAllWarehouseAreaProducts } from '@/modules/warehouse-area/products/repository';
@@ -96,9 +98,8 @@ const WarehouseAreaProductPage = () => {
             {
                 accessorKey: 'actions',
                 header: () => '',
-                cell: ({ row }) => (
+                cell: ({}) => (
                     <div className="inline-flex gap-2 items-center">
-                        <ButtonAction.View href={`/warehouse-area/products/${row.original.storageArea.code}`} />
                     </div>
                 ),
                 enableSorting: false,

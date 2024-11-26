@@ -19,6 +19,7 @@ import { useAllStorageAreas, useDeleteStorageArea } from '@/modules/storage-area
 import { StorageAreaOverview, StorageAreaStatus } from '@/modules/storage-area/interface';
 import ModalAddStorageArea from '@/components/Pages/Storage-area/ModalAddStorageArea';
 import ModalUpdateStorageArea from '@/components/Pages/Storage-area/ModalUpdateStorageArea';
+import StorageAreaTypeBadge from '@/components/Badge/StorageAreaTypeBadge';
 
 interface StorageAreaFilter extends PaginationState {
     name: string;
@@ -95,6 +96,11 @@ const StorageAreaPage = () => {
                         <div>{row.original.name}</div>
                     </div>
                 ),
+            },
+            {
+                accessorKey: 'type',
+                header: () => <span>Loại</span>,
+                cell: ({ row }) => <StorageAreaTypeBadge type={row.original.type} />,
             },
             {
                 accessorKey: 'description',

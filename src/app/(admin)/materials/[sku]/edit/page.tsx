@@ -98,6 +98,8 @@ const NewMaterialPage = () => {
         }
     };
 
+    const isReadOnly = material.status === MaterialStatus.ACTIVE;
+
     return (
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
@@ -115,15 +117,15 @@ const NewMaterialPage = () => {
                         <Card className={`p-[18px] col-span-1`}>
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>
                             <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
-                                <Input name="name" label="Tên nguyên vật liệu" placeholder="Nhập tên nguyên vật liệu"
+                                <Input readOnly={isReadOnly} name="name" label="Tên nguyên vật liệu" placeholder="Nhập tên nguyên vật liệu"
                                        required />
-                                <Select name="categories" label="Danh mục" multiple options={
+                                <Select readOnly={isReadOnly} name="categories" label="Danh mục" multiple options={
                                     categories ? categories.map(category => ({
                                         label: category.name,
                                         value: category.id,
                                     })) : []
                                 } />
-                                <Input name="origin" label="Nhập khẩu" placeholder="Nhập nơi nhập khẩu" required />
+                                <Input readOnly={isReadOnly} name="origin" label="Nhập khẩu" placeholder="Nhập nơi nhập khẩu" required />
                                 <Select name="status" label="Trạng thái" options={[
                                     ...Object.keys(MaterialStatus).map(status => (
                                         { label: MaterialStatusVietnamese[status as MaterialStatus], value: status }
@@ -136,14 +138,14 @@ const NewMaterialPage = () => {
                             <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
                                 <div className="grid grid-cols-2 gap-x-3">
                                     <div className="col-span-1">
-                                        <Input name="weight" label="Khối lượng tịnh" placeholder="Nhập khối lượng tịnh"
+                                        <Input readOnly={isReadOnly} name="weight" label="Khối lượng tịnh" placeholder="Nhập khối lượng tịnh"
                                                required />
                                     </div>
                                     <div className="col-span-1">
-                                        <Input name="unit" label="Đơn vị" placeholder="Chọn đơn vị" required />
+                                        <Input readOnly={isReadOnly} name="unit" label="Đơn vị" placeholder="Chọn đơn vị" required />
                                     </div>
                                 </div>
-                                <Input name="packing" label="Quy cách đóng gói" placeholder="Nhập quy cách đóng gói"
+                                <Input readOnly={isReadOnly} name="packing" label="Quy cách đóng gói" placeholder="Nhập quy cách đóng gói"
                                        required />
                                 <Input name="minimum_stock_level" label="Cảnh báo số lượng đạt mức tối thiểu"
                                        placeholder="Nhập số lượng cảnh báo tối thiểu"

@@ -10,8 +10,6 @@ import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import Select from '@/components/Select';
-import { ProductStatus } from '@/modules/products/interface';
-import { ProductStatusVietnamese } from '@/components/Badge/ProductStatusBadge';
 import TextArea from '@/components/TextArea';
 import { MaterialStatus } from '@/modules/materials/interface';
 import { useRouter } from 'next/navigation';
@@ -19,20 +17,15 @@ import { useCreateMaterial } from '@/modules/materials/repository';
 import { useCategoryList } from '@/modules/categories/repository';
 import Loader from '@/components/Loader';
 import { CategoryType } from '@/modules/categories/interface';
+import { MaterialStatusVietnamese } from '@/components/Badge/MaterialStatusBadge';
 
 const ProductSchema = object({
-    sku: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length < 4) return this.createError({ message: 'Mã phải có ít nhất 4 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
-    name: string().required('Tên không được để trống'),
+    name: string().trim().required('Tên không được để trống'),
     categories: array().required('Chọn danh mục').min(1, 'Chọn tối thiểu 1 danh mục'),
-    origin: string().required('Nơi nhập khẩu không được để trống'),
+    origin: string().trim().required('Nơi nhập khẩu không được để trống'),
     weight: number().required('Khối lượng không được để trống'),
-    unit: string().required('Đơn vị không được để trống'),
-    packing: string().required('Quy cách đóng gói không được để trống'),
+    unit: string().trim().required('Đơn vị không được để trống'),
+    packing: string().trim().required('Quy cách đóng gói không được để trống'),
 });
 
 interface FormValues {
@@ -97,13 +90,6 @@ const NewMaterialPage = () => {
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
                 <Form>
-                    <div className="mt-5">
-                        <Card className={`p-[18px] col-span-3`}>
-                            <Typography.Title level={4}>Mã nguyên vật liệu</Typography.Title>
-                            <Input name="sku"
-                                   placeholder="Nếu không nhập mã nguyên vật liệu, hệ thống sẽ tự động tạo" />
-                        </Card>
-                    </div>
                     <div className="grid grid-cols-2 gap-x-3 mt-5">
                         <Card className={`p-[18px] col-span-1`}>
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>
@@ -117,9 +103,9 @@ const NewMaterialPage = () => {
                                     })) : []
                                 } />
                                 <Input name="origin" label="Nhập khẩu" placeholder="Nhập nơi nhập khẩu" required />
-                                <Select name="status" label="Trạng thái" readOnly options={[
-                                    ...Object.keys(ProductStatus).map(status => (
-                                        { label: ProductStatusVietnamese[status as ProductStatus], value: status }
+                                <Select name="status" label="Trạng thái" options={[
+                                    ...Object.keys(MaterialStatus).map(status => (
+                                        { label: MaterialStatusVietnamese[status as MaterialStatus], value: status }
                                     )),
                                 ]} />
                             </div>
@@ -152,7 +138,7 @@ const NewMaterialPage = () => {
                     <div className="mt-5">
                         <Card className={`p-[18px] col-span-3`}>
                             <Typography.Title level={4}>Ghi chú</Typography.Title>
-                            <TextArea name="note" label="Ghi chú" />
+                            <TextArea name="note" label="Ghi chú" placeholder="Ghi chú ..."/>
                         </Card>
                     </div>
 

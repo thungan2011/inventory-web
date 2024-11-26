@@ -3,12 +3,18 @@ export enum StorageAreaStatus {
     INACTIVE = 'INACTIVE',
 }
 
+export enum StorageAreaType {
+    PRODUCT = 'PRODUCT',
+    MATERIAL = 'MATERIAL',
+}
+
 export interface StorageAreaOverview {
     id: number;
     code: string;
     name: string;
     description: string;
     status: StorageAreaStatus;
+    type: StorageAreaType;
 }
 
 export interface StorageAreaDetail extends StorageAreaOverview {

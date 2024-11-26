@@ -13,21 +13,19 @@ export const ORDER_QUERY_KEY = 'orders';
 interface FetchAllOrderParams {
     page?: number;
     status?: OrderStatus;
+    customer_name?: string;
+    code?: string;
+    phone?: string;
 }
 
 const getAllOrders = (params: FetchAllOrderParams): Promise<PageObject<OrderOverview>> => {
-    return httpRepository.get<PageObject<OrderOverview>>('/v1/orders', {
-        page: params.page || 1,
-        status: params.status,
-    });
+    return httpRepository.get<PageObject<OrderOverview>>('/v1/orders', {...params});
 };
 
 export const useAllOrders = (params: FetchAllOrderParams) => {
     return useQuery({
         queryKey: [ORDER_QUERY_KEY, params],
         queryFn: () => getAllOrders(params),
-        placeholderData: previousData => previousData,
-        staleTime: 5000,
     });
 };
 
@@ -62,7 +60,7 @@ interface AddOrderPayload {
     products: {
         product_id: number;
         quantity: number;
-    }[]
+    }[];
 }
 
 const createOrder = (payload: AddOrderPayload): Promise<void> => {
@@ -79,6 +77,43 @@ export const useCreateOrder = () => {
         },
         onError: () => {
             toast.error('Thêm đơn hàng không thành công. Thử lại sau.');
+        },
+    });
+};
+
+/**
+ * update order
+ */
+interface UpdateOrderPayload {
+    customer_id: number;
+    status: OrderStatus;
+    phone: string;
+    address: string;
+    city: string;
+    district: string;
+    ward: string;
+    delivery_date: string;
+    payment_method: PaymentMethod;
+    products: {
+        product_id: number;
+        quantity: number;
+    }[];
+}
+
+const updateOrder = ({ id, payload }: { payload: UpdateOrderPayload, id: number }): Promise<void> => {
+    return httpRepository.put<void>(`/v1/orders/${id}`, payload);
+};
+
+export const useUpdateOrder = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateOrder,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY] });
+            toast.success('Cập nhật đơn hàng thành công');
+        },
+        onError: () => {
+            toast.error('Cập nhật đơn hàng không thành công. Thử lại sau.');
         },
     });
 };
