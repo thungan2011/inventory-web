@@ -15,10 +15,11 @@ import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
-import DatePicker from '@/components/DatePicker';
 
 interface OrderFilter extends PaginationState {
-    search: string;
+    customer_name: string;
+    phone: string;
+    code: string;
     status: 'ALL' | OrderStatus;
 }
 
@@ -30,13 +31,18 @@ const OrderPage = () => {
 
     const [filters, setFilters] = useState<OrderFilter>({
         page: 1,
-        search: '',
+        customer_name: '',
+        code: '',
+        phone: '',
         status: 'ALL',
     });
 
     const orderQuery = useAllOrders({
         page: filters.page,
         status: filters.status === 'ALL' ? undefined : filters.status,
+        customer_name: filters.customer_name,
+        code: filters.code,
+        phone: filters.phone,
     });
 
     const {
@@ -111,7 +117,7 @@ const OrderPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/orders/${row.original.code}`} />
-                        <ButtonAction.Update />
+                        <ButtonAction.Update href={`/orders/${row.original.code}/edit`}/>
                     </div>
                 ),
                 enableSorting: false,
@@ -141,14 +147,10 @@ const OrderPage = () => {
                         <Form>
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
-                                <div className="grid grid-cols-3 gap-4">
-                                    <Input name="search" placeholder="Mã đơn hàng" />
-                                    <Input name="country" placeholder="Tên khách hàng" />
-                                    <Input name="country" placeholder="Số điện thoại" />
-                                </div>
-                                <div className="grid grid-cols-3 gap-4">
-                                    <DatePicker name="orderDate"/>
-                                    <DatePicker name="orderDate" />
+                                <div className="grid grid-cols-4 gap-4">
+                                    <Input name="code" placeholder="Mã đơn hàng" />
+                                    <Input name="customer_name" placeholder="Tên khách hàng" />
+                                    <Input name="phone" placeholder="Số điện thoại" />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

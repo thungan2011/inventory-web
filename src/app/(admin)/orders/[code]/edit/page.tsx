@@ -25,11 +25,13 @@ import { MdRemoveCircleOutline } from 'react-icons/md';
 import useClickOutside from '@/hook/useClickOutside';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import AddressForm from '@/components/AddressForm';
-import { useCreateOrder } from '@/modules/orders/repository';
+import { useOrderByCode, useUpdateOrder } from '@/modules/orders/repository';
 import ButtonAction from '@/components/ButtonAction';
-import dayjs from 'dayjs';
 import DatePicker from '@/components/DatePicker';
-import { useRouter } from 'next/navigation';
+import { router } from 'next/client';
+import { useParams } from 'next/navigation';
+import Loader from '@/components/Loader';
+import NotFound from '@/components/NotFound';
 
 const DELIVERY_METHODS = {
     SELF_PICKUP: 'Tự đến lấy',
@@ -108,25 +110,6 @@ interface FormValues {
         packing: string;
     }[];
 }
-
-const initialFormValues: FormValues = {
-    customerId: 0,
-    receiverName: '',
-    receiverPhone: '',
-    receiverAddress: '',
-    ward: '',
-    district: '',
-    city: '',
-    totalShipping: 0,
-    totalPayment: 0,
-    totalPrice: 0,
-    deliveryMethod: DELIVERY_METHOD_OPTIONS[0].value.toString(),
-    deliveryDate: new Date(),
-    vat: 10,
-    status: OrderStatus.PROCESSED,
-    note: '',
-    products: [],
-};
 
 interface CustomerFilter extends PaginationState {
     name: string;
@@ -486,30 +469,46 @@ const FormContent = ({ isLoading } : FormContentProps) => {
     );
 };
 
-const NewOrderPage = () => {
-    const router = useRouter();
-    const createOrder = useCreateOrder();
+const UpdateOrderPage = () => {
+    const { code } = useParams<{ code: string }>();
+    const { data: order, isLoading } = useOrderByCode(code);
+    const updateOrder = useUpdateOrder();
 
     useEffect(() => {
         document.title = 'Nut Garden - Tạo đơn hàng';
     }, []);
 
+    if (isLoading) {
+        return <Loader />;
+    }
+
+    if (!order) {
+        return <NotFound />;
+    }
+
+    const initialFormValues: FormValues = {
+        customerId: order.customer.id,
+        receiverName: order.customer.name,
+        receiverPhone: order.phone,
+        receiverAddress: order.address,
+        ward: order.ward,
+        district: order.district,
+        city: order.city,
+        totalShipping: 0,
+        totalPayment: 0,
+        totalPrice: order.totalPrice,
+        deliveryMethod: DELIVERY_METHOD_OPTIONS[0].value.toString(),
+        deliveryDate: order.deliveryDate,
+        vat: 10,
+        status: order.status,
+        note: order.note,
+        products: [],
+    };
+
     const handleSubmit = async (values: FormValues) => {
         console.log(values);
         console.table(values);
         try {
-            await createOrder.mutateAsync({
-                address: values.receiverAddress,
-                delivery_date: dayjs(values.deliveryDate).format('YYYY-MM-DD'),
-                payment_method: PaymentMethod.CASH,
-                phone: values.receiverPhone,
-                products: values.products.map(product => ({ product_id: product.id, quantity: product.quantity })),
-                customer_id: values.customerId || 1,
-                city: values.city,
-                district: values.district,
-                ward: values.ward,
-                status: OrderStatus.PENDING,
-            });
             router.push('/orders');
         } catch (error) {
             console.log(error);
@@ -520,9 +519,9 @@ const NewOrderPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
-                <FormContent isLoading={createOrder.isPending} />
+                <FormContent isLoading={updateOrder.isPending} />
             </Formik>
         </div>
     );
 };
-export default NewOrderPage;
+export default UpdateOrderPage;

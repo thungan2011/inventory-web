@@ -126,7 +126,6 @@ const NewProviderPage = () => {
     useEffect(() => {
         document.title = 'Nut Garden - Cập nhật nhà cung cấp';
     }, []);
-
     if (isLoading) {
         return <Loader />;
     }
@@ -134,6 +133,7 @@ const NewProviderPage = () => {
     if (!provider) {
         return <NotFound />;
     }
+
 
     const initialFormValues: FormValues = {
         code: provider.code,

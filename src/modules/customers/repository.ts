@@ -52,6 +52,8 @@ interface AddCustomerPayload {
     status: CustomerStatus;
     note: string;
     gender: number;
+    group_customer_id: number;
+    birthday?: string;
 }
 
 const createCustomer = (payload: AddCustomerPayload): Promise<void> => {
@@ -122,6 +124,8 @@ interface UpdateCustomerPayload {
     email?: string;
     status: CustomerStatus;
     note: string;
+    gender: number;
+    birthday?: string;
 }
 
 const updateCustomer = ({id, payload} : {payload: UpdateCustomerPayload, id: number}): Promise<void> => {

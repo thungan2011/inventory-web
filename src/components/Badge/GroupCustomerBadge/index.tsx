@@ -10,7 +10,7 @@ const GroupCustomerBadge = ({ data }: { data: string }) => {
     const colorClass = colors[data] || 'text-gray-500';
 
     return (
-        <span className={`px-2 py-1 rounded font-medium text-nowrap ${colorClass} bg-opacity-50`}>
+        <span className={`px-2 py-1 rounded font-medium text-nowrap ${colorClass} bg-opacity-50 text-xs`}>
             {data}
         </span>
     );

@@ -19,6 +19,7 @@ export interface CustomerOverview {
     note: string;
     groupCustomer: {
         name: string;
+        id: number;
     }
 }
 

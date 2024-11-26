@@ -21,13 +21,13 @@ import Loader from '@/components/Loader';
 import { CategoryType } from '@/modules/categories/interface';
 
 const ProductSchema = object({
-    name: string().required('Tên không được để trống'),
+    name: string().trim().required('Tên không được để trống'),
     categories: array().required('Chọn danh mục').min(1, 'Chọn tối thiểu 1 danh mục'),
-    origin: string().required('Nơi nhập khẩu không được để trống'),
+    origin: string().trim().required('Nơi nhập khẩu không được để trống'),
     weight: number().required('Khối lượng không được để trống').min(0, 'Tối thiểu là 0'),
-    unit: string().required('Đơn vị không được để trống'),
-    packing: string().required('Quy cách đóng gói không được để trống'),
-    usage_time: string().required('Thời gian sử dụng không được để trống'),
+    unit: string().trim().required('Đơn vị không được để trống'),
+    packing: string().trim().required('Quy cách đóng gói không được để trống'),
+    usage_time: string().trim().required('Thời gian sử dụng không được để trống'),
     minimum_stock_level: number().nullable().min(0, 'Tối thiểu là 0'),
     maximum_stock_level: number().nullable().min(0, 'Tối thiểu là 0'),
 });

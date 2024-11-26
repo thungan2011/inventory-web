@@ -11,9 +11,11 @@ export const BaseStatusVietnamese : Record<BaseStatus, string> = {
 export enum Gender {
     MALE = 'MALE',
     FEMALE = 'FEMALE',
+    OTHER = 'OTHER',
 }
 
 export const GenderVietnamese : Record<Gender, string> = {
     [Gender.FEMALE]: 'Nữ',
-    [Gender.MALE]: 'Nam'
+    [Gender.MALE]: 'Nam',
+    [Gender.OTHER]: 'Khác'
 };

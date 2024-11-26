@@ -7,9 +7,10 @@ import * as Yup from 'yup';
 import { string } from 'yup';
 import Input from '@/components/Input';
 import TextArea from '@/components/TextArea';
-import { StorageAreaOverview, StorageAreaStatus } from '@/modules/storage-area/interface';
+import { StorageAreaOverview, StorageAreaStatus, StorageAreaType } from '@/modules/storage-area/interface';
 import { useUpdateStorageArea } from '@/modules/storage-area/repository';
 import { StorageAreaStatusVietnamese } from '@/components/Badge/StorageAreaStatusBadge';
+import { StorageAreaTypeVietnamese } from '@/components/Badge/StorageAreaTypeBadge';
 
 type ModalAddStorageAreaProps = {
     onClose: () => void;
@@ -19,12 +20,14 @@ type ModalAddStorageAreaProps = {
 interface FormValues {
     name: string;
     code: string;
+    type: StorageAreaType;
     status: StorageAreaStatus;
     description: string;
 }
 
 const validationSchema = Yup.object().shape({
     name: string().required('Tên không được để trống'),
+    type: string().required('Chọn loại lưu kho'),
 });
 
 const ModalUpdateStorageArea = ({ onClose, storageArea }: ModalAddStorageAreaProps) => {
@@ -40,6 +43,7 @@ const ModalUpdateStorageArea = ({ onClose, storageArea }: ModalAddStorageAreaPro
         name: storageArea.name,
         code: storageArea.code,
         status: storageArea.status,
+        type: storageArea.type,
         description: storageArea.description || '',
     };
 
@@ -64,6 +68,17 @@ const ModalUpdateStorageArea = ({ onClose, storageArea }: ModalAddStorageAreaPro
                 <Input name="code" label="Mã khu vực lưu kho" readOnly
                        placeholder="Nếu không nhập mã khu vực lưu kho, hệ thống sẽ tự động tạo" />
                 <Input name="name" label="Tên khu vực lưu kho" placeholder="Nhập khu vực lưu kho" required />
+                <Select name="type" label="Loại" required
+                        options={[
+                            {
+                                value: StorageAreaType.PRODUCT,
+                                label: StorageAreaTypeVietnamese[StorageAreaType.PRODUCT],
+                            },
+                            {
+                                value: StorageAreaType.MATERIAL,
+                                label: StorageAreaTypeVietnamese[StorageAreaType.MATERIAL],
+                            },
+                        ]} />
                 <Select name="status" label="Trạng thái"
                         options={[
                             {
