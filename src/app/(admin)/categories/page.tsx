@@ -70,10 +70,12 @@ const CategoryPage = () => {
         onDelete: async (data) => {
             await deleteCategory.mutateAsync(data.id);
         },
-        canDelete: data => data.status !== BaseStatus.ACTIVE,
-        unableDeleteMessage: 'Không thể xóa danh mục đang hoạt động',
+        canDelete: (data) =>
+            data.status !== BaseStatus.ACTIVE && ((data.type === CategoryType.PRODUCT && data.totalProduct === 0)
+            || (data.type === CategoryType.MATERIAL && data.totalMaterial === 0)),
+        unableDeleteMessage: 'Không thể xóa danh mục đang hoạt động hoặc danh mục đang chứa nguyên vật liệu/thành phẩm',
         onSuccess: () => {
-            setFilters(prevState => ({ ...prevState, page: 1 }));
+            setFilters((prevState) => ({ ...prevState, page: 1 }));
         },
     });
 
@@ -95,7 +97,7 @@ const CategoryPage = () => {
                 header: 'Tên danh mục',
                 cell: ({ row }) => (
                     <div className="text-nowrap">{row.original.name}</div>
-                )
+                ),
             },
             {
                 id: 'quantity',
@@ -114,7 +116,7 @@ const CategoryPage = () => {
                     <div className="w-72 max-w-72 line-clamp-2">
                         {row.original.description}
                     </div>
-                )
+                ),
             },
             {
                 accessorKey: 'status',

@@ -19,15 +19,16 @@ import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge
 import AddressForm from '@/components/AddressForm';
 import { Gender, GenderVietnamese } from '@/modules/base/interface';
 import { useGroupCustomerList } from '@/modules/group-customers/repository';
+import dayjs from 'dayjs';
 
 const CustomerSchema = object({
-    name: string().required('Tên không được để trống'),
-    phone: string().required('Số điện thoại không được để trống'),
-    address: string().required('Địa chỉ không được để trống'),
-    ward: string().required('Chọn Phường/xã'),
-    district: string().required('Chọn Quận/huyện'),
-    city: string().required('Chọn Tỉnh/thành phố'),
-    birthday: string().nullable(),
+    name: string().trim().required('Tên không được để trống'),
+    phone: string().trim().required('Số điện thoại không được để trống'),
+    address: string().trim().required('Địa chỉ không được để trống'),
+    ward: string().trim().required('Chọn Phường/xã'),
+    district: string().trim().required('Chọn Quận/huyện'),
+    city: string().trim().required('Chọn Tỉnh/thành phố'),
+    birthday: string().trim().nullable(),
 });
 
 interface FormValues {
@@ -43,6 +44,7 @@ interface FormValues {
     gender: Gender;
     status: CustomerStatus;
     note: string;
+    groupCustomer: number;
 }
 
 const initialFormValues: FormValues = {
@@ -58,6 +60,7 @@ const initialFormValues: FormValues = {
     email: '',
     status: CustomerStatus.INACTIVE,
     note: '',
+    groupCustomer: 0,
 };
 
 interface FormContentProps {
@@ -147,7 +150,10 @@ const NewCustomerPage = () => {
         try {
             await createCustomer.mutateAsync({
                 ...values,
-                gender: values.gender === Gender.MALE ? 1 : 0,
+                birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
+                group_customer_id: values.groupCustomer,
+                gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 0 : 2
+
             });
             router.push('/customers');
         } catch (error) {

@@ -46,6 +46,7 @@ interface FormValues {
     email?: string;
     status: CustomerStatus;
     note: string;
+    groupCustomer: number;
 }
 
 interface FormContentProps {
@@ -165,6 +166,7 @@ const NewCustomerPage = () => {
         status: customer.status,
         note: customer.note || '',
         gender: customer.gender == 0 ? Gender.FEMALE : Gender.MALE,
+        groupCustomer: customer.groupCustomer.id,
     };
 
     const handleSubmit = async (values: FormValues) => {
@@ -175,6 +177,8 @@ const NewCustomerPage = () => {
                 id: customer.id,
                 payload: {
                     ...values,
+                    birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
+                    gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 0 : 2
                 },
             });
             router.push('/customers');

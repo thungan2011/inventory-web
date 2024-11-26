@@ -39,8 +39,11 @@ const CustomerDetail = () => {
                     <Typography.Title level={3}>Thông tin chung</Typography.Title>
                     <div className="flex flex-col gap-3">
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                  label="Tên"
+                                  label="Tên khách hàng"
                                   value={customer.name} />
+                        <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
+                                  label="Nhóm khách hàng"
+                                  value={customer.groupCustomer.name} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Sinh nhật"
                                   value={customer.birthday ? formatDateToLocalDate(customer.birthday) : 'Chưa cập nhật'} />

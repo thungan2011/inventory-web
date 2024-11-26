@@ -8,8 +8,8 @@ const statusColors = {
 };
 
 export const MaterialStatusVietnamese: Record<MaterialStatus, string> = {
-    [MaterialStatus.ACTIVE]: 'Đang hoạt động',
-    [MaterialStatus.INACTIVE]: 'Không hoạt động',
+    [MaterialStatus.ACTIVE]: 'Đang sử dụng',
+    [MaterialStatus.INACTIVE]: 'Không sử dụng',
     [MaterialStatus.OUT_OF_STOCK]: 'Hết hàng',
 };
 
@@ -19,8 +19,8 @@ const MaterialStatusBadge = ({ status }: { status: MaterialStatus }) => {
 
     return (
         <span className={`px-2 py-1 rounded font-medium text-nowrap ${colorClass} bg-opacity-50 text-xs`}>
-            {status === MaterialStatus.INACTIVE && 'Không hoạt động'}
-            {status === MaterialStatus.ACTIVE && 'Đang hoạt động'}
+            {status === MaterialStatus.INACTIVE && 'Không sử dụng'}
+            {status === MaterialStatus.ACTIVE && 'Đang sử dụng'}
             {status === MaterialStatus.OUT_OF_STOCK && 'Hết hàng'}
         </span>
     );

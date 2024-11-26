@@ -89,7 +89,6 @@ export const breadcrumbs: IBreadcrumb[] = [
             { label: 'Chi tiết' },
         ],
     },
-
     {
         label: 'Quản lý Combo',
         link: '^/combos$',
@@ -192,6 +191,15 @@ export const breadcrumbs: IBreadcrumb[] = [
             { label: 'Khách hàng' },
             { label: 'Danh sách khách hàng', link: "/customers" },
             { label: 'Thêm mới' },
+        ],
+    },
+    {
+        label: 'Cập nhật khách hàng',
+        link: '^/customers/[^/]+/edit$',
+        breadcrumbTrail: [
+            { label: 'Khách hàng' },
+            { label: 'Danh sách khách hàng', link: "/customers" },
+            { label: 'Cập nhật' },
         ],
     },
     {

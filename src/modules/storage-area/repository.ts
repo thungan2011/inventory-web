@@ -1,7 +1,12 @@
 import { PageObject } from '@/core/pagination/interface';
 import httpRepository from '@/core/repository/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { StorageAreaDetail, StorageAreaOverview, StorageAreaStatus } from '@/modules/storage-area/interface';
+import {
+    StorageAreaDetail,
+    StorageAreaOverview,
+    StorageAreaStatus,
+    StorageAreaType,
+} from '@/modules/storage-area/interface';
 import { toast } from 'react-toastify';
 import useDataFetching from '@/hook/useDataFetching';
 
@@ -45,6 +50,7 @@ interface AddStorageAreaPayload {
     status: StorageAreaStatus;
     code: string;
     description: string;
+    type: StorageAreaType;
 }
 
 const createStorageArea = (payload: AddStorageAreaPayload): Promise<void> => {
@@ -96,6 +102,7 @@ interface UpdateStorageAreaPayload {
     status: StorageAreaStatus;
     code: string;
     description: string;
+    type: StorageAreaType;
 }
 
 const updateStorageArea = ({ id, payload }: { payload: UpdateStorageAreaPayload, id: number }): Promise<void> => {

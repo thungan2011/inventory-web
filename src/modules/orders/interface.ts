@@ -56,8 +56,4 @@ export interface OrderDetail extends OrderOverview {
         price: number;
         quantity: number;
     } [];
-
-    // prices: {
-    //     price: number;
-    // }[]
 }
