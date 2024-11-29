@@ -9,22 +9,43 @@ interface UseDeleteModalReturn<T> {
     handleDelete: () => Promise<void>;
 }
 
+interface DeleteValidation<T> {
+    condition: (data: T) => boolean;
+    message: string;
+}
+
 interface UseDeleteModalProps<T> {
     onDelete: (data: T) => Promise<void>;
     onSuccess?: () => void;
     canDelete?: (data: T) => boolean;
     unableDeleteMessage?: string;
+
+    validations?: DeleteValidation<T>[];
 }
 
-function useDeleteModal<T>({ onDelete, onSuccess, unableDeleteMessage = "Không thể xóa", canDelete } : UseDeleteModalProps<T>) : UseDeleteModalReturn<T> {
+function useDeleteModal<T>({
+                               onDelete,
+                               onSuccess,
+                               unableDeleteMessage = 'Không thể xóa',
+                               canDelete,
+                               validations = [],
+                           }: UseDeleteModalProps<T>): UseDeleteModalReturn<T> {
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [selectedData, setSelectedData] = useState<T | null>(null);
 
     const openDeleteModal = (data: T) => {
+        for (const validation of validations) {
+            if (!validation.condition(data)) {
+                toast.error(validation.message);
+                return;
+            }
+        }
+
         if (canDelete && !canDelete(data)) {
             toast.error(unableDeleteMessage);
             return;
         }
+
         setSelectedData(data);
         setShowDeleteModal(true);
     };

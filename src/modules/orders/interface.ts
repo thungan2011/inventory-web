@@ -23,6 +23,11 @@ export const PaymentMethodVietnamese: Record<PaymentMethod, string> = {
     [PaymentMethod.CASH]: 'Tiền mặt',
 };
 
+export enum DeliveryType {
+    SHIPPING = 'SHIPPING',
+    STORE_PICKUP = 'STORE_PICKUP',
+}
+
 export interface OrderOverview {
     id: string;
     code: string;
@@ -52,7 +57,20 @@ export interface OrderOverview {
 }
 
 export interface OrderDetail extends OrderOverview {
+    shippingFee: number;
+    discountPercent: number;
+    deliveryType: DeliveryType;
     orderDetails: {
+        product: {
+            id: number;
+            sku: string;
+            name: string;
+            image: string;
+            weight: number;
+            unit: string;
+            packing: string;
+        };
+
         price: number;
         quantity: number;
     } [];

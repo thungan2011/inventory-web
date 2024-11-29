@@ -14,6 +14,8 @@ type InputProps = {
     readOnly?: boolean;
     unit?: string;
     wrapperClassName?: string;
+    step?: number;
+    onChange?: (value: number) => void;
 };
 
 const InputCurrency = ({
@@ -28,6 +30,8 @@ const InputCurrency = ({
                            required = false,
                            readOnly = false,
                            unit,
+                           step = 1000,
+                           onChange,
                        }: InputProps) => {
     const id = useId();
     const [field, , helpers] = useField(name);
@@ -51,6 +55,7 @@ const InputCurrency = ({
     const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const rawValue = event.target.value.replace(/\D/g, '');
         await helpers.setValue(rawValue === '' ? '' : Number(rawValue));
+        onChange?.(Number(rawValue));
     };
 
     const handleBlur = () => {
@@ -60,31 +65,27 @@ const InputCurrency = ({
     const handleKeyDown = async (event: React.KeyboardEvent<HTMLInputElement>) => {
         const currentValue = Number(field.value) || 0;
 
-        switch(event.key) {
+        switch (event.key) {
             case 'ArrowUp':
                 event.preventDefault();
-                const increasedValue = currentValue + 1000;
-                if (max && increasedValue > max) {
-                    await helpers.setValue(max);
-                } else {
-                    await helpers.setValue(increasedValue);
-                }
+                const increasedValue = currentValue + step;
+                const newIncreasedValue = max && increasedValue > max ? max : increasedValue;
+                await helpers.setValue(newIncreasedValue);
+                onChange?.(newIncreasedValue);
                 break;
 
             case 'ArrowDown':
                 event.preventDefault();
-                const decreasedValue = currentValue - 1000;
-                if (decreasedValue < (min || 0)) {
-                    await helpers.setValue(min || 0);
-                } else {
-                    await helpers.setValue(decreasedValue);
-                }
+                const decreasedValue = currentValue - step;
+                const newDecreasedValue = min && decreasedValue < (min || 0) ? (min || 0) : decreasedValue;
+                await helpers.setValue(newDecreasedValue);
+                onChange?.(newDecreasedValue);
                 break;
         }
     };
 
     return (
-        <div className={!wrapperClassName ? 'mb-3' : wrapperClassName}>
+        <div className={wrapperClassName ? wrapperClassName : 'mb-3'}>
             {
                 label && (
                     <div className="mb-1 inline-flex gap-x-1 h-6">
@@ -112,6 +113,7 @@ const InputCurrency = ({
                        onChange={handleChange}
                        onBlur={handleBlur}
                        onKeyDown={handleKeyDown}
+                       autoComplete="off"
                 />
 
                 {unit && <span className="text-gray-400 uppercase text-xs">{unit}</span>}

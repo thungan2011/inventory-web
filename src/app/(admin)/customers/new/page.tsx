@@ -117,7 +117,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                             )),
                         ]} />
 
-                        <TextArea name="note" label="Ghi chú" />
+                        <TextArea name="note" label="Ghi chú" placeholder="Nhập ghi chú (nếu có)" />
                     </div>
                 </Card>
             </div>

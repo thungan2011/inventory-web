@@ -70,10 +70,17 @@ const CategoryPage = () => {
         onDelete: async (data) => {
             await deleteCategory.mutateAsync(data.id);
         },
-        canDelete: (data) =>
-            data.status !== BaseStatus.ACTIVE && ((data.type === CategoryType.PRODUCT && data.totalProduct === 0)
-            || (data.type === CategoryType.MATERIAL && data.totalMaterial === 0)),
-        unableDeleteMessage: 'Không thể xóa danh mục đang hoạt động hoặc danh mục đang chứa nguyên vật liệu/thành phẩm',
+        validations: [
+            {
+                condition: (data) => data.status !== BaseStatus.ACTIVE,
+                message: 'Không thể xóa danh mục đang hoạt động',
+            },
+            {
+                condition: (data) => (data.type === CategoryType.PRODUCT && data.totalProduct <= 0)
+                    || (data.type === CategoryType.MATERIAL && data.totalMaterial <= 0),
+                message: 'Không thể xóa danh mục đang chứa nguyên vật liệu/thành phẩm',
+            },
+        ],
         onSuccess: () => {
             setFilters((prevState) => ({ ...prevState, page: 1 }));
         },

@@ -4,7 +4,7 @@ export enum EmployeeStatus {
 }
 
 export interface EmployeeOverview {
-    id: string;
+    id: number;
     userId: string;
     avatar: string;
     lastName: string;

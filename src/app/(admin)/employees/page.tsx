@@ -18,12 +18,14 @@ import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
+import { useAuth } from '@/hook/useAuth';
 
 interface EmployeeFilter extends PaginationState {
     search: string;
 }
 
 const EmployeePage = () => {
+    const { user } = useAuth();
 
     const [filters, setFilters] = useState<EmployeeFilter>({
         page: 1,
@@ -88,7 +90,12 @@ const EmployeePage = () => {
                 header: () => <span>Tên</span>,
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{`${row.original.firstName} ${row.original.lastName}`}</div>
+                        <div className="flex gap-3">
+                            {`${row.original.firstName} ${row.original.lastName}`}
+                            {
+                                user?.id === row.original.id && (<div className="bg-brand-500 text-white rounded px-1 py-0.5 text-xs">ME</div>)
+                            }
+                        </div>
                         <div className="text-xs text-gray-700">{row.original.phone}</div>
                     </div>
                 ),
