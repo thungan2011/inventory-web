@@ -12,20 +12,14 @@ export const PRODUCT_QUERY_KEY = 'products';
  */
 interface FetchAllProductParams {
     page?: number;
-    search: string;
-    origin: string;
-    packing: string;
+    search?: string;
+    origin?: string;
+    packing?: string;
     status?: ProductStatus;
 }
 
 const getAllProducts = (params: FetchAllProductParams): Promise<PageObject<ProductOverview>> => {
-    return httpRepository.get<PageObject<ProductOverview>>('/v1/products', {
-        page: params.page || 1,
-        search: params.search,
-        origin: params.origin,
-        packing: params.packing,
-        status: params.status,
-    });
+    return httpRepository.get<PageObject<ProductOverview>>('/v1/products', {...params});
 };
 
 export const useAllProducts = (params: FetchAllProductParams) => {

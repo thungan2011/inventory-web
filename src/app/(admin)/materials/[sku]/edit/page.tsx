@@ -119,7 +119,7 @@ const NewMaterialPage = () => {
                             <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
                                 <Input readOnly={isReadOnly} name="name" label="Tên nguyên vật liệu" placeholder="Nhập tên nguyên vật liệu"
                                        required />
-                                <Select readOnly={isReadOnly} name="categories" label="Danh mục" multiple options={
+                                <Select disabled={isReadOnly} name="categories" label="Danh mục" multiple options={
                                     categories ? categories.map(category => ({
                                         label: category.name,
                                         value: category.id,

@@ -1,7 +1,12 @@
 import httpRepository from '@/core/repository/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import { ImportProductDetail, ImportProductOverview, ImportProductType } from '@/modules/imports/products/interface';
+import {
+    ImportProductDetail,
+    ImportProductOverview,
+    ImportProductStatus,
+    ImportProductType,
+} from '@/modules/imports/products/interface';
 import useDataFetching from '@/hook/useDataFetching';
 import { toast } from 'react-toastify';
 
@@ -12,11 +17,17 @@ export const IMPORT_PRODUCT_QUERY_KEY = 'import_products';
  */
 interface FetchAllImportProductParams {
     page?: number;
+    code: string;
+    type?: ImportProductType;
+    status?: ImportProductStatus;
 }
 
 const getAllImportProducts = (params: FetchAllImportProductParams): Promise<PageObject<ImportProductOverview>> => {
     return httpRepository.get<PageObject<ImportProductOverview>>('/v1/product_import_receipts', {
         page: params.page || 1,
+        code: params.code,
+        type: params.type,
+        status: params.status,
     });
 };
 

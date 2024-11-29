@@ -81,7 +81,7 @@ const ModalUpdateProductPrice = ({ onClose, productPrice }: ModalUpdateProductPr
                 <DatePicker name="dateEnd" label="Ngày kết thúc" minDate={dayjs().toDate()} required />
                 <InputCurrency name="price" label="Giá" placeholder="Nhập giá" required unit="VND"
                                readOnly={isReadOnly} />
-                <Select name="status" label="Trạng thái" readOnly={isReadOnly}
+                <Select name="status" label="Trạng thái" disabled={isReadOnly}
                         tooltip="Trạng thái mặc định khi tạo là `Không hoạt động`"
                         options={[
                             {

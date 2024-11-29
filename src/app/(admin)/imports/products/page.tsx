@@ -12,7 +12,6 @@ import {
     ImportProductStatus,
     ImportProductStatusVietnamese,
     ImportProductType,
-    ImportProductTypesVietnamese,
 } from '@/modules/imports/products/interface';
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
@@ -23,20 +22,28 @@ import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ImportProductTypesBadge from '@/components/Badge/ImportProductTypesBadge';
+import { ImportMaterialTypeVietnamese } from '@/modules/imports/materials/interface';
 
 interface ImportProductFilter extends PaginationState {
-    search: string;
+    code: string;
+    type: ImportProductType | 'ALL';
+    status: ImportProductStatus | 'ALL';
 }
 
 const ImportProductPage = () => {
 
-    const initialFilterValues = {
+    const initialFilterValues: ImportProductFilter = {
         page: 1,
-        search: '',
+        code: '',
+        type: 'ALL',
+        status: 'ALL',
     };
     const [filters, setFilters] = useState<ImportProductFilter>(initialFilterValues);
     const importProductQuery = useAllImportProducts({
         page: filters.page,
+        code: filters.code,
+        type: filters.type === 'ALL' ? undefined : filters.type,
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {
@@ -135,17 +142,13 @@ const ImportProductPage = () => {
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-3 gap-4">
-                                    <Input name="search" placeholder="Mã phiếu nhập" />
-                                    <Input name="search" placeholder="Người lập phiếu" />
-                                    <Input name="search" placeholder="Ngày lập phiếu" />
-                                </div>
-                                <div className="grid grid-cols-3 gap-4">
+                                    <Input name="code" placeholder="Mã phiếu nhập" />
                                     <Select name="type"
                                             placeholder="Lọc theo loại"
                                             options={[
                                                 { label: 'Tất cả loại', value: 'ALL' },
                                                 ...Object.values(ImportProductType).map(value => ({
-                                                    label: ImportProductTypesVietnamese[value],
+                                                    label: ImportMaterialTypeVietnamese[value],
                                                     value,
                                                 })),
                                             ]}

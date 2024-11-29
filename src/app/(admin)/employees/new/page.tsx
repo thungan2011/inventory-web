@@ -191,7 +191,7 @@ const NewEmployeePage = () => {
                                         />
                                     </div>
                                 </div>
-                                <Select name="status" label="Trạng thái" readOnly options={[
+                                <Select name="status" label="Trạng thái" disabled options={[
                                     ...Object.keys(BaseStatus).map(status => (
                                         { label: BaseStatusVietnamese[status as BaseStatus], value: status }
                                     )),

@@ -9,11 +9,10 @@ import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
-import { OrderStatus, PaymentMethod, PaymentMethodVietnamese } from '@/modules/orders/interface';
+import { OrderDetail, OrderStatus, PaymentMethod, PaymentMethodVietnamese } from '@/modules/orders/interface';
 import InputCurrency from '@/components/InputCurrency';
 import TextArea from '@/components/TextArea';
 import Select, { SelectProps } from '@/components/Select';
-import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
 import { CustomerStatus } from '@/modules/customers/interface';
 import { useAllCustomers } from '@/modules/customers/repository';
 import { useAllProducts } from '@/modules/products/repository';
@@ -25,45 +24,78 @@ import { MdRemoveCircleOutline } from 'react-icons/md';
 import useClickOutside from '@/hook/useClickOutside';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import AddressForm from '@/components/AddressForm';
-import { useOrderByCode, useUpdateOrder } from '@/modules/orders/repository';
+import { useCreateOrder, useOrderByCode } from '@/modules/orders/repository';
 import ButtonAction from '@/components/ButtonAction';
+import dayjs from 'dayjs';
 import DatePicker from '@/components/DatePicker';
-import { router } from 'next/client';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
+import TableCore from '@/components/Tables/TableCore';
+import ProductSearch from '@/components/ProductSearch';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
 
 const DELIVERY_METHODS = {
-    SELF_PICKUP: 'Tự đến lấy',
-    DELIVERY: 'Giao hàng tận',
+    STORE_PICKUP: 'STORE_PICKUP',
+    SHIPPING: 'SHIPPING',
 } as const;
 
 const DELIVERY_METHOD_OPTIONS: SelectProps['options'] = [
-    { label: 'Tự đến lấy', value: DELIVERY_METHODS.SELF_PICKUP },
-    { label: 'Giao hàng tận nơi', value: DELIVERY_METHODS.DELIVERY },
+    { label: 'Tự đến lấy', value: DELIVERY_METHODS.STORE_PICKUP },
+    { label: 'Giao hàng tận nơi', value: DELIVERY_METHODS.SHIPPING },
 ];
+
+interface Product {
+    id: number;
+    name: string;
+    quantity: number;
+    price: number;
+    sku: string;
+    weight: number;
+    unit: string;
+    packing: string;
+    image?: string;
+}
+
+interface FormValues {
+    customerId: number;
+    receiverName: string;
+    receiverPhone: string;
+    receiverAddress: string;
+    ward: string;
+    district: string;
+    city: string;
+    shippingFee: number;
+    totalPayment: number;
+    totalPrice: number;
+    deliveryType: string;
+    deliveryDate: Date;
+    discountPercent: number;
+    status: OrderStatus;
+    note: string;
+    products: Product[];
+}
 
 const ProductSchema = object({
     receiverName: string().required('Tên người nhận không được để trống'),
     receiverPhone: string().required('Số điện thoại người nhận không được để trống'),
-    deliveryMethod: string().required('Chọn hình thức nhận hàng'),
-    receiverAddress: string().when('deliveryMethod', ([deliveryMethod], schema) => {
-        return deliveryMethod === DELIVERY_METHODS.DELIVERY
+    deliveryType: string().required('Chọn hình thức nhận hàng'),
+    receiverAddress: string().when('deliveryType', ([deliveryType], schema) => {
+        return deliveryType === DELIVERY_METHODS.SHIPPING
             ? schema.required('Địa chỉ nhận hàng không được để trống')
             : schema.optional();
     }),
-    ward: string().when('deliveryMethod', ([deliveryMethod], schema) => {
-        return deliveryMethod === DELIVERY_METHODS.DELIVERY
+    ward: string().when('deliveryType', ([deliveryType], schema) => {
+        return deliveryType === DELIVERY_METHODS.SHIPPING
             ? schema.required('Chọn Phường/xã')
             : schema.optional();
     }),
-    district: string().when('deliveryMethod', ([deliveryMethod], schema) => {
-        return deliveryMethod === DELIVERY_METHODS.DELIVERY
+    district: string().when('deliveryType', ([deliveryType], schema) => {
+        return deliveryType === DELIVERY_METHODS.SHIPPING
             ? schema.required('Chọn Quận/huyện')
             : schema.optional();
     }),
-    city: string().when('deliveryMethod', ([deliveryMethod], schema) => {
-        return deliveryMethod === DELIVERY_METHODS.DELIVERY
+    city: string().when('deliveryType', ([deliveryType], schema) => {
+        return deliveryType === DELIVERY_METHODS.SHIPPING
             ? schema.required('Chọn Tỉnh/thành phố')
             : schema.optional();
     }),
@@ -75,131 +107,187 @@ const ProductSchema = object({
         }),
     ).min(1, 'Vui lòng chọn ít nhất 1 sản phẩm'),
 
-    totalShipping: number().when('deliveryMethod', ([deliveryMethod], schema) => {
-        return deliveryMethod === DELIVERY_METHODS.DELIVERY
+    shippingFee: number().when('deliveryType', ([deliveryType], schema) => {
+        return deliveryType === DELIVERY_METHODS.SHIPPING
             ? schema.required('Nhập phí vận chuyển')
             : schema.default(0);
     }),
-    vat: number().required('Nhập thuế VAT'),
+    discountPercent: number().required('Nhập chiếc khấu'),
 });
 
-interface FormValues {
-    customerId: number;
-    receiverName: string;
-    receiverPhone: string;
-    receiverAddress: string;
-    ward: string;
-    district: string;
-    city: string;
-    totalShipping: number;
-    totalPayment: number;
-    totalPrice: number;
-    deliveryMethod: string;
-    deliveryDate: Date;
-    vat: number;
-    status: OrderStatus;
-    note: string;
-    products: {
-        id: number;
-        name: string;
-        quantity: number;
-        price: number;
-        sku: string;
-        weight: number;
-        unit: string;
-        packing: string;
-    }[];
+interface ProductTableProps {
+    products: Product[];
 }
 
-interface CustomerFilter extends PaginationState {
-    name: string;
-    code: string;
-    phone: string;
-}
+const ProductTable = ({ products }: ProductTableProps) => {
+    const { setFieldValue } = useFormikContext<FormValues>();
 
-interface ProductFilter extends PaginationState {
-    search: string;
-    origin: string;
-    packing: string;
-}
+    const handleQuantityChange = (index: number, newValue: number) => {
+        if (newValue <= 0) {
+            console.log('remove');
+            const newProducts = [...products];
+            console.log(newProducts);
+            newProducts.splice(index, 1);
+            setFieldValue('products', newProducts);
+        }
+    };
+
+    return (
+        <TableCore className="mt-3">
+            <TableCore.Header>
+                <TableCore.RowHeader>
+                    <TableCore.Head>Sản phẩm</TableCore.Head>
+                    <TableCore.Head>Giá</TableCore.Head>
+                    <TableCore.Head>Số lượng</TableCore.Head>
+                    <TableCore.Head className="!max-w-8">Thành tiền</TableCore.Head>
+                    <TableCore.Head className="!max-w-8"></TableCore.Head>
+                </TableCore.RowHeader>
+            </TableCore.Header>
+            <FieldArray name="products" render={arrayHelper => (
+                <TableCore.Body>
+                    {
+                        products.length > 0 ? (
+                            products.map((product, index) => (
+                                <TableCore.RowBody key={product.id}>
+                                    <TableCore.Cell>
+                                        <div className="flex gap-2">
+                                            <div
+                                                className="relative w-14 h-14 border rounded overflow-hidden">
+                                                <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
+                                                       alt={`Ảnh của ${product.name}`}
+                                                       fill
+                                                       className="object-cover" />
+                                            </div>
+                                            <div
+                                                className="flex-1 flex flex-col justify-center max-w-72">
+                                                <div
+                                                    className="text-sm font-medium line-clamp-1"
+                                                    title={`${product.sku} - ${product.name}`}
+                                                >
+                                                    {product.sku} - {product.name}
+                                                </div>
+                                                <div
+                                                    className="text-xs line-clamp-1">{product.weight}{product.unit} - {product.packing}</div>
+                                            </div>
+                                        </div>
+                                    </TableCore.Cell>
+                                    <TableCore.Cell>{formatNumberToCurrency(product.price)}</TableCore.Cell>
+                                    <TableCore.Cell>
+                                        <InputCurrency name={`products.${index}.quantity`}
+                                                       placeholder="Nhập số lượng"
+                                                       step={1}
+                                                       wrapperClassName="mb-0"
+                                                       onChange={(value) => handleQuantityChange(index, value)}
+                                        />
+                                    </TableCore.Cell>
+                                    <TableCore.Cell>
+                                        {formatNumberToCurrency(product.price * product.quantity)}
+                                    </TableCore.Cell>
+                                    <TableCore.Cell>
+                                        <div className="flex justify-end items-center">
+                                            <button type="button"
+                                                    onClick={() => arrayHelper.remove(index)}>
+                                                <MdRemoveCircleOutline size={20} />
+                                            </button>
+                                        </div>
+                                    </TableCore.Cell>
+                                </TableCore.RowBody>
+                            ))
+                        ) : (
+                            <TableCore.RowBody>
+                                <TableCore.Cell colSpan={5}>
+                                    <div className="text-center text-gray-400 py-10">
+                                        Chưa có sản phẩm nào
+                                    </div>
+                                </TableCore.Cell>
+                            </TableCore.RowBody>
+                        )
+                    }
+                </TableCore.Body>
+            )} />
+        </TableCore>
+    );
+};
 
 interface FormContentProps {
     isLoading: boolean;
+    order: OrderDetail;
 }
 
-const FormContent = ({ isLoading } : FormContentProps) => {
+const FormContent = ({ isLoading, order }: FormContentProps) => {
     const { values, setFieldValue, errors, touched } = useFormikContext<FormValues>();
-    const [search, setSearch] = useState<string>('');
     const [showListProduct, setShowListProduct] = useState<boolean>(false);
+    const [productSearchTerm, setProductSearchTerm] = useState<string>('');
+    const [customerSearchTerm, setCustomerSearchTerm] = useState<string>(order.customer.name);
+
     const dropdownRef = useRef<HTMLDivElement>(null);
+
     useClickOutside(dropdownRef, () => setShowListProduct(false));
 
-    // Customer
-    const [customerFilters, setCustomerFilters] = useState<CustomerFilter>({
-        page: 1,
-        name: '',
-        code: '',
-        phone: '',
-    });
     const customerQuery = useAllCustomers({
-        page: customerFilters.page,
-        name: customerFilters.name,
-        code: customerFilters.code,
-        phone: customerFilters.phone,
+        page: 1,
+        name: customerSearchTerm,
         status: CustomerStatus.ACTIVE,
     });
 
-    const {
-        data: customers,
-    } = useFilterPagination({
-        queryResult: customerQuery,
-        initialFilters: customerFilters,
-        onFilterChange: setCustomerFilters,
-    });
-
-    const [productFilters, setProductFilters] = useState<ProductFilter>({
-        search: '',
-        packing: '',
-        origin: '',
-        page: 1,
-    });
-
     const productQuery = useAllProducts({
-        page: productFilters.page,
-        search: productFilters.search,
-        origin: productFilters.origin,
-        packing: productFilters.packing,
+        page: 1,
+        search: productSearchTerm,
         status: ProductStatus.ACTIVE,
     });
 
-    const {
-        data: productsSearch,
-    } = useFilterPagination({
-        queryResult: productQuery,
-        initialFilters: productFilters,
-        onFilterChange: setProductFilters,
-    });
+    const customerOptions = React.useMemo(() => {
+        return (customerQuery.data?.data || []).map(customer => ({
+            value: customer.id,
+            label: `${customer.code} - ${customer.name} - ${customer.phone}`,
+        }));
+    }, [customerQuery.data]);
 
     // Filter products before render
-    const filteredProducts = React.useMemo(() => {
-        if (!productsSearch) return [];
+    const availableProducts = React.useMemo(() => {
+        if (!productQuery.data) return [];
 
-        return productsSearch.filter(product => {
+        return productQuery.data.data.filter(product => {
             const hasValidPrice = product.prices && product.prices.length > 0;
             const isNotInCart = !values.products.find(p => p.id === product.id);
             return hasValidPrice && isNotInCart;
         });
-    }, [productsSearch, values.products]);
+    }, [productQuery.data, values.products]);
 
-    const onChangeSearchValue = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newValue = e.target.value;
-        setSearch(newValue);
-    };
+    useEffect(() => {
+        const totalPrice = values.products.reduce((acc, product) => {
+            return acc + product.price * product.quantity;
+        }, 0);
+        setFieldValue('totalPrice', totalPrice);
+        setFieldValue('totalPayment', totalPrice + values.shippingFee - (totalPrice * values.discountPercent / 100));
+    }, [values.products, values.discountPercent, values.shippingFee, setFieldValue]);
+
+    useEffect(() => {
+        if (values.deliveryType === DELIVERY_METHODS.STORE_PICKUP) {
+            setFieldValue('shippingFee', 0);
+            setFieldValue('ward', '');
+            setFieldValue('district', '');
+            setFieldValue('city', '');
+            setFieldValue('receiverAddress', '');
+        }
+    }, [values.deliveryType, setFieldValue]);
+
+    useEffect(() => {
+        const selectedCustomer = customerQuery.data?.data.find(c => c.id === values.customerId);
+        if (selectedCustomer) {
+            setFieldValue('receiverName', selectedCustomer.name);
+            setFieldValue('receiverPhone', selectedCustomer.phone);
+            setFieldValue('receiverAddress', selectedCustomer.address || '');
+            setFieldValue('city', selectedCustomer.city || '');
+            setFieldValue('district', selectedCustomer.district || '');
+            setFieldValue('ward', selectedCustomer.ward || '');
+        }
+    }, [values.customerId, setFieldValue, customerQuery.data]);
 
     const handleAddProduct = (product: ProductOverview) => {
         const isExist = values.products.find(p => p.id === product.id);
         if (!isExist) {
-            const newProduct = {
+            const newProduct: Product = {
                 id: product.id,
                 sku: product.sku,
                 quantity: 1,
@@ -213,215 +301,89 @@ const FormContent = ({ isLoading } : FormContentProps) => {
             setFieldValue('products', [...values.products, newProduct]);
         }
         setShowListProduct(false);
-        setSearch('');
-    };
-
-    useEffect(() => {
-        const totalPrice = values.products.reduce((acc, product) => {
-            return acc + product.price * product.quantity;
-        }, 0);
-        setFieldValue('totalPrice', totalPrice);
-        setFieldValue('totalPayment', totalPrice + values.totalShipping + (totalPrice * values.vat / 100));
-    }, [values.products, values.vat, values.totalShipping, setFieldValue]);
-
-    useEffect(() => {
-        if (values.deliveryMethod === DELIVERY_METHODS.SELF_PICKUP) {
-            setFieldValue('totalShipping', 0);
-            setFieldValue('ward', '');
-            setFieldValue('district', '');
-            setFieldValue('city', '');
-            setFieldValue('receiverAddress', '');
-        }
-    }, [values.deliveryMethod, setFieldValue]);
-
-    useEffect(() => {
-        const customer = customers?.find(customer => customer.id === values.customerId);
-        if (customer) {
-            setFieldValue('receiverName', customer.name);
-            setFieldValue('receiverPhone', customer.phone);
-            setFieldValue('receiverAddress', customer.address || '');
-            setFieldValue('city', customer.city || '');
-            setFieldValue('district', customer.district || '');
-            setFieldValue('ward', customer.ward || '');
-        }
-    }, [values.customerId, setFieldValue, customers]);
-
-    const renderDeliverySection = () => {
-        const isSelfPickup = values.deliveryMethod === DELIVERY_METHODS.SELF_PICKUP;
-
-        return (
-            <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
-                <Select name="deliveryMethod"
-                        options={DELIVERY_METHOD_OPTIONS}
-                        label="Hình thức nhận hàng"
-                        placeholder="Chọn hình thức nhận hàng"
-                />
-                <DatePicker name="deliveryDate" label="Ngày giao hàng dự kiến" />
-                <Input name="receiverName" label="Tên người nhận" placeholder="Nhập tên người nhận"
-                       required />
-                <Input name="receiverPhone" label="Số điện thoại" placeholder="Nhập số điện thoại"
-                       required />
-                {
-                    !isSelfPickup && (
-                        <>
-                            <Input name="receiverAddress" label="Địa chỉ" placeholder="Nhập địa chỉ" required />
-                            <AddressForm city="" district="" ward="" setFieldValue={setFieldValue} />
-                        </>
-                    )
-                }
-            </div>
-        );
     };
 
     return (
         <Form>
-            <div className="grid grid-cols-6 gap-x-3">
-                <div className={`col-span-4`}>
+            <div className="grid grid-cols-8 gap-x-3">
+                <div className={`col-span-6`}>
                     <Card className={`p-[18px]`}>
                         <Typography.Title level={4}>Thông tin khách hàng</Typography.Title>
                         <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
                             <div className="flex gap-2 items-end">
                                 <div className="flex-1">
-                                    <Select name="customerId" label="Mã khách hàng"
-                                            options={
-                                                (customers || []).map(customer => ({
-                                                    label: `${customer.code} - ${customer.name} - ${customer.phone}`,
-                                                    value: customer.id,
-                                                }))
-                                            }
-                                            placeholder="Chọn mã khách hàng"
+                                    <Select name="customerId" label="Khách hàng"
+                                            options={customerOptions}
+                                            placeholder="Chọn khách hàng"
+                                            enableSearch={true}
+                                            onSearch={setCustomerSearchTerm}
                                     />
                                 </div>
                                 <ButtonIcon className="h-10 mb-3" type="button" icon={<FaPlus />} />
                             </div>
                         </div>
                     </Card>
+
                     <Card className={`p-[18px] mt-5`}>
                         <Typography.Title level={4}>Nhận hàng và vận chuyển</Typography.Title>
-                        {renderDeliverySection()}
+                        <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
+                            <Select name="deliveryType"
+                                    options={DELIVERY_METHOD_OPTIONS}
+                                    label="Hình thức nhận hàng"
+                                    placeholder="Chọn hình thức nhận hàng"
+                            />
+                            <DatePicker name="deliveryDate"
+                                        label="Ngày giao hàng dự kiến"
+                            />
+                            <Input name="receiverName"
+                                   label="Tên người nhận"
+                                   placeholder="Nhập tên người nhận"
+                                   required
+                            />
+                            <Input name="receiverPhone"
+                                   label="Số điện thoại"
+                                   placeholder="Nhập số điện thoại"
+                                   required
+                            />
+                            {
+                                values.deliveryType === DELIVERY_METHODS.SHIPPING && (
+                                    <>
+                                        <Input name="receiverAddress"
+                                               label="Địa chỉ"
+                                               placeholder="Nhập địa chỉ"
+                                               required
+                                        />
+                                        <AddressForm city={values.city}
+                                                     district={values.district}
+                                                     ward={values.ward}
+                                                     setFieldValue={setFieldValue}
+                                        />
+                                    </>
+                                )
+                            }
+                            <TextArea name="note" label="Ghi chú" placeholder="Ghi chú đơn hàng (nếu có)" />
+                        </div>
                     </Card>
+
                     <Card className={`p-[18px] col-span-3 mt-5`}>
                         <Typography.Title level={4}>Chi tiết đơn hàng</Typography.Title>
                         <div className="flex gap-2 items-center">
                             <div className="font-normal text-sm cursor-pointer">Sản phẩm áp dụng:</div>
                             {errors.products && touched.products && typeof errors.products === 'string' && (
-                                <div className="text-red-500 text-sm">{errors.products}</div>
+                                <div className="text-red-500 text-xs">{errors.products}</div>
                             )}
                         </div>
                         <div className="border p-2 rounded">
                             <div className="flex gap-3">
-                                <div className="relative w-[500px]">
-                                    <input className="border rounded h-8 px-2 text-sm w-full"
-                                           value={search} onChange={onChangeSearchValue}
-                                           onClick={() => setShowListProduct(true)}
-                                           placeholder="Tìm theo tên hoặc mã sản phẩm" />
-                                    {
-                                        showListProduct && (
-                                            <div
-                                                ref={dropdownRef}
-                                                className="absolute z-10 left-0 right-0 py-2 bg-white shadow-lg rounded max-h-72 border overflow-auto">
-                                                {
-                                                    filteredProducts?.map(product => {
-                                                        if (values.products.find(p => p.id === product.id && product.prices.length > 0)) return null;
-
-                                                        return (
-                                                            <div key={product.id}
-                                                                 className="p-2 hover:bg-gray-100 cursor-pointer"
-                                                                 onClick={() => handleAddProduct(product)}>
-                                                                <div className="flex gap-3">
-                                                                    <div
-                                                                        className="relative w-12 h-12 rounded border overflow-hidden">
-                                                                        <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
-                                                                               alt={`Ảnh combo ${product.name}`}
-                                                                               fill
-                                                                               className="object-cover" />
-                                                                    </div>
-                                                                    <div className="flex-1 flex flex-col justify-center">
-                                                                        <div className="text-sm font-medium line-clamp-1">
-                                                                            #{product.sku} - {product.name}
-                                                                        </div>
-                                                                        <div className="text-xs line-clamp-1">
-                                                                            {product.packing}
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className="flex justify-center items-center">
-                                                                        <button type="button" className="text-brand-500">
-                                                                            <FaPlus />
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })
-                                                }
-                                                {
-                                                    filteredProducts?.length === 0 && (
-                                                        <div className="text-center text-gray-400 py-2">
-                                                            Không tìm thấy sản phẩm nào
-                                                        </div>
-                                                    )
-                                                }
-                                            </div>
-                                        )
-                                    }
-                                </div>
+                                <ProductSearch onSelect={handleAddProduct}
+                                               products={availableProducts}
+                                               searchValue={productSearchTerm}
+                                               onSearchChange={setProductSearchTerm}
+                                               showDropdown={showListProduct}
+                                               onShowDropdownChange={setShowListProduct}
+                                />
                             </div>
-                            <div className="mt-3 min-h-64 overflow-y-auto border-t">
-                                <FieldArray name="products" render={arrayHelper => (
-                                    <div>
-                                        {
-                                            values.products.length > 0 ? (
-                                                values.products.map((product, index) => (
-                                                    <div key={`product-${index}`}
-                                                         className={`flex justify-between gap-3 py-1 ${index !== 0 && 'border-t'}`}>
-                                                        <div className="flex gap-2 flex-1 items-center">
-                                                            <div className="flex justify-center items-center w-8">
-                                                                {index + 1}
-                                                            </div>
-                                                            <div
-                                                                className="relative w-14 h-14 border rounded overflow-hidden">
-                                                                <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
-                                                                       alt={`Ảnh của ${product.name}`}
-                                                                       fill
-                                                                       className="object-cover" />
-                                                            </div>
-                                                            <div className="flex-1 flex flex-col justify-center">
-                                                                <div className="text-sm font-medium line-clamp-1"
-                                                                     title={`${product.sku} - ${product.name}`}
-                                                                >
-                                                                    {product.sku} - {product.name}
-                                                                </div>
-                                                                <div
-                                                                    className="text-xs line-clamp-1">{product.weight}{product.unit} - {product.packing}</div>
-                                                            </div>
-                                                            <div>
-                                                                {formatNumberToCurrency(product.price)}
-                                                            </div>
-                                                        </div>
-                                                        <div className="flex gap-2 items-center">
-                                                            <div className="w-36">
-                                                                <InputCurrency name={`products.${index}.quantity`}
-                                                                               placeholder="Số lượng"
-                                                                               wrapperClassName="mb-0" />
-                                                            </div>
-                                                            <div className="w-14 flex items-center justify-center">
-                                                                <button type="button"
-                                                                        onClick={() => arrayHelper.remove(index)}>
-                                                                    <MdRemoveCircleOutline size={20} />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div className="text-center text-gray-400 py-2">
-                                                    Chưa có sản phẩm nào
-                                                </div>
-                                            )
-                                        }
-                                    </div>
-                                )} />
-                            </div>
+                            <ProductTable products={values.products} />
                         </div>
                     </Card>
                     <Card className={`p-[18px] mt-5`}>
@@ -436,25 +398,45 @@ const FormContent = ({ isLoading } : FormContentProps) => {
                                         }))
                                     }
                             />
-                            <InputCurrency name="paymentAmount" label="Số tiền đã thanh toán" unit="VND" />
+                            <InputCurrency name="paymentAmount"
+                                           placeholder="Nhập số tiền thanh toán"
+                                           label="Số tiền đã thanh toán"
+                                           unit="VND"
+                            />
                         </div>
                     </Card>
-                    <Card className={`p-[18px] mt-5`}>
-                        <TextArea name="note" label="Ghi chú" placeholder="Ghi chú đơn hàng (nếu có)" />
-                    </Card>
                 </div>
-                <Card className={`p-[18px] col-span-2`}>
-                    <Typography.Title level={4}>Thanh toán</Typography.Title>
-                    <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 text-xs">
-                        <InputCurrency name="totalPrice" label="Tổng tiền sản phẩm" unit="VND" readOnly />
-                        <InputCurrency name="totalShipping" label="Phí vận chuyển" unit="VND"
-                                       tooltip="Nếu bạn không nhập phí vận chuyển, hệ thống sẽ mặc định là 0 VND." />
-                        <Input name="vat" label="Chiết khấu" placeholder="Nhập thuế GTGT"
-                               tooltip="Nếu không nhập thuế GTGT sẽ tự động tính toán với tỷ lệ 10% trên tổng hóa đơn." />
-                        <InputCurrency name="totalPayment" label="Thanh toán" placeholder="Thanh toán" readOnly
-                                       unit="VND" />
+
+                <div className="col-span-2 relative">
+                    <div className="sticky top-16 w-full max-w-full">
+                        <Card className={`p-[18px]`}>
+                            <Typography.Title level={4}>Thanh toán</Typography.Title>
+                            <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 text-xs">
+                                <InputCurrency name="totalPrice"
+                                               label="Tổng tiền sản phẩm"
+                                               unit="VND"
+                                               readOnly
+                                />
+                                <InputCurrency name="shippingFee"
+                                               label="Phí vận chuyển"
+                                               unit="VND"
+                                               tooltip="Nếu bạn không nhập phí vận chuyển, hệ thống sẽ mặc định là 0 VND."
+                                />
+                                <Input name="discountPercent"
+                                       label="Chiết khấu"
+                                       placeholder="Nhập thuế GTGT"
+                                       tooltip="Nếu không nhập thuế GTGT sẽ tự động tính toán với tỷ lệ 10% trên tổng hóa đơn."
+                                />
+                                <InputCurrency name="totalPayment"
+                                               label="Thanh toán"
+                                               placeholder="Thanh toán"
+                                               readOnly
+                                               unit="VND"
+                                />
+                            </div>
+                        </Card>
                     </div>
-                </Card>
+                </div>
             </div>
 
             <div className="mt-5 mb-10 flex justify-end items-center gap-4">
@@ -470,15 +452,16 @@ const FormContent = ({ isLoading } : FormContentProps) => {
 };
 
 const UpdateOrderPage = () => {
+    const router = useRouter();
     const { code } = useParams<{ code: string }>();
-    const { data: order, isLoading } = useOrderByCode(code);
-    const updateOrder = useUpdateOrder();
+    const { data: order, isLoading: isOrderLoading } = useOrderByCode(code);
+    const createOrder = useCreateOrder();
 
     useEffect(() => {
-        document.title = 'Nut Garden - Tạo đơn hàng';
+        document.title = 'Nut Garden - Cập nhật đơn hàng';
     }, []);
 
-    if (isLoading) {
+    if (isOrderLoading) {
         return <Loader />;
     }
 
@@ -488,27 +471,38 @@ const UpdateOrderPage = () => {
 
     const initialFormValues: FormValues = {
         customerId: order.customer.id,
-        receiverName: order.customer.name,
+        receiverName: '',
         receiverPhone: order.phone,
         receiverAddress: order.address,
         ward: order.ward,
         district: order.district,
         city: order.city,
-        totalShipping: 0,
+        shippingFee: order.shippingFee,
         totalPayment: 0,
         totalPrice: order.totalPrice,
-        deliveryMethod: DELIVERY_METHOD_OPTIONS[0].value.toString(),
-        deliveryDate: order.deliveryDate,
-        vat: 10,
-        status: order.status,
+        deliveryType: order.deliveryType,
+        deliveryDate: dayjs(order.deliveryDate).toDate(),
+        discountPercent: order.discountPercent,
+        status: OrderStatus.PROCESSED,
         note: order.note,
-        products: [],
+        products: order.orderDetails.map(detail => ({
+            id: detail.product.id,
+            name: detail.product.name,
+            quantity: detail.quantity,
+            price: detail.price,
+            sku: detail.product.sku,
+            weight: detail.product.weight,
+            unit: detail.product.unit,
+            packing: detail.product.packing,
+            image: detail.product.image,
+        })),
     };
 
     const handleSubmit = async (values: FormValues) => {
         console.log(values);
         console.table(values);
         try {
+
             router.push('/orders');
         } catch (error) {
             console.log(error);
@@ -519,7 +513,7 @@ const UpdateOrderPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
-                <FormContent isLoading={updateOrder.isPending} />
+                <FormContent isLoading={createOrder.isPending} order={order} />
             </Formik>
         </div>
     );

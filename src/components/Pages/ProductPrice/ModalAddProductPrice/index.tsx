@@ -130,7 +130,7 @@ const FormikContent = ({ onClose }: { onClose: () => void }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <DatePicker name="startDate" label="Ngày bắt đầu" minDate={currentDate} required />
                 <DatePicker name="endDate" label="Ngày kết thúc" minDate={currentDate} required />
-                <Select name="status" label="Trạng thái" readOnly
+                <Select name="status" label="Trạng thái" disabled
                         tooltip="Trạng thái mặc định khi tạo là `Ngưng hoạt động`" options={[
                     { value: BaseStatus.ACTIVE, label: BaseStatusVietnamese[BaseStatus.ACTIVE] },
                     { value: BaseStatus.INACTIVE, label: BaseStatusVietnamese[BaseStatus.INACTIVE] },
@@ -271,7 +271,7 @@ const ModalAddProductPrice = ({ onClose, isOpen }: ModalAddProductPriceProps) =>
     };
 
     return (
-        <Modal title="Thêm giá" open={true} onClose={onClose} className="!w-3/4">
+        <Modal title="Thêm bảng giá" open={true} onClose={onClose} className="!w-3/4">
             <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={validationSchema}>
                 <FormikContent onClose={onClose} />
             </Formik>

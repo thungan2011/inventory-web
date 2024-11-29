@@ -12,20 +12,14 @@ export const CUSTOMER_QUERY_KEY = 'customers';
  */
 interface FetchAllCustomerParams {
     page?: number;
-    name: string;
-    code: string;
+    name?: string;
+    code?: string;
     status?: CustomerStatus;
-    phone: string;
+    phone?: string;
 }
 
 const getAllCustomers = (params: FetchAllCustomerParams): Promise<PageObject<CustomerOverview>> => {
-    return httpRepository.get<PageObject<CustomerOverview>>('/v1/customers', {
-        page: params.page || 1,
-        name: params.name,
-        code: params.code,
-        status: params.status,
-        phone: params.phone,
-    });
+    return httpRepository.get<PageObject<CustomerOverview>>('/v1/customers', {...params});
 };
 
 export const useAllCustomers = (params: FetchAllCustomerParams) => {
