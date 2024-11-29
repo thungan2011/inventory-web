@@ -4,6 +4,7 @@ import { PageObject } from '@/core/pagination/interface';
 import {
     ExportMaterialDetail,
     ExportMaterialOverview,
+    ExportMaterialStatus,
     ExportMaterialType,
 } from '@/modules/exports/materials/interface';
 import useDataFetching from '@/hook/useDataFetching';
@@ -16,11 +17,17 @@ export const EXPORT_MATERIAL_QUERY_KEY = 'export_materials';
  */
 interface FetchAllExportMaterialParams {
     page?: number;
+    code: string;
+    type?: ExportMaterialType;
+    status?: ExportMaterialStatus;
 }
 
 const getAllExportMaterials = (params: FetchAllExportMaterialParams): Promise<PageObject<ExportMaterialOverview>> => {
     return httpRepository.get<PageObject<ExportMaterialOverview>>('/v1/material_export_receipts', {
         page: params.page || 1,
+        code: params.code,
+        type: params.type,
+        status: params.status,
     });
 };
 

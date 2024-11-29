@@ -271,7 +271,7 @@ const ModalAddProductPrice = ({ onClose, isOpen }: ModalAddProductPriceProps) =>
     };
 
     return (
-        <Modal title="Thêm giá" open={true} onClose={onClose} className="!w-3/4">
+        <Modal title="Thêm bảng giá" open={true} onClose={onClose} className="!w-3/4">
             <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={validationSchema}>
                 <FormikContent onClose={onClose} />
             </Formik>

@@ -4,6 +4,7 @@ import { PageObject } from '@/core/pagination/interface';
 import {
     ImportMaterialDetail,
     ImportMaterialOverview,
+    ImportMaterialStatus,
     ImportMaterialType,
 } from '@/modules/imports/materials/interface';
 import useDataFetching from '@/hook/useDataFetching';
@@ -16,11 +17,17 @@ export const IMPORT_MATERIAL_QUERY_KEY = 'import_materials';
  */
 interface FetchAllImportMaterialParams {
     page?: number;
+    code: string;
+    type?: ImportMaterialType;
+    status?: ImportMaterialStatus;
 }
 
 const getAllImportMaterials = (params: FetchAllImportMaterialParams): Promise<PageObject<ImportMaterialOverview>> => {
     return httpRepository.get<PageObject<ImportMaterialOverview>>('/v1/material_import_receipts', {
         page: params.page || 1,
+        code: params.code,
+        type: params.type,
+        status: params.status,
     });
 };
 
@@ -44,7 +51,7 @@ export const useImportMaterialByCode = (code: string) => {
     return useDataFetching(
         [IMPORT_MATERIAL_QUERY_KEY, code],
         () => getImportMaterialByCode(code),
-        {enabled: !!code}
+        { enabled: !!code },
     );
 };
 

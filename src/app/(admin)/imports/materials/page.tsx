@@ -24,17 +24,25 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ImportMaterialTypeBadge from '@/components/Badge/ImportMateriaTypeBadge';
 
 interface ImportMaterialFilter extends PaginationState {
-    search: string;
+    code: string;
+    type: ImportMaterialType | 'ALL';
+    status: ImportMaterialStatus | 'ALL';
 }
 
 const ImportMaterialPage = () => {
-    const initialFilterValues = {
+    const initialFilterValues : ImportMaterialFilter = {
         page: 1,
-        search: '',
+        code: '',
+        type: 'ALL',
+        status: 'ALL',
     };
     const [filters, setFilters] = useState<ImportMaterialFilter>(initialFilterValues);
     const importMaterialQuery = useAllImportMaterials({
         page: filters.page,
+        code: filters.code,
+        type: filters.type === 'ALL' ? undefined : filters.type,
+        status: filters.status === 'ALL' ? undefined : filters.status,
+
     });
 
     const {
@@ -97,7 +105,6 @@ const ImportMaterialPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/imports/materials/${row.original.code}`} />
-                        {/*<ButtonAction.Update />*/}
                     </div>
                 ),
                 enableSorting: false,
@@ -129,11 +136,7 @@ const ImportMaterialPage = () => {
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-3 gap-4">
-                                    <Input name="search" placeholder="Mã phiếu nhập" />
-                                    <Input name="search" placeholder="Người lập phiếu" />
-                                    <Input name="search" placeholder="Ngày lập phiếu" />
-                                </div>
-                                <div className="grid grid-cols-3 gap-4">
+                                    <Input name="code" placeholder="Mã phiếu nhập" />
                                     <Select name="type"
                                             placeholder="Lọc theo loại"
                                             options={[

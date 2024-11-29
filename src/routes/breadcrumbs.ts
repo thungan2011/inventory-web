@@ -30,6 +30,15 @@ export const breadcrumbs: IBreadcrumb[] = [
         ],
     },
     {
+        label: 'Cập nhật đơn hàng',
+        link: '^/orders/[^/]+/edit$',
+        breadcrumbTrail: [
+            { label: 'Đơn hàng' },
+            { label: 'Danh sách đơn hàng', link: "/orders" },
+            { label: 'Cập nhật' },
+        ],
+    },
+    {
         label: 'Chi tiết đơn hàng',
         link: '^/orders/[^/]+$',
         breadcrumbTrail: [
@@ -137,7 +146,7 @@ export const breadcrumbs: IBreadcrumb[] = [
         link: '^/materials/[^/]+/edit$',
         breadcrumbTrail: [
             { label: 'Nguyên vật liệu' },
-            { label: 'Danh sách nguyên vật liệu', link: "/products" },
+            { label: 'Danh sách nguyên vật liệu', link: "/materials" },
             { label: 'Cập nhật' },
         ],
     },
@@ -165,6 +174,15 @@ export const breadcrumbs: IBreadcrumb[] = [
             { label: 'Nhà cung cấp' },
             { label: 'Danh sách nhà cung cấp', link: "/providers" },
             { label: 'Thêm mới' },
+        ],
+    },
+    {
+        label: 'Cập nhật nhà cung cấp',
+        link: '^/providers/[^/]+/edit$',
+        breadcrumbTrail: [
+            { label: 'Nhà cung cấp' },
+            { label: 'Danh sách nhà cung cấp', link: "/providers" },
+            { label: 'Cập nhật' },
         ],
     },
     {

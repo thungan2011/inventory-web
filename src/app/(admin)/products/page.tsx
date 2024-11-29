@@ -81,7 +81,7 @@ const ProductPage = () => {
             },
             {
                 accessorKey: 'name',
-                header: 'Tên',
+                header: 'Tên thành phẩm',
                 cell: ({ row }) => (
                     <div className="flex gap-2">
                         <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
