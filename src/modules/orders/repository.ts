@@ -1,7 +1,7 @@
 import { PageObject } from '@/core/pagination/interface';
 import httpRepository from '@/core/repository/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { OrderDetail, OrderOverview, OrderStatus, PaymentMethod } from '@/modules/orders/interface';
+import { DeliveryType, OrderDetail, OrderOverview, OrderStatus, PaymentMethod } from '@/modules/orders/interface';
 import useDataFetching from '@/hook/useDataFetching';
 import { toast } from 'react-toastify';
 
@@ -49,6 +49,9 @@ export const useOrderByCode = (code: string) => {
  */
 interface AddOrderPayload {
     customer_id: number;
+    delivery_type: DeliveryType;
+    discount_percent: number;
+    shipping_fee: number;
     status: OrderStatus;
     phone: string;
     address: string;

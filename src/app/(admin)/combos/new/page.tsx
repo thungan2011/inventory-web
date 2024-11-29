@@ -93,7 +93,7 @@ const NewProductPage = () => {
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>
                             <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
                                 <Input name="name" label="Tên combo" placeholder="Nhập tên combo" required />
-                                <Select name="status" label="Trạng thái" readOnly options={[
+                                <Select name="status" label="Trạng thái" disabled options={[
                                     ...Object.keys(ComboStatus).map(status => (
                                         { label: ComboStatusVietnamese[status as ComboStatus], value: status }
                                     )),

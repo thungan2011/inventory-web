@@ -127,7 +127,7 @@ const UpdateProductPage = () => {
                             <Typography.Title level={4}>Thông tin chung</Typography.Title>
                             <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
                                 <Input readOnly={isReadOnly} name="name" label="Tên sản phẩm" placeholder="Nhập tên sản phẩm" required />
-                                <Select readOnly={isReadOnly} name="categories" label="Danh mục" multiple options={
+                                <Select disabled={isReadOnly} name="categories" label="Danh mục" multiple options={
                                     categories ? categories.map(category => ({
                                         label: category.name,
                                         value: category.id,

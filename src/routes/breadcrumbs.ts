@@ -48,6 +48,15 @@ export const breadcrumbs: IBreadcrumb[] = [
         ],
     },
     {
+        label: 'Cập nhật đơn hàng',
+        link: '^/orders/[^/]+/edit$',
+        breadcrumbTrail: [
+            { label: 'Đơn hàng' },
+            { label: 'Danh sách đơn hàng', link: "/orders" },
+            { label: 'Cập nhật' },
+        ],
+    },
+    {
         label: 'Quản lý danh mục',
         link: '^/categories$',
         breadcrumbTrail: [

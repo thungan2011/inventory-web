@@ -136,8 +136,7 @@ const OrderPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/orders/new'} />
-                            <ButtonAction.Import />
+                            <ButtonAction.Add text="Tạo đơn" href={'/orders/new'} />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

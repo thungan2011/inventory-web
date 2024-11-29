@@ -115,7 +115,7 @@ const FormContent = ({ isLoading, customer }: FormContentProps) => {
                                 { label: CustomerStatusVietnamese[status as CustomerStatus], value: status }
                             )),
                         ]} />
-                        <TextArea name="note" label="Ghi chú" />
+                        <TextArea name="note" label="Ghi chú" placeholder="Nhập ghi chú (nếu có)" />
                     </div>
                 </Card>
             </div>
@@ -178,7 +178,7 @@ const NewCustomerPage = () => {
                 payload: {
                     ...values,
                     birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
-                    gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 0 : 2
+                    gender: values.gender === Gender.MALE ? 2 : values.gender === Gender.FEMALE ? 1 : 3
                 },
             });
             router.push('/customers');
