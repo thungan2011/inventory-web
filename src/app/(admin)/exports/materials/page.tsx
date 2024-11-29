@@ -25,18 +25,25 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ExportMaterialTypeBadge from '@/components/Badge/ExportMaterialTypeBadge';
 
 interface ExportMaterialFilter extends PaginationState {
-    search: string;
+    code: string;
+    // type: ExportMaterialType;
+    // status: ExportMaterialStatus;
 }
 
 const ExportMaterialPage = () => {
 
-    const initialFilterValues = {
+    const initialFilterValues: ExportMaterialFilter = {
         page: 1,
-        search: '',
+        code: '',
+        // type: 'ALL',
+        // status: 'ALL',
     };
     const [filters, setFilters] = useState<ExportMaterialFilter>(initialFilterValues);
     const exportMaterialQuery = useAllExportMaterials({
         page: filters.page,
+        code: filters.code,
+        // type: filters.type === 'ALL' ? undefined : filters.type,
+        // status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {
@@ -134,10 +141,6 @@ const ExportMaterialPage = () => {
                                     <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                     <div className="grid grid-cols-3 gap-4">
                                         <Input name="search" placeholder="Mã phiếu xuất" />
-                                        <Input name="search" placeholder="Người lập phiếu" />
-                                        <Input name="search" placeholder="Ngày lập phiếu" />
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-4">
                                         <Select name="type"
                                                 placeholder="Lọc theo loại"
                                                 options={[
