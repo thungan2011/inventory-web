@@ -4,10 +4,11 @@ type TypographyTitleProps = {
     level: 1 | 2 | 3 | 4 | 5 | 6;
     children: React.ReactNode;
     style?: React.CSSProperties;
+    className?: string;
 };
 
 const Typography = {
-    Title: ({ level, children, style }: TypographyTitleProps) => {
+    Title: ({ level, children, style, className = '' }: TypographyTitleProps) => {
         const baseStyles = 'text-brand-500 dark:text-white font-nunito mb-3';
         const styles = {
             1: 'text-4xl',
@@ -20,7 +21,7 @@ const Typography = {
 
         const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
         return (
-            <Tag className={`${styles[level]} ${baseStyles}`} style={style}>{children}</Tag>
+            <Tag className={`${styles[level]} ${baseStyles} ${className}`} style={style}>{children}</Tag>
         );
     },
     Text: () => {

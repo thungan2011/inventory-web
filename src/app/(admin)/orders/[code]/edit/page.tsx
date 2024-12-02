@@ -13,13 +13,10 @@ import { OrderDetail, OrderStatus, PaymentMethod, PaymentMethodVietnamese } from
 import InputCurrency from '@/components/InputCurrency';
 import TextArea from '@/components/TextArea';
 import Select, { SelectProps } from '@/components/Select';
-import { CustomerStatus } from '@/modules/customers/interface';
-import { useAllCustomers } from '@/modules/customers/repository';
 import { useAllProducts } from '@/modules/products/repository';
 import { ProductOverview, ProductStatus } from '@/modules/products/interface';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
-import { FaPlus } from 'react-icons/fa6';
 import { MdRemoveCircleOutline } from 'react-icons/md';
 import useClickOutside from '@/hook/useClickOutside';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
@@ -57,7 +54,6 @@ interface Product {
 }
 
 interface FormValues {
-    customerId: number;
     receiverName: string;
     receiverPhone: string;
     receiverAddress: string;
@@ -218,30 +214,16 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
     const { values, setFieldValue, errors, touched } = useFormikContext<FormValues>();
     const [showListProduct, setShowListProduct] = useState<boolean>(false);
     const [productSearchTerm, setProductSearchTerm] = useState<string>('');
-    const [customerSearchTerm, setCustomerSearchTerm] = useState<string>(order.customer.name);
 
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     useClickOutside(dropdownRef, () => setShowListProduct(false));
-
-    const customerQuery = useAllCustomers({
-        page: 1,
-        name: customerSearchTerm,
-        status: CustomerStatus.ACTIVE,
-    });
 
     const productQuery = useAllProducts({
         page: 1,
         search: productSearchTerm,
         status: ProductStatus.ACTIVE,
     });
-
-    const customerOptions = React.useMemo(() => {
-        return (customerQuery.data?.data || []).map(customer => ({
-            value: customer.id,
-            label: `${customer.code} - ${customer.name} - ${customer.phone}`,
-        }));
-    }, [customerQuery.data]);
 
     // Filter products before render
     const availableProducts = React.useMemo(() => {
@@ -272,18 +254,6 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
         }
     }, [values.deliveryType, setFieldValue]);
 
-    useEffect(() => {
-        const selectedCustomer = customerQuery.data?.data.find(c => c.id === values.customerId);
-        if (selectedCustomer) {
-            setFieldValue('receiverName', selectedCustomer.name);
-            setFieldValue('receiverPhone', selectedCustomer.phone);
-            setFieldValue('receiverAddress', selectedCustomer.address || '');
-            setFieldValue('city', selectedCustomer.city || '');
-            setFieldValue('district', selectedCustomer.district || '');
-            setFieldValue('ward', selectedCustomer.ward || '');
-        }
-    }, [values.customerId, setFieldValue, customerQuery.data]);
-
     const handleAddProduct = (product: ProductOverview) => {
         const isExist = values.products.find(p => p.id === product.id);
         if (!isExist) {
@@ -306,25 +276,40 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
     return (
         <Form>
             <div className="grid grid-cols-8 gap-x-3">
-                <div className={`col-span-6`}>
+                <div className={`col-span-6 space-y-3`}>
+                    <Card className={`p-[18px]`}>
+                        <Typography.Title level={4} className="!mb-0">Đơn hàng #{order.code}</Typography.Title>
+                    </Card>
+
                     <Card className={`p-[18px]`}>
                         <Typography.Title level={4}>Thông tin khách hàng</Typography.Title>
                         <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
-                            <div className="flex gap-2 items-end">
-                                <div className="flex-1">
-                                    <Select name="customerId" label="Khách hàng"
-                                            options={customerOptions}
-                                            placeholder="Chọn khách hàng"
-                                            enableSearch={true}
-                                            onSearch={setCustomerSearchTerm}
-                                    />
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="font-medium">Mã khách hàng:</div>
+                                        <div className="text-gray-800">{order.customer.code}</div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="font-medium">Tên khách hàng:</div>
+                                        <div className="text-gray-800">{order.customer.name}</div>
+                                    </div>
                                 </div>
-                                <ButtonIcon className="h-10 mb-3" type="button" icon={<FaPlus />} />
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="font-medium">Số điện thoại:</div>
+                                        <div className="text-gray-800">{order.customer.phone || 'Chưa cập nhật'}</div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="font-medium">Email:</div>
+                                        <div className="text-gray-800">{order.customer.email || 'Chưa cập nhật'}</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Card>
 
-                    <Card className={`p-[18px] mt-5`}>
+                    <Card className={`p-[18px]`}>
                         <Typography.Title level={4}>Nhận hàng và vận chuyển</Typography.Title>
                         <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5">
                             <Select name="deliveryType"
@@ -365,7 +350,7 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
                         </div>
                     </Card>
 
-                    <Card className={`p-[18px] col-span-3 mt-5`}>
+                    <Card className={`p-[18px] col-span-3`}>
                         <Typography.Title level={4}>Chi tiết đơn hàng</Typography.Title>
                         <div className="flex gap-2 items-center">
                             <div className="font-normal text-sm cursor-pointer">Sản phẩm áp dụng:</div>
@@ -386,7 +371,7 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
                             <ProductTable products={values.products} />
                         </div>
                     </Card>
-                    <Card className={`p-[18px] mt-5`}>
+                    <Card className={`p-[18px]`}>
                         <Typography.Title level={4}>Hình thức thanh toán</Typography.Title>
                         <div
                             className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 grid grid-cols-2 gap-x-3">
@@ -470,8 +455,7 @@ const UpdateOrderPage = () => {
     }
 
     const initialFormValues: FormValues = {
-        customerId: order.customer.id,
-        receiverName: '',
+        receiverName: order.customer.name,
         receiverPhone: order.phone,
         receiverAddress: order.address,
         ward: order.ward,

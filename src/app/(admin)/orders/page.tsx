@@ -72,7 +72,7 @@ const OrderPage = () => {
             },
             {
                 accessorKey: 'name_customer',
-                header: 'Tên khách hàng',
+                header: 'Khách hàng',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{row.original.customer.name}</div>
