@@ -12,12 +12,11 @@ export const EMPLOYEE_QUERY_KEY = 'employees';
  */
 interface FetchAllEmployeeParams {
     page?: number;
+    first_name?: string;
 }
 
 const getAllEmployees = (params: FetchAllEmployeeParams): Promise<PageObject<EmployeeOverview>> => {
-    return httpRepository.get<PageObject<EmployeeOverview>>('/v1/profiles', {
-        page: params.page || 1,
-    });
+    return httpRepository.get<PageObject<EmployeeOverview>>('/v1/profiles', {...params});
 };
 
 export const useAllEmployees = (params: FetchAllEmployeeParams) => {

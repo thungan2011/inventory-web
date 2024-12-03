@@ -13,9 +13,9 @@ export const MATERIAL_QUERY_KEY = 'materials';
  */
 interface FetchAllMaterialParams {
     page?: number;
-    name: string;
+    name?: string;
     status?: MaterialStatus;
-    origin: string;
+    origin?: string;
 }
 
 const getAllMaterials = (params: FetchAllMaterialParams): Promise<PageObject<MaterialOverview>> => {

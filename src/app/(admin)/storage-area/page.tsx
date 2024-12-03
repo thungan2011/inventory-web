@@ -16,15 +16,17 @@ import WarehouseAreaListStatusBadge, {
     StorageAreaStatusVietnamese,
 } from '../../../components/Badge/StorageAreaStatusBadge';
 import { useAllStorageAreas, useDeleteStorageArea } from '@/modules/storage-area/repository';
-import { StorageAreaOverview, StorageAreaStatus } from '@/modules/storage-area/interface';
+import { StorageAreaOverview, StorageAreaStatus, StorageAreaType } from '@/modules/storage-area/interface';
 import ModalAddStorageArea from '@/components/Pages/Storage-area/ModalAddStorageArea';
 import ModalUpdateStorageArea from '@/components/Pages/Storage-area/ModalUpdateStorageArea';
-import StorageAreaTypeBadge from '@/components/Badge/StorageAreaTypeBadge';
+import StorageAreaTypeBadge, { StorageAreaTypeVietnamese } from '@/components/Badge/StorageAreaTypeBadge';
+import { SelectProps } from '@/components/Select';
 
 interface StorageAreaFilter extends PaginationState {
     name: string;
     status: StorageAreaStatus | 'ALL';
     code: string;
+    type: StorageAreaType;
 }
 
 const StorageAreaPage = () => {
@@ -36,6 +38,7 @@ const StorageAreaPage = () => {
         name: '',
         status: 'ALL',
         code: '',
+        type: StorageAreaType.PRODUCT,
     });
 
     const storageAreaQuery = useAllStorageAreas({
@@ -43,6 +46,7 @@ const StorageAreaPage = () => {
         name: filters.name,
         code: filters.code,
         status: filters.status === 'ALL' ? undefined : filters.status,
+        type: filters.type,
     });
 
     const {
@@ -132,6 +136,11 @@ const StorageAreaPage = () => {
         [deleteModal],
     );
 
+    const typeOptions : SelectProps['options'] = Object.values(StorageAreaType).map(value => ({
+        label: StorageAreaTypeVietnamese[value],
+        value: value,
+    }));
+
     const handleExportExcel = () => {
     };
 
@@ -152,9 +161,13 @@ const StorageAreaPage = () => {
                         <Form>
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-4 gap-4">
                                     <Input name="code" placeholder="Mã khu vực lưu kho" />
                                     <Input name="name" placeholder="Tên khu vực lưu kho" />
+                                    <Select name="type"
+                                            placeholder="Lọc theo loại"
+                                            options={typeOptions}
+                                    />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

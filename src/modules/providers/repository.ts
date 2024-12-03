@@ -13,10 +13,10 @@ export const PROVIDER_QUERY_KEY = 'providers';
  */
 interface FetchAllProviderParams {
     page?: number;
-    name: string;
-    code: string;
+    name?: string;
+    code?: string;
     status?: BaseStatus;
-    phone: string;
+    phone?: string;
 }
 
 const getAllProviders = (params: FetchAllProviderParams) : Promise<PageObject<ProviderOverview>> => {

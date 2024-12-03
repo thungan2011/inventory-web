@@ -19,18 +19,14 @@ export const STORAGE_AREA_QUERY_KEY = 'storage-area-list';
 
 interface FetchAllWarehouseAreaListParams {
     page?: number;
-    name: string;
+    name?: string;
     status?: StorageAreaStatus;
-    code: string;
+    code?: string;
+    type?: StorageAreaType;
 }
 
 const getAllStorageAreas = (params: FetchAllWarehouseAreaListParams): Promise<PageObject<StorageAreaOverview>> => {
-    return httpRepository.get<PageObject<StorageAreaOverview>>('/v1/storage_areas', {
-        page: params.page || 1,
-        name: params.name,
-        status: params.status,
-        code: params.code,
-    });
+    return httpRepository.get<PageObject<StorageAreaOverview>>('/v1/storage_areas', {...params});
 };
 
 export const useAllStorageAreas = (params: FetchAllWarehouseAreaListParams) => {

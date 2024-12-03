@@ -66,6 +66,7 @@ export interface ImportProductDetail{
     details: {
         quantity: number;
         price: number;
+        expiryDate: Date;
         product: {
             sku: string;
             name: string;

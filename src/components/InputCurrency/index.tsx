@@ -3,35 +3,37 @@ import React, { useId } from 'react';
 import Tooltip from '@/components/Tooltip';
 
 type InputProps = {
-    name: string;
-    label?: string;
-    placeholder?: string;
-    tooltip?: string;
     autoFocus?: boolean;
-    min?: number;
+    className?: string;
+    label?: string;
     max?: number;
-    required?: boolean;
+    min?: number;
+    name: string;
+    onChange?: (value: number) => void;
+    placeholder?: string;
     readOnly?: boolean;
+    required?: boolean;
+    step?: number;
+    tooltip?: string;
     unit?: string;
     wrapperClassName?: string;
-    step?: number;
-    onChange?: (value: number) => void;
 };
 
 const InputCurrency = ({
-                           name,
-                           label,
-                           wrapperClassName,
-                           placeholder = '',
-                           tooltip,
                            autoFocus = false,
-                           min,
+                           label,
                            max,
-                           required = false,
-                           readOnly = false,
-                           unit,
-                           step = 1000,
+                           min,
+                           name,
                            onChange,
+                           placeholder = '',
+                           readOnly = false,
+                           required = false,
+                           step = 1000,
+                           tooltip,
+                           unit,
+                           wrapperClassName,
+                           className = '',
                        }: InputProps) => {
     const id = useId();
     const [field, , helpers] = useField(name);
@@ -77,7 +79,7 @@ const InputCurrency = ({
             case 'ArrowDown':
                 event.preventDefault();
                 const decreasedValue = currentValue - step;
-                const newDecreasedValue = min && decreasedValue < (min || 0) ? (min || 0) : decreasedValue;
+                const newDecreasedValue = Math.max(decreasedValue, min || 0);
                 await helpers.setValue(newDecreasedValue);
                 onChange?.(newDecreasedValue);
                 break;
@@ -99,11 +101,11 @@ const InputCurrency = ({
             }
             <div
                 onClick={handleContainerClick}
-                className={`border rounded-md h-10 px-3 dark:text-white dark:bg-navy-900 w-full text-[14px] focus-within:border-brand-500 flex items-center group`}>
+                className={`border rounded-md h-10 px-3 dark:text-white dark:bg-navy-900 w-full text-[14px] focus-within:border-brand-500 flex items-center group ${className}`}>
                 <input ref={inputRef}
                        id={id}
                        placeholder={placeholder}
-                       className={`flex-1 min-w-20`}
+                       className={`flex-1 min-w-16`}
                        type="text"
                        autoFocus={autoFocus}
                        min={min}

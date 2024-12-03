@@ -59,17 +59,24 @@ export const useImportMaterialByCode = (code: string) => {
  * Create import material
  */
 interface AddImportMaterialPayload {
-    sku?: string;
-    name: string;
+    provider_id?: number;
+    receiver_id?: number;
     type: ImportMaterialType;
     note: string;
+    materials: {
+        material_id: number;
+        quantity: number;
+        price: number;
+        expiry_date: string;
+        storage_area_id: number;
+    }[];
 }
 
 const createImportMaterial = (payload: AddImportMaterialPayload): Promise<void> => {
     return httpRepository.post<void>('/v1/import/materials', payload);
 };
 
-export const useCreateImportProduct = () => {
+export const useCreateImportMaterial = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: createImportMaterial,
