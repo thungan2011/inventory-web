@@ -49,7 +49,7 @@ const DefaultProductItem = ({ product, onSelect }: {
 const ProductSearchDropdown = ({ products, onSelect, dropdownRef, renderProduct }: ProductSearchDropdownProps) => {
     if (products.length === 0) {
         return (
-            <div className="absolute z-10 left-0 right-0 py-2 bg-white shadow-lg rounded max-h-72 border">
+            <div ref={dropdownRef} className="absolute z-10 left-0 right-0 py-2 bg-white shadow-lg rounded max-h-72 border">
                 <div className="text-center text-gray-400 py-2">
                     Không tìm thấy sản phẩm nào
                 </div>

@@ -85,6 +85,40 @@ const MaterialPage = () => {
                 ),
             },
             {
+                accessorKey: 'quantityAvailable',
+                header: 'Tồn kho',
+                cell: ({ row }) => {
+                    const { quantityAvailable, minimumStockLevel, maximumStockLevel } = row.original;
+                    return (
+                        <div className="flex gap-2 items-center">
+                            <div
+                                className={`flex justify-center items-center rounded py-0.5 w-14 font-medium bg-gray-50`}>
+                                {row.original.quantityAvailable}
+                            </div>
+                            {
+                                quantityAvailable === 0 && (
+                                    <div className="text-red-500 bg-red-50 rounded-full px-2 py-1 text-xs">
+                                        Hết hàng
+                                    </div>
+                                )
+                            }
+                            {
+                                minimumStockLevel && quantityAvailable !== 0 && quantityAvailable <= minimumStockLevel && (
+                                    <div className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs">
+                                        Cận tồn
+                                    </div>
+                                )
+                            }
+                            {
+                                maximumStockLevel && quantityAvailable >= maximumStockLevel && (
+                                    <div className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs">Đã đủ</div>
+                                )
+                            }
+                        </div>
+                    );
+                },
+            },
+            {
                 accessorKey: 'weight',
                 header: 'Khối lượng',
                 cell: ({ row }) => <div>{`${row.original.weight} ${row.original.unit}`}</div>,
