@@ -17,11 +17,12 @@ export interface LocationAllocation {
     quantity: number;
 }
 
-type ModalAddCategoryProps = {
+type ModalChooseLocationProps = {
     onClose: () => void;
     totalQuantity: number;
     onSubmit: (allocations: LocationAllocation[]) => void;
     locations: LocationAllocation[];
+    locationType: StorageAreaType;
 }
 
 interface FormValues {
@@ -45,9 +46,10 @@ const validationSchema = (totalQuantity: number) => Yup.object().shape({
 interface FormikContentProps {
     onClose: () => void;
     totalQuantity: number;
+    locationType: StorageAreaType;
 }
 
-const FormikContent = ({ onClose, totalQuantity }: FormikContentProps) => {
+const FormikContent = ({ onClose, totalQuantity, locationType }: FormikContentProps) => {
     const { values, setFieldValue, errors, submitForm } = useFormikContext<FormValues>();
     const [showListStorageArea, setShowListStorageArea] = useState<boolean>(false);
     const [storageAreaSearchTerm, setStorageAreaSearchTerm] = useState<string>('');
@@ -55,7 +57,7 @@ const FormikContent = ({ onClose, totalQuantity }: FormikContentProps) => {
     const storageAreaQuery = useAllStorageAreas({
         name: storageAreaSearchTerm,
         status: StorageAreaStatus.ACTIVE,
-        type: StorageAreaType.MATERIAL,
+        type: locationType,
     });
 
     const availableStorageArea = React.useMemo(() => {
@@ -98,7 +100,7 @@ const FormikContent = ({ onClose, totalQuantity }: FormikContentProps) => {
                             showDropdown={showListStorageArea}
                             onShowDropdownChange={setShowListStorageArea}
                             renderItem={(item, onSelect) => (
-                                <div className={`px-3 py-2 first:border-t-0 border-t cursor-pointer hover:bg-gray-100`}
+                                <div className={`px-3 py-2 first:border-t-0 border-t cursor-pointer hover:bg-gray-100 line-clamp-1`}
                                      onClick={() => onSelect(item)}>
                                     #{item.code} - {item.name}
                                 </div>
@@ -173,7 +175,7 @@ const FormikContent = ({ onClose, totalQuantity }: FormikContentProps) => {
     );
 };
 
-const ModalChooseLocation = ({ onClose, totalQuantity, onSubmit, locations }: ModalAddCategoryProps) => {
+const ModalChooseLocation = ({ onClose, totalQuantity, onSubmit, locations, locationType }: ModalChooseLocationProps) => {
 
     const initialValues: FormValues = {
         allocations: locations,
@@ -194,7 +196,7 @@ const ModalChooseLocation = ({ onClose, totalQuantity, onSubmit, locations }: Mo
             <Modal title="Phân bổ số lượng theo vị trí" open={true} onClose={onClose} className="!w-1/3">
                 <Formik initialValues={initialValues} onSubmit={handleSubmit}
                         validationSchema={validationSchema(totalQuantity)}>
-                    <FormikContent onClose={onClose} totalQuantity={totalQuantity} />
+                    <FormikContent onClose={onClose} totalQuantity={totalQuantity} locationType={locationType} />
                 </Formik>
             </Modal>
         </>

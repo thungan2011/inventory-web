@@ -58,11 +58,15 @@ export const useImportProductByCode = (code: string) => {
  * Create import product
  */
 interface AddImportProductPayload {
-    sku?: string;
-    name: string;
-    category_id: number[];
     type: ImportProductType;
     note: string;
+    receiver_id?: number;
+    products: {
+        product_id: number;
+        quantity: number;
+        expiry_date: string;
+        storage_area_id: number;
+    }[];
 }
 
 const createImportProduct = (payload: AddImportProductPayload): Promise<void> => {

@@ -52,7 +52,7 @@ const Search = <T,>({
                            showDropdown,
                            onShowDropdownChange,
                            renderItem,
-                           className = 'relative w-[300px]',
+                           className = 'relative w-full',
                            inputClassName = 'border rounded h-8 px-2 text-sm w-full',
                            placeholder = 'Tìm theo tên hoặc mã sản phẩm',
                        }: SearchProps<T>) => {

@@ -29,6 +29,7 @@ import { useCreateImportMaterial } from '@/modules/imports/materials/repository'
 import dayjs from 'dayjs';
 import { useAllEmployees } from '@/modules/employees/repository';
 import { useRouter } from 'next/navigation';
+import { StorageAreaType } from '@/modules/storage-area/interface';
 
 const ProductSchema = object({});
 
@@ -193,6 +194,7 @@ const MaterialTable = () => {
                                          onSubmit={(allocations) => {
                                              setFieldValue(`materials.${selectedMaterial.index}.locations`, allocations);
                                          }}
+                                         locationType={StorageAreaType.MATERIAL}
                     />
                 )
             }
