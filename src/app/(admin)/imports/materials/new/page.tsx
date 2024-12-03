@@ -321,7 +321,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                             onSelect={handleAddMaterial}
                                             onShowDropdownChange={setShowListMaterial}
                                             materials={availableMaterials}
-                                            searchValue={providerSearchTerm}
+                                            searchValue={materialSearchTerm}
                                             showDropdown={showListMaterial}
                             />
                         </div>
