@@ -82,19 +82,57 @@ const ProductPage = () => {
             {
                 accessorKey: 'name',
                 header: 'Tên thành phẩm',
-                cell: ({ row }) => (
-                    <div className="flex gap-2">
-                        <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
-                            <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
-                                   alt={`Ảnh của sản phẩm ${row.original.name}`} fill
-                                   className="object-cover" />
+                cell: ({ row }) => {
+                    return (
+                        <div className="flex gap-2">
+                            <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
+                                <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
+                                       alt={`Ảnh của sản phẩm ${row.original.name}`} fill
+                                       className="object-cover" />
+                            </div>
+                            <div className="flex flex-col justify-center">
+                                <div className="flex gap-2 items-center">
+                                    <div className="max-w-72 line-clamp-2">{row.original.name}</div>
+                                </div>
+                                <div className="text-xs text-gray-700">{row.original.origin}</div>
+                            </div>
                         </div>
-                        <div className="flex flex-col justify-center">
-                            <div className="w-72 max-w-72 line-clamp-2">{row.original.name}</div>
-                            <div className="text-xs text-gray-700">{row.original.origin}</div>
+                    );
+                }
+            },
+            {
+                accessorKey: 'quantityAvailable',
+                header: 'Tồn kho',
+                cell: ({ row }) => {
+                    const { quantityAvailable, minimumStockLevel, maximumStockLevel } = row.original;
+                    return (
+                        <div className="flex gap-2 items-center">
+                            <div
+                                className={`flex justify-center items-center rounded py-0.5 w-14 font-medium bg-gray-50`}>
+                                {row.original.quantityAvailable}
+                            </div>
+                            {
+                                quantityAvailable === 0 && (
+                                    <div className="text-red-500 bg-red-50 rounded-full px-2 py-1 text-xs">
+                                        Hết hàng
+                                    </div>
+                                )
+                            }
+                            {
+                                minimumStockLevel && quantityAvailable !== 0 && quantityAvailable <= minimumStockLevel && (
+                                    <div className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs">
+                                        Cận tồn
+                                    </div>
+                                )
+                            }
+                            {
+                                maximumStockLevel && quantityAvailable >= maximumStockLevel && (
+                                    <div className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs">Đã đủ</div>
+                                )
+                            }
                         </div>
-                    </div>
-                ),
+                    );
+                },
             },
             {
                 accessorKey: 'price',

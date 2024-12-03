@@ -61,9 +61,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const login = (response: LoginResponse) => {
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response;
-        setAccessToken(accessToken);
-        setAccessTokenForAxios(accessToken);
-        setRefreshToken(refreshToken);
+        setAccessToken(newAccessToken);
+        setAccessTokenForAxios(newAccessToken);
+        setRefreshToken(newRefreshToken);
 
         Cookies.set('accessToken', newAccessToken, { expires: 1 });
         Cookies.set('refreshToken', newRefreshToken, { expires: 14 });

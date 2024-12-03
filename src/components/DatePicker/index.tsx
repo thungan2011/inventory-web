@@ -16,6 +16,7 @@ type DatePickerProps = {
     minDate?: Date;
     maxDate?: Date;
     readOnly?: boolean;
+    wrapperClassName?: string;
 };
 
 const DAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
@@ -31,6 +32,7 @@ const DatePicker = ({
                         minDate,
                         maxDate,
                         readOnly = false,
+                        wrapperClassName,
                     }: DatePickerProps) => {
     const id = useId();
     const [field, , helpers] = useField(name);
@@ -194,7 +196,7 @@ const DatePicker = ({
     }, [showYearList, currentDate]);
 
     return (
-        <div className="mb-3">
+        <div className={wrapperClassName ? wrapperClassName : 'mb-3'}>
             {
                 label && (
                     <div className="mb-1 inline-flex gap-x-1 h-6">
@@ -225,7 +227,7 @@ const DatePicker = ({
                 {
                     isOpen && (
                         <div ref={calendarRef}
-                             className="absolute z-10 top-full left-0 mt-1 bg-white border rounded shadow-lg p-4">
+                             className="absolute z-20 top-full left-0 mt-1 bg-white border rounded shadow-lg p-4">
                             <div className="flex justify-between items-center gap-x-20 relative">
                                 <div className="flex items-center gap-x-2">
                                     <span className="text-nowrap min-w-[85px]">{currentDate.format('MMM YYYY')}</span>

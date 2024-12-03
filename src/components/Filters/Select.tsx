@@ -6,7 +6,7 @@ import { MdOutlineCheck } from 'react-icons/md';
 
 
 type Option = {
-    value: string;
+    value: string | number;
     label: string;
 }
 
@@ -26,7 +26,7 @@ const Select = ({ name, options, placeholder }: SelectProps) => {
     const selectedValues = field.value ? [field.value] : [];
     const selectedOptions = options.filter(option => selectedValues.includes(option.value));
 
-    const handleSelect = (value: string) => {
+    const handleSelect = (value: string | number) => {
         helpers.setValue(value);
         setIsOpen(false);
     };
