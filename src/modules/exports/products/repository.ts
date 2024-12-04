@@ -36,7 +36,7 @@ const getExportProductByCode = (code: string): Promise<ExportProductDetail> => {
     return httpRepository.get<ExportProductDetail>(`/v1/product_export_receipts/${code}`);
 };
 
-export const useImportProductByCode = (code: string) => {
+export const useExportProductByCode = (code: string) => {
     return useDataFetching(
         [EXPORT_PRODUCT_QUERY_KEY, code],
         () => getExportProductByCode(code),
@@ -51,9 +51,8 @@ interface AddExportProductPayload {
     type: ExportProductType;
     note?: string;
     products: {
-        product_id: number;
         quantity: number;
-        storage_area_id: number;
+        product_history_id: number;
     }[];
 }
 

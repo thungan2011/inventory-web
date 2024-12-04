@@ -330,9 +330,8 @@ const NewProductPage = () => {
                 note: values.note,
                 products: values.products.flatMap(product =>
                     product.locations.map(location => ({
-                        product_id: product.id,
                         quantity: location.quantity,
-                        storage_area_id: location.id,
+                        product_history_id: location.id,
                     })),
                 ),
             });
@@ -346,7 +345,7 @@ const NewProductPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
-                <FormSelection isLoading={false} />
+                <FormSelection isLoading={createExportProduct.isPending} />
             </Formik>
         </div>
     );
