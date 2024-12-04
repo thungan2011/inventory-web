@@ -54,13 +54,17 @@ export interface ExportMaterialDetail{
     };
     details: {
         quantity: number;
-        price: number;
+        expiryDate: Date;
         material: {
             sku: string;
             name: string;
             weight: number;
             packing: string;
             unit:string;
+        }
+        storageArea: {
+            code: string;
+            name: string;
         }
     }[]
 }

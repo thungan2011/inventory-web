@@ -13,6 +13,7 @@ import { ExportMaterialStatusVietnamese, ExportMaterialTypeVietnamese } from '@/
 import TableCore from '@/components/Tables/TableCore';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
+import { groupBy, map, sumBy } from 'lodash';
 
 const ExportMaterialDetail = () => {
     const { code } = useParams<{ code: string }>();
@@ -25,6 +26,74 @@ const ExportMaterialDetail = () => {
     if (!exportMaterial) {
         return <NotFound />;
     }
+
+    const renderMaterialDetail = () => {
+        const groupedDetails = groupBy(exportMaterial.details, detail => `${detail.material.sku}-${detail.expiryDate}`);
+
+        return map(groupedDetails, (details, key) => {
+            const firstDetail = details[0];
+            const totalQuantity = sumBy(details, 'quantity');
+
+            return (
+                <React.Fragment key={key}>
+                    <TableCore.RowBody>
+                        <TableCore.Cell>
+                            <div>
+                                <div>{firstDetail.material.sku}</div>
+                            </div>
+                        </TableCore.Cell>
+                        <TableCore.Cell>
+                            <div className="flex gap-2">
+                                <div className="relative h-14 w-14 p-1 rounded shadow">
+                                    <Image src={LOGO_IMAGE_FOR_NOT_FOUND} alt={`Ảnh của sản phẩm `}
+                                           fill
+                                           className="object-cover" />
+                                </div>
+                                <div className="flex-col flex justify-center">
+                                    <div className="font-medium">{firstDetail.material.name}</div>
+                                    <div
+                                        className="text-gray-800">{firstDetail.material.weight}{firstDetail.material.unit} - {firstDetail.material.packing}</div>
+                                </div>
+                            </div>
+                        </TableCore.Cell>
+                        <TableCore.Cell>
+                            <div>
+                                <div>{firstDetail.storageArea.name}</div>
+                                <div>#{firstDetail.storageArea.code}</div>
+                            </div>
+                        </TableCore.Cell>
+                        <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
+                        <TableCore.Cell>{firstDetail.quantity}</TableCore.Cell>
+                    </TableCore.RowBody>
+
+                    {
+                        details.slice(1).map((detail, index) => (
+                            <TableCore.RowBody key={`${key}-${index}`}>
+                                <TableCore.Cell />
+                                <TableCore.Cell />
+                                <TableCore.Cell>
+                                    <div>
+                                        <div>{detail.storageArea.name}</div>
+                                        <div>#{detail.storageArea.code}</div>
+                                    </div>
+                                </TableCore.Cell>
+                                <TableCore.Cell>{formatDateToLocalDate(detail.expiryDate)}</TableCore.Cell>
+                                <TableCore.Cell>{detail.quantity}</TableCore.Cell>
+                            </TableCore.RowBody>
+                        ))
+                    }
+
+                    <TableCore.RowBody className="font-bold">
+                        <TableCore.Cell>Tổng</TableCore.Cell>
+                        <TableCore.Cell />
+                        <TableCore.Cell />
+                        <TableCore.Cell />
+                        <TableCore.Cell>{totalQuantity}</TableCore.Cell>
+                    </TableCore.RowBody>
+                </React.Fragment>
+            );
+        });
+    };
 
     return (
         <div className="flex flex-col gap-4 mt-4">
@@ -70,62 +139,7 @@ const ExportMaterialDetail = () => {
                             </TableCore.RowHeader>
                         </TableCore.Header>
                         <TableCore.Body>
-                            {
-                                exportMaterial.details.map((detail, index) => (
-                                    <React.Fragment key={`detail-${index}`}>
-                                        <TableCore.RowBody>
-                                            <TableCore.Cell>
-                                                <div>
-                                                    <div>{detail.material.sku}</div>
-                                                </div>
-                                            </TableCore.Cell>
-                                            <TableCore.Cell>
-                                                <div className="flex gap-2">
-                                                    <div className="relative h-14 w-14 p-1 rounded shadow">
-                                                        <Image src={LOGO_IMAGE_FOR_NOT_FOUND} alt={`Ảnh của sản phẩm `}
-                                                               fill
-                                                               className="object-cover" />
-                                                    </div>
-                                                    <div className="flex-col flex justify-center">
-                                                        <div className="font-medium">{detail.material.name}</div>
-                                                        <div
-                                                            className="text-gray-800">{detail.material.weight}{detail.material.unit} - {detail.material.packing}</div>
-                                                    </div>
-                                                </div>
-                                            </TableCore.Cell>
-                                            <TableCore.Cell>
-                                                <div>
-                                                    <div>Kho lạnh lẽo</div>
-                                                    <div>#KHO123</div>
-                                                </div>
-                                            </TableCore.Cell>
-                                            <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
-                                            <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                        </TableCore.RowBody>
-
-                                        <TableCore.RowBody>
-                                            <TableCore.Cell />
-                                            <TableCore.Cell />
-                                            <TableCore.Cell>
-                                                <div>
-                                                    <div>Kho lạnh lẽo</div>
-                                                    <div>#KHO124</div>
-                                                </div>
-                                            </TableCore.Cell>
-                                            <TableCore.Cell>{formatDateToLocalDate(new Date())}</TableCore.Cell>
-                                            <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                        </TableCore.RowBody>
-
-                                        <TableCore.RowBody className="font-bold">
-                                            <TableCore.Cell>Tổng</TableCore.Cell>
-                                            <TableCore.Cell />
-                                            <TableCore.Cell />
-                                            <TableCore.Cell />
-                                            <TableCore.Cell>{detail.quantity}</TableCore.Cell>
-                                        </TableCore.RowBody>
-                                    </React.Fragment>
-                                ))
-                            }
+                            {renderMaterialDetail()}
                         </TableCore.Body>
                     </TableCore>
                 </div>

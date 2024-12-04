@@ -43,7 +43,7 @@ const SidebarLinkDropdown = (props: SidebarLinkDropdownProps) => {
                     children?.map((r) => (
                         <li key={r.path} className="first-of-type:mt-1">
                             <Link href={r.path}
-                                  className={`py-2 pl-4 hover:bg-gray-100 rounded-sm block ${isChildActive(r.path) ? 'font-bold text-navy-700' : 'font-medium text-gray-700'}`}>
+                                  className={`py-2 pl-4 hover:bg-gray-100 rounded-sm block ${isChildActive(r.path) ? 'text-navy-700' : 'font-medium text-gray-700'}`}>
                                 {r.name}
                             </Link>
                         </li>
