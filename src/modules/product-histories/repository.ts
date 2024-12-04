@@ -11,6 +11,7 @@ export const PRODUCT_HISTORY_QUERY_KEY = 'product-histories';
 interface FetchAllProductHistoryParams {
     page?: number;
     search_product?: string;
+    storage_area_id?: number;
 }
 
 const getAllProductHistories = (params: FetchAllProductHistoryParams): Promise<PageObject<ProductHistoryOverview>> => {

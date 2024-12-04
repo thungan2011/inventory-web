@@ -43,11 +43,11 @@ export const useAllExportMaterials = (params: FetchAllExportMaterialParams) => {
 /**
  * get export material by Code
  */
-const getExportMaterialByCode = (code: string): Promise<ExportMaterialDetail> => {
+const getExportMaterialByCode = (code?: string): Promise<ExportMaterialDetail> => {
     return httpRepository.get<ExportMaterialDetail>(`/v1/material_export_receipts/${code}`);
 };
 
-export const useExportMaterialByCode = (code: string) => {
+export const useExportMaterialByCode = (code?: string) => {
     return useDataFetching(
         [EXPORT_MATERIAL_QUERY_KEY, code],
         () => getExportMaterialByCode(code),

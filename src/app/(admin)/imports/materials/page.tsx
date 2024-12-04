@@ -22,6 +22,7 @@ import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ImportMaterialTypeBadge from '@/components/Badge/ImportMateriaTypeBadge';
+import { SelectProps } from '@/components/Select';
 
 interface ImportMaterialFilter extends PaginationState {
     code: string;
@@ -42,7 +43,6 @@ const ImportMaterialPage = () => {
         code: filters.code,
         type: filters.type === 'ALL' ? undefined : filters.type,
         status: filters.status === 'ALL' ? undefined : filters.status,
-
     });
 
     const {
@@ -117,6 +117,21 @@ const ImportMaterialPage = () => {
 
     };
 
+    const typeOptions : SelectProps['options'] = [
+        { label: 'Tất cả loại', value: 'ALL' },
+        ...Object.values(ImportMaterialType).map(value => ({
+            label: ImportMaterialTypeVietnamese[value],
+            value,
+        })),
+    ];
+
+    const statusOptions : SelectProps['options'] = [
+        { label: 'Tất cả trạng thái', value: 'ALL' },
+        ...Object.values(ImportMaterialStatus).map(value => ({
+            label: ImportMaterialStatusVietnamese[value],
+            value,
+        })),
+    ];
 
     return (
         <>
@@ -124,7 +139,7 @@ const ImportMaterialPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/imports/materials/new'} />
+                            <ButtonAction.Add href={'/imports/materials/new'} text="Tạo phiếu nhập" />
                             <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
@@ -139,23 +154,11 @@ const ImportMaterialPage = () => {
                                     <Input name="code" placeholder="Mã phiếu nhập" />
                                     <Select name="type"
                                             placeholder="Lọc theo loại"
-                                            options={[
-                                                { label: 'Tất cả loại', value: 'ALL' },
-                                                ...Object.values(ImportMaterialType).map(value => ({
-                                                    label: ImportMaterialTypeVietnamese[value],
-                                                    value,
-                                                })),
-                                            ]}
+                                            options={typeOptions}
                                     />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
-                                            options={[
-                                                { label: 'Tất cả trạng thái', value: 'ALL' },
-                                                ...Object.values(ImportMaterialStatus).map(value => ({
-                                                    label: ImportMaterialStatusVietnamese[value],
-                                                    value,
-                                                })),
-                                            ]}
+                                            options={statusOptions}
                                     />
                                 </div>
                             </div>

@@ -15,21 +15,34 @@ import { ProductHistoryOverview } from '@/modules/product-histories/inteface';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import ProductActionTypeBadge from '@/components/Badge/ProductActionTypeBadge';
+import { useAllStorageAreas } from '@/modules/storage-area/repository';
+import { StorageAreaStatus, StorageAreaType } from '@/modules/storage-area/interface';
+import Select, { SelectProps } from '@/components/Select';
 
 interface MaterialHistoryFilter extends PaginationState {
     searchProduct: string;
+    storageAreaId: number | 'ALL';
 }
 
 const ProductHistoryPage = () => {
+    const [storageAreaSearchTerm, setStorageAreaSearchTerm] = useState<string>('');
 
     const [filters, setFilters] = useState<MaterialHistoryFilter>({
         page: 1,
         searchProduct: '',
+        storageAreaId: 'ALL',
     });
 
     const materialHistoryQuery = useAllProductHistories({
         page: filters.page,
         search_product: filters.searchProduct,
+        storage_area_id: filters.storageAreaId === 'ALL' ? undefined : filters.storageAreaId,
+    });
+
+    const storageAreaQuery = useAllStorageAreas({
+        name: storageAreaSearchTerm,
+        status: StorageAreaStatus.ACTIVE,
+        type: StorageAreaType.PRODUCT,
     });
 
     const {
@@ -44,6 +57,14 @@ const ProductHistoryPage = () => {
         initialFilters: filters,
         onFilterChange: setFilters,
     });
+
+    const storageAreaOptions: SelectProps['options'] = [
+        { label: 'Tất cả khu vực', value: 'ALL' },
+        ...(storageAreaQuery.data?.data || []).map((storageArea) => ({
+            label: `${storageArea.code} - ${storageArea.name}`,
+            value: storageArea.id,
+        })),
+    ];
 
     useEffect(() => {
         document.title = 'Nut Garden - Lịch sử lưu kho';
@@ -65,10 +86,29 @@ const ProductHistoryPage = () => {
                                        className="object-cover rounded border shadow" />
                             </div>
                             <div className="flex flex-col gap-2 justify-center">
-                                <div className="text-nowrap text-ellipsis overflow-hidden max-w-80"
+                                <div className="text-nowrap text-ellipsis overflow-hidden max-w-60 w-60"
                                      title={product.name}>{`#${product.sku} - ${product.name}`}</div>
                                 <div
                                     className="text-xs text-gray-700">{`${product.weight}${product.unit}/${product.packing}`} </div>
+                            </div>
+                        </div>
+                    );
+                },
+            },
+            {
+                accessorKey: 'productStorageHistory.storageArea',
+                header: 'Khu vực',
+                cell: ({ row }) => {
+                    const { storageArea } = row.original.productStorageHistory;
+
+                    return (
+                        <div className="space-y-2">
+                            <div className="text-nowrap text-ellipsis overflow-hidden max-w-80"
+                                 title={storageArea.name}>
+                                {storageArea.name}
+                            </div>
+                            <div className="text-xs text-gray-800">
+                                Mã: {storageArea.code}
                             </div>
                         </div>
                     );
@@ -136,6 +176,13 @@ const ProductHistoryPage = () => {
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-4 gap-4">
                                     <Input name="searchProduct" placeholder="SKU hoặc tên thành phẩm" />
+                                    <Select name="storageAreaId"
+                                            searchPlaceholder="Nhập tên khu vực"
+                                            placeholder="Chọn khu vực lưu trữ"
+                                            options={storageAreaOptions}
+                                            enableSearch
+                                            onSearch={setStorageAreaSearchTerm}
+                                    />
                                 </div>
                             </div>
                             <AutoSubmitForm />

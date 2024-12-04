@@ -43,11 +43,11 @@ export const useAllImportMaterials = (params: FetchAllImportMaterialParams) => {
 /**
  * get import material by Code
  */
-const getImportMaterialByCode = (code: string): Promise<ImportMaterialDetail> => {
+const getImportMaterialByCode = (code?: string): Promise<ImportMaterialDetail> => {
     return httpRepository.get<ImportMaterialDetail>(`/v1/material_import_receipts/${code}`);
 };
 
-export const useImportMaterialByCode = (code: string) => {
+export const useImportMaterialByCode = (code?: string) => {
     return useDataFetching(
         [IMPORT_MATERIAL_QUERY_KEY, code],
         () => getImportMaterialByCode(code),
@@ -61,6 +61,7 @@ export const useImportMaterialByCode = (code: string) => {
 interface AddImportMaterialPayload {
     provider_id?: number;
     receiver_id?: number;
+    material_export_receipt_id?: number;
     type: ImportMaterialType;
     note: string;
     materials: {

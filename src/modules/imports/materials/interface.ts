@@ -53,7 +53,7 @@ export interface ImportMaterialDetail{
     type: ImportMaterialType;
     note: string;
     status: ImportMaterialStatus;
-    provider: {
+    provider?: {
         id: number;
         code: string;
         name: string;
@@ -77,11 +77,13 @@ export interface ImportMaterialDetail{
         price: number;
         expiryDate: Date;
         material: {
+            id: number;
             sku: string;
             name: string;
             weight: number;
             packing: string;
             unit:string;
+            origin: string;
         };
         storageArea: {
             code: string;

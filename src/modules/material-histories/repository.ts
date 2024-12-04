@@ -11,6 +11,7 @@ export const MATERIAL_HISTORY_QUERY_KEY = 'material-histories';
 interface FetchAllMaterialHistoryParams {
     page?: number;
     search_material?: string;
+    storage_area_id?: number;
 }
 
 const getAllMaterialHistories = (params: FetchAllMaterialHistoryParams): Promise<PageObject<MaterialHistoryOverview>> => {
