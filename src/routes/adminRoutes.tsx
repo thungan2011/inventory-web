@@ -66,7 +66,7 @@ const adminRoutes: IAdminRoute[] = [
         icon: <RiRoadMapLine />,
     },
     {
-        name: 'Lưu kho',
+        name: 'Tồn kho',
         path: '/warehouse-area',
         icon: <FiCalendar />,
         children: [

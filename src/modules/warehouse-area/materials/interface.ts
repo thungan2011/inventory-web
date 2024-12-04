@@ -4,10 +4,13 @@ export enum WarehouseAreaMaterialStatus {
 }
 
 export interface WarehouseAreaMaterialOverview {
+    id: number;
     quantity: number;
+    quantityAvailable: number;
     expiryDate: Date;
     status: WarehouseAreaMaterialStatus;
     storageArea: {
+        id: number;
         code: string;
         name: string;
         description: string;

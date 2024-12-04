@@ -14,26 +14,35 @@ import { Form, Formik } from 'formik';
 import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
-import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
-import DatePicker from '@/components/DatePicker';
+import { formatDateToLocalDate, timeFromNow } from '@/utils/formatDate';
 import WarehouseAreaMaterialBadge, {
     WarehouseAreaMaterialStatusVietnamese,
 } from '@/components/Badge/WarehouseAreaMaterialBadge';
 import Select from '@/components/Filters/Select';
+import dayjs from 'dayjs';
+import Image from 'next/image';
+import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 
 interface WarehouseAreaMaterialFilter extends PaginationState {
+    materialSearch: string;
     search: string;
+    status: WarehouseAreaMaterialStatus | 'ALL';
 }
 
 const WarehouseAreaMaterialPage = () => {
 
     const [filters, setFilters] = useState<WarehouseAreaMaterialFilter>({
         page: 1,
+        materialSearch: '',
         search: '',
+        status: 'ALL',
     });
 
     const warehouseAreaMaterialQuery = useAllWarehouseAreaMaterials({
         page: filters.page,
+        material_search: filters.materialSearch,
+        search: filters.search,
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {
@@ -69,23 +78,44 @@ const WarehouseAreaMaterialPage = () => {
                 accessorKey: 'material',
                 header: 'Nguyên vật liệu',
                 cell: ({ row }) => (
-                    <div className="flex flex-col gap-2">
-                        <div className="text-nowrap text-ellipsis overflow-hidden max-w-80"
-                             title={row.original.material.name}>{`#${row.original.material.sku} - ${row.original.material.name}`}</div>
-                        <div
-                            className="text-xs text-gray-700">{`${row.original.material.weight}${row.original.material.unit}/${row.original.material.packing}`} </div>
+                    <div className="flex gap-2">
+                        <div className="relative h-16 w-16">
+                            <Image src={LOGO_IMAGE_FOR_NOT_FOUND} alt={`Ảnh nguyên vật liệu ${row.original.material.name}`} fill
+                                   className="object-cover rounded border shadow" />
+                        </div>
+                        <div className="flex flex-col gap-2 justify-center">
+                            <div className="text-nowrap text-ellipsis overflow-hidden max-w-80"
+                                 title={row.original.material.name}>{`#${row.original.material.sku} - ${row.original.material.name}`}</div>
+                            <div
+                                className="text-xs text-gray-700">{`${row.original.material.weight}${row.original.material.unit}/${row.original.material.packing}`} </div>
+                        </div>
                     </div>
                 ),
             },
             {
                 accessorKey: 'expiryDate',
                 header: 'Ngày hết hạn',
-                cell: ({ row }) => (
-                    <div className="flex flex-col gap-2">
-                        <div>{formatDateInOrder(row.original.expiryDate)}</div>
-                        <div className="text-xs text-gray-700">{timeFromNow(row.original.expiryDate)}</div>
-                    </div>
-                ),
+                cell: ({ row }) => {
+                    const isExpired = dayjs(row.original.expiryDate).isBefore(dayjs());
+                    const isNearExpiry = dayjs(row.original.expiryDate).isBefore(dayjs().add(1, 'month'));
+
+                    return (
+                        <div className="flex flex-col gap-2">
+                            <div>{formatDateToLocalDate(row.original.expiryDate)}</div>
+                            <div className={`text-xs`}>
+                                {
+                                    isExpired ? (
+                                        <div className="text-red-500 bg-red-50 border w-fit border-red-500 rounded px-1 py-0.5">Đã hết hạn</div>
+                                    ) : (
+                                        <div className={`${isNearExpiry ? 'text-yellow-500' : 'text-gray-800'}`}>
+                                            Hết hạn trong {timeFromNow(row.original.expiryDate)}
+                                        </div>
+                                    )
+                                }
+                            </div>
+                        </div>
+                    );
+                }
             },
             {
                 accessorKey: 'quantity',
@@ -132,8 +162,7 @@ const WarehouseAreaMaterialPage = () => {
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-4 gap-4">
                                     <Input name="search" placeholder="Mã hoặc tên khu vực lưu trữ" />
-                                    <Input name="search" placeholder="SKU hoặc tên nguyên vật liệu" />
-                                    <DatePicker name="expiryDate" />
+                                    <Input name="materialSearch" placeholder="SKU hoặc tên nguyên vật liệu" />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

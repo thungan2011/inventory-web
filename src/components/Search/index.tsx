@@ -23,7 +23,7 @@ const SearchDropdown = <T,>({ items, onSelect, dropdownRef, renderItem }: Search
         <div ref={dropdownRef}
              className="absolute z-10 left-0 right-0 py-2 bg-white shadow-lg rounded max-h-72 border overflow-auto">
             {items.map((item, index) => (
-                <div key={`search-item-${index}`}>
+                <div key={`search-item-${index}`} className="border-t first:border-t-0">
                     {renderItem(item, onSelect)}
                 </div>
             ))}
