@@ -30,6 +30,7 @@ import { useCreateExportMaterial } from '@/modules/exports/materials/repository'
 import ModalChooseExportLocation, {
     ExportLocation,
 } from '@/components/Pages/Export/Material/ModalChooseExportLocation';
+import dayjs from 'dayjs';
 
 const ExportMaterialSchema = object({});
 
@@ -64,7 +65,6 @@ const initialFormValues: FormValues = {
 const MaterialTable = () => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
     const [selectedMaterial, setSelectedMaterial] = useState<{ index: number, quantity: number, code: string } | null>(null);
-
     return (
         <>
             <TableCore className="mt-3">
@@ -195,6 +195,7 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
     const [showListMaterial, setShowListMaterial] = useState<boolean>(false);
     const [materialSearchTerm, setMaterialSearchTerm] = useState<string>('');
+    const tomorrow = dayjs().add(1, 'day').toDate();
 
     const materialQuery = useAllMaterials({
         name: materialSearchTerm,
@@ -237,7 +238,7 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
                 unit: material.unit,
                 weight: material.weight,
                 locations: [],
-                expiryDate: new Date(),
+                expiryDate: tomorrow,
             };
             setFieldValue('materials', [...values.materials, newMaterial]);
         }
@@ -321,9 +322,8 @@ const NewExportMaterialPage = () => {
                 note: values.note,
                 materials: values.materials.flatMap(material =>
                     material.locations.map(location => ({
-                        material_id: material.id,
                         quantity: location.quantity,
-                        storage_area_id: location.storageAreaId,
+                        material_history_id: location.id,
                     })),
                 ),
             });

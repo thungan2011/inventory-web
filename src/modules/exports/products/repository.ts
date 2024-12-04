@@ -1,12 +1,7 @@
 import httpRepository from '@/core/repository/http';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PageObject } from '@/core/pagination/interface';
-import {
-    ExportProductDetail,
-    ExportProductOverview,
-    ExportProductStatus,
-    ExportProductType,
-} from '@/modules/exports/products/interface';
+import { ExportProductDetail, ExportProductOverview, ExportProductType } from '@/modules/exports/products/interface';
 import useDataFetching from '@/hook/useDataFetching';
 import { toast } from 'react-toastify';
 
@@ -54,8 +49,12 @@ export const useImportProductByCode = (code: string) => {
  */
 interface AddExportProductPayload {
     type: ExportProductType;
-    status: ExportProductStatus;
     note?: string;
+    products: {
+        product_id: number;
+        quantity: number;
+        storage_area_id: number;
+    }[];
 }
 
 const createExportProduct = (payload: AddExportProductPayload): Promise<void> => {

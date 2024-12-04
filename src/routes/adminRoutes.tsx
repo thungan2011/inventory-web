@@ -67,11 +67,11 @@ const adminRoutes: IAdminRoute[] = [
     },
     {
         name: 'Tồn kho',
-        path: '/warehouse-area',
+        path: '/stocks',
         icon: <FiCalendar />,
         children: [
-            { name: 'Nguyên vật liệu', path: '/warehouse-area/materials' },
-            { name: 'Thành phẩm', path: '/warehouse-area/products' },
+            { name: 'Nguyên vật liệu', path: '/stocks/materials' },
+            { name: 'Thành phẩm', path: '/stocks/products' },
         ],
     },
     {
@@ -102,12 +102,12 @@ const adminRoutes: IAdminRoute[] = [
         ],
     },
     {
-        name: 'Tồn kho',
-        path: '/stocks',
+        name: 'Lịch sử kho',
+        path: '/histories',
         icon: <PiWarehouse />,
         children: [
-            { name: 'Nguyên vật liệu', path: '/stocks/materials' },
-            { name: 'Thành phẩm', path: '/stocks/products' },
+            { name: 'Nguyên vật liệu', path: '/histories/materials' },
+            { name: 'Thành phẩm', path: '/histories/products' },
         ],
     },
     {

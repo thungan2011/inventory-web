@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { FieldArray, Form, Formik, useFormikContext } from 'formik';
 import Card from '@/components/Card';
-import { object } from 'yup';
+import { number, object, string } from 'yup';
 import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { FaSave } from 'react-icons/fa';
@@ -31,7 +31,10 @@ import { useAllEmployees } from '@/modules/employees/repository';
 import { useRouter } from 'next/navigation';
 import { StorageAreaType } from '@/modules/storage-area/interface';
 
-const ProductSchema = object({});
+const ProductSchema = object({
+    note: string().trim().max(500, 'Ghi chú không được vuợt quá 500 ký tự'),
+    receiver: number().required('Người nhận hàng không được để trống'),
+});
 
 interface Material {
     id: number;
@@ -63,6 +66,7 @@ const initialFormValues: ImportMaterialFormValues = {
 
 const MaterialTable = () => {
     const { values, setFieldValue } = useFormikContext<ImportMaterialFormValues>();
+    const tomorrow = dayjs().add(1, 'day').toDate();
     const [selectedMaterial, setSelectedMaterial] = useState<{ index: number, quantity: number } | null>(null);
 
     return (
@@ -127,7 +131,7 @@ const MaterialTable = () => {
                                         </TableCore.Cell>
                                         <TableCore.Cell>
                                             <div className="relative">
-                                                <DatePicker name={`materials.${index}.expiryDate`} minDate={new Date()}
+                                                <DatePicker name={`materials.${index}.expiryDate`} minDate={tomorrow}
                                                             wrapperClassName="mb-0" />
                                             </div>
                                         </TableCore.Cell>
@@ -208,6 +212,7 @@ interface FormContentProps {
 
 const FormContent = ({ isLoading }: FormContentProps) => {
     const { values, errors, touched, setFieldValue } = useFormikContext<ImportMaterialFormValues>();
+    const tomorrow = dayjs().add(1, 'day').toDate();
     const [showListMaterial, setShowListMaterial] = useState<boolean>(false);
     const [providerSearchTerm, setProviderSearchTerm] = useState<string>('');
     const [materialSearchTerm, setMaterialSearchTerm] = useState<string>('');
@@ -262,7 +267,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
             unit: material.unit,
             weight: material.weight,
             locations: [],
-            expiryDate: new Date(),
+            expiryDate: tomorrow,
         };
         setFieldValue('materials', [...values.materials, newMaterial]);
         setShowListMaterial(false);

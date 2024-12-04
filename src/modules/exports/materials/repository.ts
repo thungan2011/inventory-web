@@ -62,9 +62,8 @@ interface AddExportMaterialPayload {
     type: ExportMaterialType;
     note: string;
     materials: {
-        material_id: number;
         quantity: number;
-        storage_area_id: number;
+        material_history_id: number;
     }[];
 }
 

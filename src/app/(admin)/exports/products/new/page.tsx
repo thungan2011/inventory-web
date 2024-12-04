@@ -24,12 +24,13 @@ import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import InputCurrency from '@/components/InputCurrency';
 import { MdRemoveCircleOutline } from 'react-icons/md';
-import ModalChooseLocation, { LocationAllocation } from '@/components/Pages/Import/Material/ModalChooseLocation';
-import { StorageAreaType } from '@/modules/storage-area/interface';
 import ProductSearch from '@/components/ProductSearch';
 import { ProductOverview, ProductStatus } from '@/modules/products/interface';
 import { useAllProducts } from '@/modules/products/repository';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
+import ModalChooseExportProductLocation, {
+    ExportProductLocation,
+} from '@/components/Pages/Export/Product/ModalChooseExportProductLocation';
 
 const ProductSchema = object({});
 
@@ -44,7 +45,7 @@ interface Product {
     quantity: number;
     quantityAvailable: number;
     expiryDate: Date;
-    locations: LocationAllocation[];
+    locations: ExportProductLocation[];
     price: number;
 }
 
@@ -63,7 +64,11 @@ const initialFormValues: FormValues = {
 
 const ProductTable = () => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
-    const [selectedProduct, setSelectedProduct] = useState<{ index: number, quantity: number } | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<{
+        index: number,
+        quantity: number,
+        code: string
+    } | null>(null);
 
     return (
         <>
@@ -144,6 +149,7 @@ const ProductTable = () => {
                                                     onClick={() => setSelectedProduct({
                                                         index,
                                                         quantity: product.quantity,
+                                                        code: product.sku,
                                                     })}
                                             >
                                                 {values.products[index].locations.length > 0 ? 'Chỉnh sửa' : 'Chọn vị trí'}
@@ -175,13 +181,13 @@ const ProductTable = () => {
 
             {
                 selectedProduct && (
-                    <ModalChooseLocation onClose={() => setSelectedProduct(null)}
-                                         locations={values.products[selectedProduct.index].locations}
-                                         totalQuantity={selectedProduct.quantity}
-                                         onSubmit={(allocations) => {
-                                             setFieldValue(`products.${selectedProduct.index}.locations`, allocations);
-                                         }}
-                                         locationType={StorageAreaType.PRODUCT}
+                    <ModalChooseExportProductLocation onClose={() => setSelectedProduct(null)}
+                                                      selectedLocations={values.products[selectedProduct.index].locations}
+                                                      totalExportQuantity={selectedProduct.quantity}
+                                                      onSubmit={(newLocations) => {
+                                                          setFieldValue(`products.${selectedProduct.index}.locations`, newLocations);
+                                                      }}
+                                                      productCode={selectedProduct.code}
                     />
                 )
             }
@@ -318,12 +324,17 @@ const NewProductPage = () => {
     const handleSubmit = async (values: FormValues) => {
         console.log(values);
         console.table(values);
-
         try {
             await createExportProduct.mutateAsync({
                 type: values.type,
-                status: values.status,
                 note: values.note,
+                products: values.products.flatMap(product =>
+                    product.locations.map(location => ({
+                        product_id: product.id,
+                        quantity: location.quantity,
+                        storage_area_id: location.id,
+                    })),
+                ),
             });
             router.push('/exports/products');
         } catch (error) {

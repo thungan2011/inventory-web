@@ -1,11 +1,11 @@
 import React from 'react';
 
-const StockPage = () => {
+const WarehouseAreaPage = () => {
     return (
         <div>
-            Tồn kho
+            Khu vực lưu trữ
         </div>
     );
 };
 
-export default StockPage;
+export default WarehouseAreaPage;
