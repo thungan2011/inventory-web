@@ -17,12 +17,13 @@ export const EXPORT_PRODUCT_QUERY_KEY = 'export_products';
  */
 interface FetchAllExportProductParams {
     page?: number;
+    code?: string;
+    type?: ExportProductType;
+    status?: ExportProductStatus;
 }
 
 const getAllExportProducts = (params: FetchAllExportProductParams): Promise<PageObject<ExportProductOverview>> => {
-    return httpRepository.get<PageObject<ExportProductOverview>>('/v1/product_export_receipts', {
-        page: params.page || 1,
-    });
+    return httpRepository.get<PageObject<ExportProductOverview>>('/v1/product_export_receipts', {...params});
 };
 
 export const useAllExportProducts = (params: FetchAllExportProductParams) => {
@@ -41,7 +42,7 @@ const getExportProductByCode = (code: string): Promise<ExportProductDetail> => {
     return httpRepository.get<ExportProductDetail>(`/v1/product_export_receipts/${code}`);
 };
 
-export const useImportProductByCode = (code: string) => {
+export const useExportProductByCode = (code: string) => {
     return useDataFetching(
         [EXPORT_PRODUCT_QUERY_KEY, code],
         () => getExportProductByCode(code),
@@ -54,8 +55,11 @@ export const useImportProductByCode = (code: string) => {
  */
 interface AddExportProductPayload {
     type: ExportProductType;
-    status: ExportProductStatus;
     note?: string;
+    products: {
+        quantity: number;
+        product_history_id: number;
+    }[];
 }
 
 const createExportProduct = (payload: AddExportProductPayload): Promise<void> => {

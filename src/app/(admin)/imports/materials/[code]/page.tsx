@@ -146,17 +146,17 @@ const ImportMaterialDetail = () => {
                         <Typography.Title level={3}>Thông tin nhà cung cấp</Typography.Title>
                         <div className="flex flex-col gap-3">
                             <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                      label="Mã nhà cung cấp" value={importMaterial.provider.code || 'Chưa cập nhật'} />
+                                      label="Mã nhà cung cấp" value={importMaterial?.provider?.code || 'Chưa cập nhật'} />
                             <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                       label="Tên nhà cung cấp"
-                                      value={importMaterial.provider.name || 'Chưa cập nhật'} />
+                                      value={importMaterial?.provider?.name || 'Chưa cập nhật'} />
                             <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                      label="Số điện thoại" value={importMaterial.provider.phone || 'Chưa cập nhật'} />
+                                      label="Số điện thoại" value={importMaterial?.provider?.phone || 'Chưa cập nhật'} />
                             <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                      label="Email" value={importMaterial.provider.email || 'Chưa cập nhật'} />
+                                      label="Email" value={importMaterial?.provider?.email || 'Chưa cập nhật'} />
                             <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                       label="Địa chỉ"
-                                      value={`${importMaterial.provider.address}, ${importMaterial.provider.ward}, ${importMaterial.provider.district}, ${importMaterial.provider.city}`} />
+                                      value={`${importMaterial?.provider?.address}, ${importMaterial?.provider?.ward}, ${importMaterial?.provider?.district}, ${importMaterial?.provider?.city}`} />
                         </div>
                     </Card>
                 </div>

@@ -23,11 +23,12 @@ import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ExportMaterialTypeBadge from '@/components/Badge/ExportMaterialTypeBadge';
+import { SelectProps } from '@/components/Select';
 
 interface ExportMaterialFilter extends PaginationState {
     code: string;
-    // type: ExportMaterialType;
-    // status: ExportMaterialStatus;
+    type: ExportMaterialType | 'ALL';
+    status: ExportMaterialStatus | 'ALL';
 }
 
 const ExportMaterialPage = () => {
@@ -35,15 +36,15 @@ const ExportMaterialPage = () => {
     const initialFilterValues: ExportMaterialFilter = {
         page: 1,
         code: '',
-        // type: 'ALL',
-        // status: 'ALL',
+        type: 'ALL',
+        status: 'ALL',
     };
     const [filters, setFilters] = useState<ExportMaterialFilter>(initialFilterValues);
     const exportMaterialQuery = useAllExportMaterials({
         page: filters.page,
         code: filters.code,
-        // type: filters.type === 'ALL' ? undefined : filters.type,
-        // status: filters.status === 'ALL' ? undefined : filters.status,
+        type: filters.type === 'ALL' ? undefined : filters.type,
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {
@@ -120,6 +121,21 @@ const ExportMaterialPage = () => {
         exportToExcel<ExportMaterialOverview>(exportMaterials, [], 'importMaterials.xlsx');
     };
 
+    const typeOptions : SelectProps['options'] = [
+        { label: 'Tất cả loại', value: 'ALL' },
+        ...Object.values(ExportMaterialType).map(value => ({
+            label: ExportMaterialTypeVietnamese[value],
+            value,
+        })),
+    ];
+
+    const statusOptions : SelectProps['options'] = [
+        { label: 'Tất cả trạng thái', value: 'ALL' },
+        ...Object.values(ExportMaterialStatus).map(value => ({
+            label: ExportMaterialStatusVietnamese[value],
+            value,
+        })),
+    ];
 
     return (
         <>
@@ -140,26 +156,14 @@ const ExportMaterialPage = () => {
                                 <div className="px-4 pb-3">
                                     <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                     <div className="grid grid-cols-3 gap-4">
-                                        <Input name="search" placeholder="Mã phiếu xuất" />
+                                        <Input name="code" placeholder="Mã phiếu xuất" />
                                         <Select name="type"
                                                 placeholder="Lọc theo loại"
-                                                options={[
-                                                    { label: 'Tất cả loại', value: 'ALL' },
-                                                    ...Object.values(ExportMaterialType).map(value => ({
-                                                        label: ExportMaterialTypeVietnamese[value],
-                                                        value,
-                                                    })),
-                                                ]}
+                                                options={typeOptions}
                                         />
                                         <Select name="status"
                                                 placeholder="Lọc theo trạng thái"
-                                                options={[
-                                                    { label: 'Tất cả trạng thái', value: 'ALL' },
-                                                    ...Object.values(ExportMaterialStatus).map(value => ({
-                                                        label: ExportMaterialStatusVietnamese[value],
-                                                        value,
-                                                    })),
-                                                ]}
+                                                options={statusOptions}
                                         />
                                     </div>
                                 </div>

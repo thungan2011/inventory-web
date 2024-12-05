@@ -22,20 +22,28 @@ import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ExportProductTypeBadge from '@/components/Badge/ExportProductTypeBadge';
+import { SelectProps } from '@/components/Select';
 
 interface ExportProductFilter extends PaginationState {
-    search: string;
+    code: string;
+    type: ExportProductType | 'ALL';
+    status: ExportProductStatus | 'ALL';
 }
 
-const ExportProductPage = () => {
+const initialFilterValues : ExportProductFilter = {
+    page: 1,
+    code: '',
+    type: 'ALL',
+    status: 'ALL',
+};
 
-    const initialFilterValues = {
-        page: 1,
-        search: '',
-    };
+const ExportProductPage = () => {
     const [filters, setFilters] = useState<ExportProductFilter>(initialFilterValues);
     const exportProductQuery = useAllExportProducts({
         page: filters.page,
+        code: filters.code,
+        type: filters.type === 'ALL' ? undefined : filters.type,
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {
@@ -111,6 +119,13 @@ const ExportProductPage = () => {
         exportToExcel<ExportProductOverview>(exportProducts, [], 'exportProducts.xlsx');
     };
 
+    const typeOptions : SelectProps['options'] = [
+        { label: 'Tất cả loại', value: 'ALL' },
+        ...Object.values(ExportProductType).map(value => ({
+            label: ExportProductTypeVietnamese[value],
+            value,
+        })),
+    ];
 
     return (
         <>
@@ -119,7 +134,6 @@ const ExportProductPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add href={'/exports/products/new'} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
@@ -131,20 +145,10 @@ const ExportProductPage = () => {
                                 <div className="px-4 pb-3">
                                     <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                     <div className="grid grid-cols-3 gap-4">
-                                        <Input name="search" placeholder="Mã phiếu xuất" />
-                                        <Input name="search" placeholder="Tên người lập phiếu" />
-                                        <Input name="search" placeholder="Ngày lập phiếu" />
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-4">
+                                        <Input name="code" placeholder="Mã phiếu xuất" />
                                         <Select name="type"
                                                 placeholder="Lọc theo loại"
-                                                options={[
-                                                    { label: 'Tất cả loại', value: 'ALL' },
-                                                    ...Object.values(ExportProductType).map(value => ({
-                                                        label: ExportProductTypeVietnamese[value],
-                                                        value,
-                                                    })),
-                                                ]}
+                                                options={typeOptions}
                                         />
                                         <Select name="status"
                                                 placeholder="Lọc theo trạng thái"

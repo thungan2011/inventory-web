@@ -22,13 +22,15 @@ import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import InputCurrency from '@/components/InputCurrency';
 import { MdRemoveCircleOutline } from 'react-icons/md';
-import ModalChooseLocation, { LocationAllocation } from '@/components/Pages/Import/Material/ModalChooseLocation';
-import { StorageAreaType } from '@/modules/storage-area/interface';
 import MaterialSearch from '@/components/MaterialSearch';
 import { useAllMaterials } from '@/modules/materials/repository';
 import { MaterialOverview, MaterialStatus } from '@/modules/materials/interface';
 import { useRouter } from 'next/navigation';
 import { useCreateExportMaterial } from '@/modules/exports/materials/repository';
+import ModalChooseExportLocation, {
+    ExportLocation,
+} from '@/components/Pages/Export/Material/ModalChooseExportLocation';
+import dayjs from 'dayjs';
 
 const ExportMaterialSchema = object({});
 
@@ -42,7 +44,7 @@ interface Material {
     quantity: number;
     unit: string;
     weight: number;
-    locations: LocationAllocation[];
+    locations: ExportLocation[];
     expiryDate: Date;
 }
 
@@ -62,8 +64,7 @@ const initialFormValues: FormValues = {
 
 const MaterialTable = () => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
-    const [selectedMaterial, setSelectedMaterial] = useState<{ index: number, quantity: number } | null>(null);
-
+    const [selectedMaterial, setSelectedMaterial] = useState<{ index: number, quantity: number, code: string } | null>(null);
     return (
         <>
             <TableCore className="mt-3">
@@ -140,6 +141,7 @@ const MaterialTable = () => {
                                                     onClick={() => setSelectedMaterial({
                                                         index,
                                                         quantity: material.quantity,
+                                                        code: material.sku
                                                     })}
                                             >
                                                 {values.materials[index].locations.length > 0 ? 'Chỉnh sửa' : 'Chọn vị trí'}
@@ -171,13 +173,13 @@ const MaterialTable = () => {
 
             {
                 selectedMaterial && (
-                    <ModalChooseLocation onClose={() => setSelectedMaterial(null)}
-                                         locations={values.materials[selectedMaterial.index].locations}
-                                         totalQuantity={selectedMaterial.quantity}
+                    <ModalChooseExportLocation onClose={() => setSelectedMaterial(null)}
+                                         selectedLocations={values.materials[selectedMaterial.index].locations}
+                                         totalExportQuantity={selectedMaterial.quantity}
                                          onSubmit={(allocations) => {
                                              setFieldValue(`materials.${selectedMaterial.index}.locations`, allocations);
                                          }}
-                                         locationType={StorageAreaType.MATERIAL}
+                                         materialCode={selectedMaterial.code}
                     />
                 )
             }
@@ -193,6 +195,7 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
     const [showListMaterial, setShowListMaterial] = useState<boolean>(false);
     const [materialSearchTerm, setMaterialSearchTerm] = useState<string>('');
+    const tomorrow = dayjs().add(1, 'day').toDate();
 
     const materialQuery = useAllMaterials({
         name: materialSearchTerm,
@@ -235,7 +238,7 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
                 unit: material.unit,
                 weight: material.weight,
                 locations: [],
-                expiryDate: new Date(),
+                expiryDate: tomorrow,
             };
             setFieldValue('materials', [...values.materials, newMaterial]);
         }
@@ -319,9 +322,8 @@ const NewExportMaterialPage = () => {
                 note: values.note,
                 materials: values.materials.flatMap(material =>
                     material.locations.map(location => ({
-                        material_id: material.id,
                         quantity: location.quantity,
-                        storage_area_id: location.id,
+                        material_history_id: location.id,
                     })),
                 ),
             });
@@ -335,7 +337,7 @@ const NewExportMaterialPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ExportMaterialSchema}>
-                <FormSelection isLoading={false} />
+                <FormSelection isLoading={createExportMaterial.isPending} />
             </Formik>
         </div>
     );
