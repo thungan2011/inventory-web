@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { FieldArray, Form, Formik, useFormikContext } from 'formik';
 import Card from '@/components/Card';
-import { object } from 'yup';
+import { number, object, string } from 'yup';
 import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { FaSave } from 'react-icons/fa';
@@ -30,8 +30,14 @@ import dayjs from 'dayjs';
 import { useAllEmployees } from '@/modules/employees/repository';
 import { useRouter } from 'next/navigation';
 import { StorageAreaType } from '@/modules/storage-area/interface';
+import { useAllExportMaterials, useExportMaterialByCode } from '@/modules/exports/materials/repository';
+import { ExportMaterialStatus, ExportMaterialType } from '@/modules/exports/materials/interface';
+import { formatDateToLocalDate } from '@/utils/formatDate';
 
-const ProductSchema = object({});
+const ProductSchema = object({
+    note: string().trim().max(500, 'Ghi chú không được vuợt quá 500 ký tự'),
+    receiver: number().required('Người nhận hàng không được để trống'),
+});
 
 interface Material {
     id: number;
@@ -41,6 +47,7 @@ interface Material {
     origin: string;
     packing: string;
     quantity: number;
+    maxQuantity?: number;
     unit: string;
     weight: number;
     locations: LocationAllocation[];
@@ -53,6 +60,7 @@ interface ImportMaterialFormValues {
     type: ImportMaterialType;
     provider?: number;
     receiver?: number;
+    reception?: string;
 }
 
 const initialFormValues: ImportMaterialFormValues = {
@@ -63,6 +71,7 @@ const initialFormValues: ImportMaterialFormValues = {
 
 const MaterialTable = () => {
     const { values, setFieldValue } = useFormikContext<ImportMaterialFormValues>();
+    const tomorrow = dayjs().add(1, 'day').toDate();
     const [selectedMaterial, setSelectedMaterial] = useState<{ index: number, quantity: number } | null>(null);
 
     return (
@@ -121,14 +130,19 @@ const MaterialTable = () => {
                                             <InputCurrency name={`materials.${index}.quantity`}
                                                            placeholder="Nhập số lượng"
                                                            step={1}
+                                                           min={0}
+                                                           max={material.maxQuantity}
                                                            className="!w-20"
                                                            wrapperClassName="mb-0"
                                             />
                                         </TableCore.Cell>
                                         <TableCore.Cell>
                                             <div className="relative">
-                                                <DatePicker name={`materials.${index}.expiryDate`} minDate={new Date()}
-                                                            wrapperClassName="mb-0" />
+                                                <DatePicker name={`materials.${index}.expiryDate`}
+                                                            readOnly={values.type === ImportMaterialType.RETURN}
+                                                            minDate={tomorrow}
+                                                            wrapperClassName="mb-0"
+                                                />
                                             </div>
                                         </TableCore.Cell>
                                         <TableCore.Cell>
@@ -208,10 +222,12 @@ interface FormContentProps {
 
 const FormContent = ({ isLoading }: FormContentProps) => {
     const { values, errors, touched, setFieldValue } = useFormikContext<ImportMaterialFormValues>();
+    const tomorrow = dayjs().add(1, 'day').toDate();
     const [showListMaterial, setShowListMaterial] = useState<boolean>(false);
     const [providerSearchTerm, setProviderSearchTerm] = useState<string>('');
     const [materialSearchTerm, setMaterialSearchTerm] = useState<string>('');
     const [employeeSearchTerm, setEmployeeSearchTerm] = useState<string>('');
+    const [exportReceptionSearchTerm, setExportReceptionSearchTerm] = useState<string>('');
 
     const providerQuery = useAllProviders({
         name: providerSearchTerm,
@@ -226,6 +242,14 @@ const FormContent = ({ isLoading }: FormContentProps) => {
     const employeeQuery = useAllEmployees({
         first_name: employeeSearchTerm,
     });
+
+    const exportMaterialQuery = useAllExportMaterials({
+        code: exportReceptionSearchTerm,
+        type: ExportMaterialType.NORMAL,
+        status: ExportMaterialStatus.COMPLETED,
+    });
+
+    const { data: exportMaterial } = useExportMaterialByCode(values.reception?.split('-')[0]);
 
     const typeOptions: SelectProps['options'] = Object.keys(ImportMaterialType).map(type => (
         {
@@ -242,6 +266,11 @@ const FormContent = ({ isLoading }: FormContentProps) => {
     const employeeOptions: SelectProps['options'] = (employeeQuery.data?.data || []).map(employee => ({
         label: `${employee.code} - ${employee.firstName} ${employee.lastName}`,
         value: employee.id,
+    }));
+
+    const exportReceptionOptions: SelectProps['options'] = (exportMaterialQuery.data?.data || []).map(exportMaterial => ({
+        label: `${exportMaterial.code} - ${formatDateToLocalDate(exportMaterial.createdAt)}`,
+        value: `${exportMaterial.code}-${exportMaterial.id}`,
     }));
 
     const availableMaterials = React.useMemo(() => {
@@ -262,11 +291,37 @@ const FormContent = ({ isLoading }: FormContentProps) => {
             unit: material.unit,
             weight: material.weight,
             locations: [],
-            expiryDate: new Date(),
+            expiryDate: tomorrow,
         };
         setFieldValue('materials', [...values.materials, newMaterial]);
         setShowListMaterial(false);
     };
+
+    useEffect(() => {
+        if (values.type === ImportMaterialType.RETURN) {
+            setFieldValue('provider', undefined);
+
+            if (exportMaterial !== null) {
+                setFieldValue('materials', exportMaterial.details.map(detail => ({
+                    id: detail.material.id,
+                    sku: detail.material.sku,
+                    price: 0,
+                    maxQuantity: detail.quantity,
+                    quantity: detail.quantity,
+                    name: detail.material.name,
+                    origin: detail.material.origin,
+                    packing: detail.material.packing,
+                    unit: detail.material.unit,
+                    weight: detail.material.weight,
+                    locations: [],
+                    expiryDate: dayjs(detail.expiryDate).toDate(),
+                })));
+            }
+
+        } else {
+            setFieldValue('reception', undefined);
+        }
+    }, [values.type, values.reception, exportMaterial]);
 
     return (
         <Form>
@@ -298,6 +353,18 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                 />
                             )
                         }
+                        {
+                            values.type === ImportMaterialType.RETURN && (
+                                <Select name="reception"
+                                        label="Hóa đơn xuất"
+                                        placeholder="Chọn hóa đơn xuất"
+                                        searchPlaceholder="Nhập mã hóa đơn..."
+                                        options={exportReceptionOptions}
+                                        enableSearch
+                                        onSearch={setExportReceptionSearchTerm}
+                                />
+                            )
+                        }
                         <TextArea name="note"
                                   label="Ghi chú"
                                   placeholder="Nhập ghi chú (nếu có)"
@@ -316,15 +383,19 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                         )}
                     </div>
                     <div className="border p-2 rounded">
-                        <div>
-                            <MaterialSearch onSearchChange={setMaterialSearchTerm}
-                                            onSelect={handleAddMaterial}
-                                            onShowDropdownChange={setShowListMaterial}
-                                            materials={availableMaterials}
-                                            searchValue={materialSearchTerm}
-                                            showDropdown={showListMaterial}
-                            />
-                        </div>
+                        {
+                            values.type !== ImportMaterialType.RETURN && (
+                                <div>
+                                    <MaterialSearch onSearchChange={setMaterialSearchTerm}
+                                                    onSelect={handleAddMaterial}
+                                                    onShowDropdownChange={setShowListMaterial}
+                                                    materials={availableMaterials}
+                                                    searchValue={materialSearchTerm}
+                                                    showDropdown={showListMaterial}
+                                    />
+                                </div>
+                            )
+                        }
                         <MaterialTable />
                     </div>
                 </Card>
@@ -366,9 +437,11 @@ const NewImportMaterialPage = () => {
     const handleSubmit = async (values: ImportMaterialFormValues) => {
         console.log(values);
         try {
+
             await createImportMaterial.mutateAsync({
                 type: values.type,
                 note: values.note,
+                material_export_receipt_id: values.type === ImportMaterialType.RETURN ? Number(values.reception?.split('-')[1]) : undefined,
                 provider_id: values.type === ImportMaterialType.NORMAL ? values.provider : undefined,
                 receiver_id: values.receiver,
                 materials: values.materials.flatMap(material =>

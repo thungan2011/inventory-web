@@ -52,13 +52,18 @@ export interface ExportProductDetail {
     };
     details: {
         quantity: number;
-        price: number;
+        expiryDate: Date;
         product: {
             sku: string;
             name: string;
             weight: number;
             packing: string;
             unit: string;
+        };
+        storageArea: {
+            id: number;
+            name: string;
+            code: string;
         }
     }[];
 }

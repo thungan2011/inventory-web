@@ -507,4 +507,20 @@ export const breadcrumbs: IBreadcrumb[] = [
             { label: 'Chi tiết' },
         ],
     },
+    {
+        label: 'Lịch sử kho',
+        link: '^/histories/materials$',
+        breadcrumbTrail: [
+            { label: 'Lịch sử lưu kho' },
+            { label: 'Nguyên vật liệu' },
+        ],
+    },
+    {
+        label: 'Lịch sử kho',
+        link: '^/histories/products$',
+        breadcrumbTrail: [
+            { label: 'Lịch sử lưu kho' },
+            { label: 'Thành phẩm' },
+        ],
+    },
 ];
