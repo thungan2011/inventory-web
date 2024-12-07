@@ -19,6 +19,7 @@ import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import CategoryTypeBadge from '@/components/Badge/CategoryTypeBadge';
 import ModalAddCategory from '@/components/Pages/Category/ModalAddCategory';
 import ModalUpdateCategory from '@/components/Pages/Category/ModalUpdateCategory';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface CategoryFilter extends PaginationState {
     name: string;
@@ -26,6 +27,31 @@ interface CategoryFilter extends PaginationState {
     status: BaseStatus | 'ALL';
     type: CategoryType | 'ALL';
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'code',
+        header: 'Mã',
+    },
+    {
+        field: 'name',
+        header: 'Tên danh mục',
+    },
+    {
+        field: 'type',
+        header: 'Loại',
+        formatter: (value: CategoryType) => CategoryTypeVietnamese[value],
+    },
+    {
+        field: 'description',
+        header: 'Mô tả',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: BaseStatus) => BaseStatusVietnamese[value],
+    },
+];
 
 const CategoryPage = () => {
 
@@ -144,8 +170,8 @@ const CategoryPage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
-
+    const handleExportExcel = async () => {
+        await exportToExcel<CategoryOverview>(categories, exportColumns, 'danh-muc.xlsx');
     };
 
 
@@ -157,7 +183,6 @@ const CategoryPage = () => {
 
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add onClick={() => setShowModalAddCategory(true)} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
