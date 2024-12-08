@@ -47,7 +47,7 @@ export interface ImportMaterialOverview {
 }
 
 export interface ImportMaterialDetail{
-    id: string;
+    id: number;
     code: string;
     createdAt: Date;
     type: ImportMaterialType;

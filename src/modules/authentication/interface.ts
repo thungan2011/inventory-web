@@ -1,3 +1,7 @@
+export const ROLE_ADMIN = 'ADMIN';
+export const ROLE_EMPLOYEE_SALE = 'EMPLOYEE_SALE';
+export const ROLE_WAREHOUSE_KEEPER = 'WAREHOUSE_KEEPER';
+
 export interface LoginCredentials {
     email: string;
     password: string;

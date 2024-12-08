@@ -17,7 +17,7 @@ const DefaultProductItem = ({ product, onSelect }: {
     onSelect: (product: ProductOverview) => void
 }) => {
     return (
-        <div className="p-2 hover:bg-gray-100 cursor-pointer"
+        <div className="p-2 hover:bg-gray-100 cursor-pointer border-t first:border-t-0"
              onClick={() => onSelect(product)}>
             <div className="flex gap-3">
                 <div className="relative w-12 h-12 rounded border overflow-hidden">
@@ -33,7 +33,7 @@ const DefaultProductItem = ({ product, onSelect }: {
                         #{product.sku} - {product.name}
                     </div>
                     <div className="text-xs line-clamp-1">
-                        {product.packing}
+                        Tồn kho khả dụng: {product.quantityAvailable} | Loại: {product.packing}
                     </div>
                 </div>
                 <div className="flex justify-center items-center">

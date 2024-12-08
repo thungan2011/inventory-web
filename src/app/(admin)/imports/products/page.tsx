@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 import { formatDateToLocalDate } from '@/utils/formatDate';
 import Card from '@/components/Card';
 import Table from '@/components/Tables';
@@ -29,6 +29,19 @@ interface ImportProductFilter extends PaginationState {
     type: ImportProductType | 'ALL';
     status: ImportProductStatus | 'ALL';
 }
+
+const exportColumns: ExcelColumn[] = [
+    { field: 'code', header: 'Mã phiếu nhập' },
+    {
+        field: 'createdAt',
+        header: 'Ngày lập phiếu',
+        formatter: (value: Date) => formatDateToLocalDate(value),
+    },
+    { field: 'type', header: 'Loại giao dịch' },
+    { field: 'status', header: 'Trạng thái' },
+    { field: 'note', header: 'Ghi chú' },
+    { field: 'creator.fullName', header: 'Người lập phiếu' },
+];
 
 const ImportProductPage = () => {
 
@@ -95,10 +108,6 @@ const ImportProductPage = () => {
                 header: 'Loại giao dịch',
                 cell: ({ row }) => <ImportProductTypesBadge type={row.original.type} />,
             },
-            // {
-            //     accessorKey: 'note',
-            //     header: () => <span>Ghi chú</span>,
-            // },
             {
                 accessorKey: 'status',
                 header: () => <span>Trạng thái</span>,
@@ -119,8 +128,8 @@ const ImportProductPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
-        exportToExcel<ImportProductOverview>(importProducts, [], 'importProducts.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<ImportProductOverview>(importProducts, exportColumns, 'ds-nhap-kho-nguyen-lieu.xlsx');
     };
 
 
@@ -130,8 +139,7 @@ const ImportProductPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/imports/products/new'} />
-                            <ButtonAction.Import />
+                            <ButtonAction.Add text="Tạo phiếu nhập" href={'/imports/products/new'} />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

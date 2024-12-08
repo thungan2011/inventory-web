@@ -90,3 +90,45 @@ export const useCreateImportMaterial = () => {
         },
     });
 };
+
+/**
+ * Approve import material
+ */
+const approveImportMaterial = (id: number): Promise<void> => {
+    return httpRepository.post<void>(`/v1/import/materials/approve/${id}`);
+};
+
+export const useApproveImportMaterial = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: approveImportMaterial,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [IMPORT_MATERIAL_QUERY_KEY] });
+            toast.success('Duyệt phiếu thành công');
+        },
+        onError: () => {
+            toast.error('Duyệt phiếu không thành công. Thử lại sau.');
+        },
+    });
+};
+
+/**
+ * Reject import material
+ */
+const rejectImportMaterial = (id: number): Promise<void> => {
+    return httpRepository.post<void>(`/v1/import/materials/reject/${id}`);
+};
+
+export const useRejectImportMaterial = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: rejectImportMaterial,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [IMPORT_MATERIAL_QUERY_KEY] });
+            toast.success('Từ chối duyệt phiếu thành công');
+        },
+        onError: () => {
+            toast.error('Từ chối duyệt phiếu không thành công. Thử lại sau.');
+        },
+    });
+};
