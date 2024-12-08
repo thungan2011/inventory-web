@@ -17,7 +17,7 @@ const DefaultMaterialItem = ({ material, onSelect }: {
     onSelect: (material: MaterialOverview) => void
 }) => {
     return (
-        <div className="p-2 hover:bg-gray-100 cursor-pointer"
+        <div className="p-2 hover:bg-gray-100 cursor-pointer border-t first:border-t-0"
              onClick={() => onSelect(material)}>
             <div className="flex gap-3">
                 <div className="relative w-12 h-12 rounded border overflow-hidden">
@@ -32,8 +32,14 @@ const DefaultMaterialItem = ({ material, onSelect }: {
                     <div className="text-sm font-medium line-clamp-1">
                         #{material.sku} - {material.name}
                     </div>
-                    <div className="text-xs line-clamp-1">
-                        {material.packing}
+                    <div className="text-xs flex items-center gap-2">
+                        <div>
+                            Loại: {material.packing}
+                        </div>
+                        <div>|</div>
+                        <div>
+                            Tồn kho khả dụng: {material.quantityAvailable}
+                        </div>
                     </div>
                 </div>
                 <div className="flex justify-center items-center">

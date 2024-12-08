@@ -32,7 +32,6 @@ interface ExportMaterialFilter extends PaginationState {
 }
 
 const ExportMaterialPage = () => {
-
     const initialFilterValues: ExportMaterialFilter = {
         page: 1,
         code: '',
@@ -59,7 +58,6 @@ const ExportMaterialPage = () => {
         initialFilters: filters,
         onFilterChange: setFilters,
     });
-
 
     useEffect(() => {
         document.title = 'Nut Garden - Xuất kho';
@@ -117,8 +115,8 @@ const ExportMaterialPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
-        exportToExcel<ExportMaterialOverview>(exportMaterials, [], 'importMaterials.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<ExportMaterialOverview>(exportMaterials, [], 'importMaterials.xlsx');
     };
 
     const typeOptions : SelectProps['options'] = [
@@ -143,8 +141,7 @@ const ExportMaterialPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/exports/materials/new'} />
-                            <ButtonAction.Import />
+                            <ButtonAction.Add href={'/exports/materials/new'} text="Tạo phiếu xuất" />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

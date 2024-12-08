@@ -69,6 +69,7 @@ export interface OrderDetail extends OrderOverview {
             weight: number;
             unit: string;
             packing: string;
+            quantityAvailable: number;
         };
 
         price: number;

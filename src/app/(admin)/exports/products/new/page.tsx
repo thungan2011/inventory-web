@@ -24,13 +24,16 @@ import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import InputCurrency from '@/components/InputCurrency';
 import { MdRemoveCircleOutline } from 'react-icons/md';
-import ProductSearch from '@/components/ProductSearch';
 import { ProductOverview, ProductStatus } from '@/modules/products/interface';
 import { useAllProducts } from '@/modules/products/repository';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import ModalChooseExportProductLocation, {
     ExportProductLocation,
 } from '@/components/Pages/Export/Product/ModalChooseExportProductLocation';
+import ProductSearch from '@/components/ProductSearch';
+import { useAllOrders, useOrderByCode } from '@/modules/orders/repository';
+import { OrderStatus } from '@/modules/orders/interface';
+import { formatDateToLocalDate } from '@/utils/formatDate';
 
 const ProductSchema = object({});
 
@@ -43,8 +46,8 @@ interface Product {
     unit: string;
     packing: string;
     quantity: number;
+    quantityOrdered?: number;
     quantityAvailable: number;
-    expiryDate: Date;
     locations: ExportProductLocation[];
     price: number;
 }
@@ -54,6 +57,7 @@ interface FormValues {
     note?: string;
     type: ExportProductType;
     products: Product[];
+    order?: string;
 }
 
 const initialFormValues: FormValues = {
@@ -78,7 +82,8 @@ const ProductTable = () => {
                         <TableCore.Head>Sản phẩm</TableCore.Head>
                         <TableCore.Head>Giá bán</TableCore.Head>
                         <TableCore.Head>Tồn kho khả dụng</TableCore.Head>
-                        <TableCore.Head>Số lượng</TableCore.Head>
+                        {values.type === ExportProductType.NORMAL && <TableCore.Head>Số lượng đặt</TableCore.Head>}
+                        <TableCore.Head>Số lượng xuất</TableCore.Head>
                         <TableCore.Head>Vị trí lưu kho</TableCore.Head>
                         <TableCore.Head className="!max-w-8"></TableCore.Head>
                     </TableCore.RowHeader>
@@ -99,7 +104,7 @@ const ProductTable = () => {
                                                            className="object-cover" />
                                                 </div>
                                                 <div
-                                                    className="flex-1 flex flex-col justify-center max-w-96">
+                                                    className="flex-1 flex flex-col justify-center max-w-64">
                                                     <div
                                                         className="text-sm font-medium line-clamp-1"
                                                         title={`${product.sku} - ${product.name}`}
@@ -117,6 +122,13 @@ const ProductTable = () => {
                                         <TableCore.Cell>
                                             {product.quantityAvailable}
                                         </TableCore.Cell>
+                                        {
+                                            values.type === ExportProductType.NORMAL && (
+                                                <TableCore.Cell>
+                                                    {product.quantityOrdered}
+                                                </TableCore.Cell>
+                                            )
+                                        }
                                         <TableCore.Cell>
                                             <InputCurrency name={`products.${index}.quantity`}
                                                            placeholder="Nhập số lượng"
@@ -203,6 +215,7 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
     const [showListProduct, setShowListProduct] = useState<boolean>(false);
     const [productSearchValue, setProductSearchValue] = useState<string>('');
+    const [orderSearchTerm, setOrderSearchTerm] = useState<string>('');
 
     const productQuery = useAllProducts({
         page: 1,
@@ -210,12 +223,26 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
         status: ProductStatus.ACTIVE,
     });
 
-    const typeOptions: SelectProps['options'] = Object.keys(ExportProductType).map(type => (
-        {
-            label: ExportProductTypeVietnamese[type as ExportProductType],
-            value: type,
-        }
-    ));
+    const orderQuery = useAllOrders({
+        status: OrderStatus.PENDING,
+        code: orderSearchTerm,
+    });
+
+    const { data: order } = useOrderByCode(values.order?.split(' - ')[0]);
+
+    const typeOptions: SelectProps['options'] = Object.keys(ExportProductType)
+        .filter(type => type !== ExportProductType.OTHER)
+        .map(type => (
+            {
+                label: ExportProductTypeVietnamese[type as ExportProductType],
+                value: type,
+            }
+        ));
+
+    const orderOptions : SelectProps['options'] = (orderQuery.data?.data || []).map(order => ({
+        label: `${order.code} - ${order.customer.name} - Đặt ngày ${formatDateToLocalDate(order.orderDate)}`,
+        value: `${order.code} - ${order.id}`,
+    }));
 
     const statusOptions: SelectProps['options'] = Object.keys(ExportMaterialStatus).map(status => (
         {
@@ -236,7 +263,6 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
 
     const handleAddProduct = (product: ProductOverview) => {
         const newProduct: Product = {
-            expiryDate: new Date(),
             locations: [],
             id: product.id,
             sku: product.sku,
@@ -253,6 +279,31 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
         setShowListProduct(false);
     };
 
+    useEffect(() => {
+        if (values.type === ExportProductType.NORMAL && order) {
+            setFieldValue('products', order.orderDetails.map(detail => ({
+                id: detail.product.id,
+                sku: detail.product.sku,
+                name: detail.product.name,
+                weight: detail.product.weight,
+                unit: detail.product.unit,
+                packing: detail.product.packing,
+                quantity: detail.product.quantityAvailable > detail.quantity ? detail.quantity : detail.product.quantityAvailable,
+                quantityAvailable: detail.product.quantityAvailable,
+                quantityOrdered: detail.quantity,
+                expiryDate: new Date(),
+                locations: [],
+                price: detail.price,
+            })));
+        }
+    }, [values.type, order]);
+
+    useEffect(() => {
+        if (values.type !== ExportProductType.NORMAL) {
+            setFieldValue('products', []);
+        }
+    }, [values.type]);
+
     return (
         <Form>
             <div className="grid gap-x-3 mt-5">
@@ -260,10 +311,25 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
                     <Typography.Title level={4}>Thông tin chung</Typography.Title>
                     <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
                         <Select name="type"
+                                required
                                 label="Loại giao dịch"
                                 options={typeOptions}
                         />
+                        {
+                            values.type === ExportProductType.NORMAL && (
+                                <Select name="order"
+                                        label="Đơn hàng"
+                                        required
+                                        placeholder="Chọn đơn hàng"
+                                        searchPlaceholder="Nhập mã đơn hàng..."
+                                        options={orderOptions}
+                                        enableSearch
+                                        onSearch={setOrderSearchTerm}
+                                />
+                            )
+                        }
                         <Select name="status"
+                                required
                                 label="Trạng thái"
                                 options={statusOptions}
                         />
@@ -275,15 +341,19 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
                 <Card className={`p-[18px] col-span-3`}>
                     <Typography.Title level={4}>Thông tin chi tiết</Typography.Title>
                     <div className="border p-2 rounded">
-                        <div className="flex gap-3">
-                            <ProductSearch onSelect={handleAddProduct}
-                                           products={availableProducts}
-                                           searchValue={productSearchValue}
-                                           onSearchChange={setProductSearchValue}
-                                           showDropdown={showListProduct}
-                                           onShowDropdownChange={setShowListProduct}
-                            />
-                        </div>
+                        {
+                            values.type !== ExportProductType.NORMAL && (
+                                <div className="flex gap-3">
+                                    <ProductSearch onSelect={handleAddProduct}
+                                                   products={availableProducts}
+                                                   searchValue={productSearchValue}
+                                                   onSearchChange={setProductSearchValue}
+                                                   showDropdown={showListProduct}
+                                                   onShowDropdownChange={setShowListProduct}
+                                    />
+                                </div>
+                            )
+                        }
                         <ProductTable />
                     </div>
                 </Card>

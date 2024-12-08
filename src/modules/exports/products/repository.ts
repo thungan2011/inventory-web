@@ -38,11 +38,11 @@ export const useAllExportProducts = (params: FetchAllExportProductParams) => {
 /**
  * get export Product by Code
  */
-const getExportProductByCode = (code: string): Promise<ExportProductDetail> => {
+const getExportProductByCode = (code?: string): Promise<ExportProductDetail> => {
     return httpRepository.get<ExportProductDetail>(`/v1/product_export_receipts/${code}`);
 };
 
-export const useExportProductByCode = (code: string) => {
+export const useExportProductByCode = (code?: string) => {
     return useDataFetching(
         [EXPORT_PRODUCT_QUERY_KEY, code],
         () => getExportProductByCode(code),

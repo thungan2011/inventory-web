@@ -20,6 +20,8 @@ import CategoryTypeBadge from '@/components/Badge/CategoryTypeBadge';
 import ModalAddCategory from '@/components/Pages/Category/ModalAddCategory';
 import ModalUpdateCategory from '@/components/Pages/Category/ModalUpdateCategory';
 import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
+import { useAuth } from '@/hook/useAuth';
+import { ROLE_ADMIN, ROLE_WAREHOUSE_KEEPER } from '@/modules/authentication/interface';
 
 interface CategoryFilter extends PaginationState {
     name: string;
@@ -54,7 +56,7 @@ const exportColumns: ExcelColumn[] = [
 ];
 
 const CategoryPage = () => {
-
+    const { user } = useAuth();
     const [showModalAddCategory, setShowModalAddCategory] = useState<boolean>(false);
     const [categoryToUpdate, setCategoryToUpdate] = useState<CategoryOverview | null>(null);
 
@@ -182,7 +184,7 @@ const CategoryPage = () => {
                     <div className="flex items-center justify-end">
 
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add onClick={() => setShowModalAddCategory(true)} />
+                            <ButtonAction.Add disabled={user && (user.role !== ROLE_ADMIN && user.role !== ROLE_WAREHOUSE_KEEPER)}  onClick={() => setShowModalAddCategory(true)} />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
