@@ -65,6 +65,7 @@ interface AddExportMaterialPayload {
         quantity: number;
         material_history_id: number;
     }[];
+    material_import_receipt_id?: number;
 }
 
 const createExportMaterial = (payload: AddExportMaterialPayload): Promise<void> => {

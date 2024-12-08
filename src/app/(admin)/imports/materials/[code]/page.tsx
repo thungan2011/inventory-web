@@ -8,7 +8,11 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
-import { useImportMaterialByCode } from '@/modules/imports/materials/repository';
+import {
+    useApproveImportMaterial,
+    useImportMaterialByCode,
+    useRejectImportMaterial,
+} from '@/modules/imports/materials/repository';
 import { ImportMaterialStatusVietnamese, ImportMaterialTypeVietnamese } from '@/modules/imports/materials/interface';
 import { formatDateToLocalDate } from '@/utils/formatDate';
 import TableCore from '@/components/Tables/TableCore';
@@ -19,6 +23,8 @@ import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 const ImportMaterialDetail = () => {
     const { code } = useParams<{ code: string }>();
     const { data: importMaterial, isLoading } = useImportMaterialByCode(code);
+    const approveImportMaterial = useApproveImportMaterial();
+    const rejectImportMaterial = useRejectImportMaterial();
 
     if (isLoading) {
         return <Loader />;
@@ -104,12 +110,43 @@ const ImportMaterialDetail = () => {
         });
     };
 
+    const handleApproveReceipt = async () => {
+        try {
+            await approveImportMaterial.mutateAsync(importMaterial.id);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const handleRejectReceipt = async () => {
+        try {
+            await rejectImportMaterial.mutateAsync(importMaterial.id);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div className="flex flex-col gap-4 mt-4">
             <Card className="p-[18px]">
-                <div className="flex gap-1 text-xl font-nunito font-medium">
-                    <div>Mã phiếu nhập</div>
-                    <div className="text-brand-500">#{importMaterial.code}</div>
+                <div className="flex justify-between items-center">
+                    <div className="flex gap-1 text-xl font-nunito font-medium">
+                        <div>Mã phiếu nhập</div>
+                        <div className="text-brand-500">#{importMaterial.code}</div>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button
+                            className="bg-red-400 py-2 px-4 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80"
+                            onClick={handleRejectReceipt}
+                            type="button">Từ chối
+                        </button>
+                        <button
+                            className="bg-brand-500 py-2 px-4 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80"
+                            onClick={handleApproveReceipt}
+                            type="button">Phê duyệt
+                        </button>
+                    </div>
                 </div>
             </Card>
 

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { FieldArray, Form, Formik, useFormikContext } from 'formik';
 import Card from '@/components/Card';
-import { number, object, string } from 'yup';
+import { array, number, object, string } from 'yup';
 import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { FaSave } from 'react-icons/fa';
@@ -24,7 +24,6 @@ import MaterialSearch from '@/components/MaterialSearch';
 import { useAllMaterials } from '@/modules/materials/repository';
 import { MaterialOverview, MaterialStatus } from '@/modules/materials/interface';
 import ModalChooseLocation, { LocationAllocation } from '@/components/Pages/Import/Material/ModalChooseLocation';
-import DatePicker from '@/components/DatePicker';
 import { useCreateImportMaterial } from '@/modules/imports/materials/repository';
 import dayjs from 'dayjs';
 import { useAllEmployees } from '@/modules/employees/repository';
@@ -33,10 +32,27 @@ import { StorageAreaType } from '@/modules/storage-area/interface';
 import { useAllExportMaterials, useExportMaterialByCode } from '@/modules/exports/materials/repository';
 import { ExportMaterialStatus, ExportMaterialType } from '@/modules/exports/materials/interface';
 import { formatDateToLocalDate } from '@/utils/formatDate';
+import DatePicker from '@/components/DatePicker';
 
-const ProductSchema = object({
+const materialSchema = object({
+    quantity: number().required('Vui lòng nhập số lượng')
+        .min(1, 'Số lượng không được nhỏ hơn 1'),
+});
+
+const ImportMaterialReceiptSchema = object({
     note: string().trim().max(500, 'Ghi chú không được vuợt quá 500 ký tự'),
     receiver: number().required('Người nhận hàng không được để trống'),
+    type: string().required('Loại giao dịch là bắt buộc')
+        .oneOf(Object.values(ImportMaterialType), 'Loại giao dịch không hợp lệ'),
+    provider: number().when('type', {
+        is: ImportMaterialType.NORMAL,
+        then: (schema) => schema.required('Vui lòng chọn nhà cung cấp'),
+        otherwise: (schema) => schema.optional(),
+    }),
+    materials: array()
+        .of(materialSchema)
+        .min(1, 'Vui lòng chọn ít nhất một nguyên liệu')
+        .required('Vui lòng chọn ít nhất một nguyên liệu'),
 });
 
 interface Material {
@@ -60,7 +76,7 @@ interface ImportMaterialFormValues {
     type: ImportMaterialType;
     provider?: number;
     receiver?: number;
-    reception?: string;
+    receipt?: string;
 }
 
 const initialFormValues: ImportMaterialFormValues = {
@@ -81,7 +97,8 @@ const MaterialTable = () => {
                     <TableCore.RowHeader>
                         <TableCore.Head>Nguyên liệu</TableCore.Head>
                         <TableCore.Head>Giá nhập</TableCore.Head>
-                        <TableCore.Head>Số lượng</TableCore.Head>
+                        {values.type === ImportMaterialType.RETURN && <TableCore.Head>Số lượng đã xuất</TableCore.Head>}
+                        <TableCore.Head>{values.type === ImportMaterialType.RETURN ? 'Số lượng nhập lại' : 'Số lượng'}</TableCore.Head>
                         <TableCore.Head>Ngày hết hạn</TableCore.Head>
                         <TableCore.Head className="text-nowrap">Thành tiền</TableCore.Head>
                         <TableCore.Head>Vị trí lưu kho</TableCore.Head>
@@ -117,15 +134,27 @@ const MaterialTable = () => {
                                             </div>
                                         </TableCore.Cell>
                                         <TableCore.Cell>
-                                            <InputCurrency name={`materials.${index}.price`}
-                                                           placeholder="Nhập giá nhập"
-                                                           step={1000}
-                                                           className="!w-36"
-                                                           readOnly={values.type === ImportMaterialType.RETURN}
-                                                           wrapperClassName="mb-0"
-                                                           unit="VND"
-                                            />
+                                            {
+                                                values.type === ImportMaterialType.NORMAL ? (
+                                                    <InputCurrency name={`materials.${index}.price`}
+                                                                   placeholder="Nhập giá nhập"
+                                                                   step={1000}
+                                                                   className="!w-36"
+                                                                   wrapperClassName="mb-0"
+                                                                   unit="VND"
+                                                    />
+                                                ) : (
+                                                    formatNumberToCurrency(material.price)
+                                                )
+                                            }
                                         </TableCore.Cell>
+                                        {
+                                            values.type === ImportMaterialType.RETURN && (
+                                                <TableCore.Cell>
+                                                    {material.maxQuantity}
+                                                </TableCore.Cell>
+                                            )
+                                        }
                                         <TableCore.Cell>
                                             <InputCurrency name={`materials.${index}.quantity`}
                                                            placeholder="Nhập số lượng"
@@ -137,13 +166,20 @@ const MaterialTable = () => {
                                             />
                                         </TableCore.Cell>
                                         <TableCore.Cell>
-                                            <div className="relative">
-                                                <DatePicker name={`materials.${index}.expiryDate`}
-                                                            readOnly={values.type === ImportMaterialType.RETURN}
-                                                            minDate={tomorrow}
-                                                            wrapperClassName="mb-0"
-                                                />
-                                            </div>
+                                            {
+                                                values.type === ImportMaterialType.NORMAL ? (
+                                                    <div className="relative">
+                                                        <DatePicker name={`materials.${index}.expiryDate`}
+                                                                    minDate={tomorrow}
+                                                                    wrapperClassName="mb-0"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div>
+                                                        {dayjs(material.expiryDate).format('DD/MM/YYYY')}
+                                                    </div>
+                                                )
+                                            }
                                         </TableCore.Cell>
                                         <TableCore.Cell>
                                             {formatNumberToCurrency(material.price * material.quantity)}
@@ -249,14 +285,16 @@ const FormContent = ({ isLoading }: FormContentProps) => {
         status: ExportMaterialStatus.COMPLETED,
     });
 
-    const { data: exportMaterial } = useExportMaterialByCode(values.reception?.split('-')[0]);
+    const { data: exportMaterial } = useExportMaterialByCode(values.receipt?.split('-')[0]);
 
-    const typeOptions: SelectProps['options'] = Object.keys(ImportMaterialType).map(type => (
-        {
-            label: ImportMaterialTypeVietnamese[type as ImportMaterialType],
-            value: type,
-        }
-    ));
+    const typeOptions: SelectProps['options'] = Object.keys(ImportMaterialType)
+        .filter(type => type !== ImportMaterialType.OTHER)
+        .map(type => (
+            {
+                label: ImportMaterialTypeVietnamese[type as ImportMaterialType],
+                value: type,
+            }
+        ));
 
     const providerOptions: SelectProps['options'] = (providerQuery.data?.data || []).map(provider => ({
         label: `${provider.code} - ${provider.name}`,
@@ -321,7 +359,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
         } else {
             setFieldValue('reception', undefined);
         }
-    }, [values.type, values.reception, exportMaterial]);
+    }, [values.type, exportMaterial, setFieldValue]);
 
     return (
         <Form>
@@ -336,8 +374,10 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                             />
                             <Select name="receiver"
                                     label="Người nhận hàng"
+                                    required
                                     placeholder="Chọn người nhận hàng"
                                     options={employeeOptions}
+                                    searchPlaceholder="Nhập tên nhân viên..."
                                     enableSearch
                                     onSearch={setEmployeeSearchTerm}
                             />
@@ -346,7 +386,9 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                             values.type === ImportMaterialType.NORMAL && (
                                 <Select name="provider"
                                         label="Nhà cung cấp"
+                                        required
                                         placeholder="Chọn nhà cung cấp"
+                                        searchPlaceholder="Nhập tên nhà cung cấp..."
                                         options={providerOptions}
                                         enableSearch
                                         onSearch={setProviderSearchTerm}
@@ -355,7 +397,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                         }
                         {
                             values.type === ImportMaterialType.RETURN && (
-                                <Select name="reception"
+                                <Select name="receipt"
                                         label="Hóa đơn xuất"
                                         placeholder="Chọn hóa đơn xuất"
                                         searchPlaceholder="Nhập mã hóa đơn..."
@@ -441,7 +483,7 @@ const NewImportMaterialPage = () => {
             await createImportMaterial.mutateAsync({
                 type: values.type,
                 note: values.note,
-                material_export_receipt_id: values.type === ImportMaterialType.RETURN ? Number(values.reception?.split('-')[1]) : undefined,
+                material_export_receipt_id: values.type === ImportMaterialType.RETURN ? Number(values.receipt?.split('-')[1]) : undefined,
                 provider_id: values.type === ImportMaterialType.NORMAL ? values.provider : undefined,
                 receiver_id: values.receiver,
                 materials: values.materials.flatMap(material =>
@@ -463,7 +505,7 @@ const NewImportMaterialPage = () => {
     return (
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
-                    validationSchema={ProductSchema}>
+                    validationSchema={ImportMaterialReceiptSchema}>
                 <FormContent isLoading={createImportMaterial.isPending} />
             </Formik>
         </div>

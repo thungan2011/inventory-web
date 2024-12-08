@@ -306,7 +306,7 @@ export const breadcrumbs: IBreadcrumb[] = [
         link: '^/exports/materials/new$',
         breadcrumbTrail: [
             { label: 'Xuất kho' },
-            { label: 'Nguyên vật liệu', link: "/exports/materials" },
+            { label: 'Danh sách xuất kho', link: "/exports/materials" },
             { label: 'Phiếu xuất kho' },
         ],
     },

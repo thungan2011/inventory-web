@@ -116,16 +116,32 @@ const FormikContent = ({ onClose, totalQuantity, materialCode }: FormikContentPr
     const handleAddStorageArea = (item: WarehouseAreaMaterialOverview) => {
         const isExist = values.exportLocations.find(a => a.id === item.id);
         if (!isExist) {
-            const newLocation: ExportLocation = {
-                id: item.id,
-                storageAreaId: item.storageArea.id,
-                code: item.storageArea.code,
-                name: item.storageArea.name,
-                quantityAvailable: item.quantityAvailable,
-                expiryDate: item.expiryDate,
-                quantity: values.exportLocations.length === 0 ? totalQuantity : 0,
-            };
-            setFieldValue('exportLocations', [...values.exportLocations, newLocation]);
+            if (values.exportLocations.length === 0) {
+                const newLocation: ExportLocation = {
+                    id: item.id,
+                    storageAreaId: item.storageArea.id,
+                    code: item.storageArea.code,
+                    name: item.storageArea.name,
+                    quantityAvailable: item.quantityAvailable,
+                    expiryDate: item.expiryDate,
+                    quantity: totalQuantity < item.quantityAvailable ? totalQuantity : item.quantityAvailable,
+                };
+                setFieldValue('exportLocations', [...values.exportLocations, newLocation]);
+            } else {
+                const currentTotalQuantity = sumBy(values.exportLocations, 'quantity');
+                const remaining = totalQuantity - currentTotalQuantity;
+
+                const newLocation: ExportLocation = {
+                    id: item.id,
+                    storageAreaId: item.storageArea.id,
+                    code: item.storageArea.code,
+                    name: item.storageArea.name,
+                    quantityAvailable: item.quantityAvailable,
+                    expiryDate: item.expiryDate,
+                    quantity: remaining < item.quantityAvailable ? remaining : item.quantityAvailable,
+                };
+                setFieldValue('exportLocations', [...values.exportLocations, newLocation]);
+            }
         }
         setShowListStorageArea(false);
     };

@@ -54,11 +54,13 @@ export interface ExportProductDetail {
         quantity: number;
         expiryDate: Date;
         product: {
+            id: number;
             sku: string;
             name: string;
             weight: number;
             packing: string;
             unit: string;
+            image: string;
         };
         storageArea: {
             id: number;

@@ -17,7 +17,6 @@ import {
     ImportProductType,
     ImportProductTypesVietnamese,
 } from '@/modules/imports/products/interface';
-import ProductSearch from '@/components/ProductSearch';
 import TableCore from '@/components/Tables/TableCore';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
@@ -33,8 +32,12 @@ import { useAllEmployees } from '@/modules/employees/repository';
 import { useCreateImportProduct } from '@/modules/imports/products/reponsitory';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
+import { useAllExportProducts, useExportProductByCode } from '@/modules/exports/products/repository';
+import { ExportProductStatus, ExportProductType } from '@/modules/exports/products/interface';
+import { formatDateToLocalDate } from '@/utils/formatDate';
+import ProductSearch from '@/components/ProductSearch';
 
-const ProductSchema = object({});
+const ImportProductReceiptSchema = object({});
 
 interface Product {
     id: number;
@@ -55,6 +58,7 @@ interface FormValues {
     type: ImportProductType;
     products: Product[];
     receiver?: number;
+    receipt?: string;
 }
 
 const initialFormValues: FormValues = {
@@ -67,6 +71,8 @@ const initialFormValues: FormValues = {
 interface FormContentProps {
     isLoading: boolean;
 }
+
+const MIN_EXPIRY_DATE : Date = dayjs().add(1, 'day').toDate();
 
 const ProductTable = () => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
@@ -122,7 +128,7 @@ const ProductTable = () => {
                                         <TableCore.Cell>
                                             <div className="relative">
                                                 <DatePicker name={`products.${index}.expiryDate`}
-                                                            minDate={new Date()}
+                                                            minDate={MIN_EXPIRY_DATE}
                                                             wrapperClassName="mb-0" />
                                             </div>
                                         </TableCore.Cell>
@@ -199,6 +205,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
     const [showListProduct, setShowListProduct] = useState<boolean>(false);
     const [productSearchValue, setProductSearchValue] = useState<string>('');
     const [employeeSearchTerm, setEmployeeSearchTerm] = useState<string>('');
+    const [exportSearchTerm, setExportSearchTerm] = useState<string>('');
     const dropdownRef = useRef<HTMLDivElement>(null);
     useClickOutside(dropdownRef, () => setShowListProduct(false));
 
@@ -212,12 +219,22 @@ const FormContent = ({ isLoading }: FormContentProps) => {
         first_name: employeeSearchTerm,
     });
 
-    const typeOptions: SelectProps['options'] = Object.keys(ImportProductType).map(type => (
-        {
-            label: ImportProductTypesVietnamese[type as ImportProductType],
-            value: type,
-        }
-    ));
+    const exportProductQuery = useAllExportProducts({
+        code: exportSearchTerm,
+        type: ExportProductType.NORMAL,
+        status: ExportProductStatus.COMPLETED,
+    });
+
+    const { data: exportProduct } = useExportProductByCode(values.receipt?.split(' - ')[0]);
+
+    const typeOptions: SelectProps['options'] = Object.keys(ImportProductType)
+        .filter(type => type !== ImportProductType.OTHER)
+        .map(type => (
+            {
+                label: ImportProductTypesVietnamese[type as ImportProductType],
+                value: type,
+            }
+        ));
 
     const statusOptions: SelectProps['options'] = Object.keys(ImportProductStatus).map(status => (
         {
@@ -231,6 +248,11 @@ const FormContent = ({ isLoading }: FormContentProps) => {
         value: employee.id,
     }));
 
+    const exportOptions: SelectProps['options'] = (exportProductQuery.data?.data || []).map(exportProduct => ({
+        label: `${exportProduct.code} - ${formatDateToLocalDate(exportProduct.createdAt)}`,
+        value: `${exportProduct.code} - ${exportProduct.id}`,
+    }));
+
     const filteredProducts = React.useMemo(() => {
         if (!productQuery.data) return [];
 
@@ -239,9 +261,26 @@ const FormContent = ({ isLoading }: FormContentProps) => {
         });
     }, [productQuery.data]);
 
+    useEffect(() => {
+        if (values.type === ImportProductType.RETURN && exportProduct) {
+            setFieldValue('products', exportProduct.details.map(detail => ({
+                id: detail.product.id,
+                sku: detail.product.sku,
+                image: detail.product.image,
+                name: detail.product.name,
+                weight: detail.product.weight,
+                unit: detail.product.unit,
+                packing: detail.product.packing,
+                quantity: detail.quantity,
+                expiryDate: detail.expiryDate,
+                locations: [],
+            })));
+        }
+    }, [values.type, exportProduct, setFieldValue]);
+
     const handleAddProduct = (product: ProductOverview) => {
         const newProduct: Product = {
-            expiryDate: new Date(),
+            expiryDate: dayjs().add(1, 'day').toDate(),
             locations: [],
             id: product.id,
             sku: product.sku,
@@ -263,10 +302,12 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                 <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
                     <div className="grid grid-cols-2 gap-4">
                         <Select name="type"
+                                required
                                 label="Loại giao dịch"
                                 options={typeOptions}
                         />
                         <Select name="receiver"
+                                required
                                 label="Người nhận hàng"
                                 placeholder="Chọn người nhận hàng"
                                 options={employeeOptions}
@@ -274,6 +315,19 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                 onSearch={setEmployeeSearchTerm}
                         />
                     </div>
+                    {
+                        values.type === ImportProductType.RETURN && (
+                            <Select name="receipt"
+                                    label="Phiếu xuất bán hàng"
+                                    required
+                                    placeholder="Chọn phiếu xuất bán hàng"
+                                    searchPlaceholder="Nhập mã phiếu xuất"
+                                    options={exportOptions}
+                                    enableSearch
+                                    onSearch={setExportSearchTerm}
+                            />
+                        )
+                    }
                     <Select name="status"
                             label="Trạng thái"
                             options={statusOptions}
@@ -294,15 +348,19 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                     )}
                 </div>
                 <div className="border p-2 rounded">
-                    <div className="flex gap-3">
-                        <ProductSearch onSelect={handleAddProduct}
-                                       products={filteredProducts}
-                                       searchValue={productSearchValue}
-                                       onSearchChange={setProductSearchValue}
-                                       showDropdown={showListProduct}
-                                       onShowDropdownChange={setShowListProduct}
-                        />
-                    </div>
+                    {
+                        values.type !== ImportProductType.RETURN && (
+                            <div className="flex gap-3">
+                                <ProductSearch onSelect={handleAddProduct}
+                                               products={filteredProducts}
+                                               searchValue={productSearchValue}
+                                               onSearchChange={setProductSearchValue}
+                                               showDropdown={showListProduct}
+                                               onShowDropdownChange={setShowListProduct}
+                                />
+                            </div>
+                        )
+                    }
                     <ProductTable />
                 </div>
             </Card>
@@ -365,7 +423,7 @@ const NewProductPage = () => {
     return (
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
-                    validationSchema={ProductSchema}>
+                    validationSchema={ImportProductReceiptSchema}>
                 <FormContent isLoading={createImportProduct.isPending} />
             </Formik>
         </div>

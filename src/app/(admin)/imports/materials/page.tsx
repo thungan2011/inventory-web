@@ -113,7 +113,7 @@ const ImportMaterialPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
 
     };
 
@@ -140,7 +140,6 @@ const ImportMaterialPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add href={'/imports/materials/new'} text="Tạo phiếu nhập" />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

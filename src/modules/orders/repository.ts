@@ -32,11 +32,11 @@ export const useAllOrders = (params: FetchAllOrderParams) => {
 /**
  * get orders by CODE
  */
-const getOrderByCode = (code: string): Promise<OrderDetail> => {
+const getOrderByCode = (code?: string): Promise<OrderDetail> => {
     return httpRepository.get<OrderDetail>(`/v1/orders/${code}`);
 };
 
-export const useOrderByCode = (code: string) => {
+export const useOrderByCode = (code?: string) => {
     return useDataFetching(
         [ORDER_QUERY_KEY, code],
         () => getOrderByCode(code),

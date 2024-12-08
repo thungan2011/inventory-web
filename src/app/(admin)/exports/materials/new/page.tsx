@@ -22,7 +22,6 @@ import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import InputCurrency from '@/components/InputCurrency';
 import { MdRemoveCircleOutline } from 'react-icons/md';
-import MaterialSearch from '@/components/MaterialSearch';
 import { useAllMaterials } from '@/modules/materials/repository';
 import { MaterialOverview, MaterialStatus } from '@/modules/materials/interface';
 import { useRouter } from 'next/navigation';
@@ -31,6 +30,10 @@ import ModalChooseExportLocation, {
     ExportLocation,
 } from '@/components/Pages/Export/Material/ModalChooseExportLocation';
 import dayjs from 'dayjs';
+import { formatDateToLocalDate } from '@/utils/formatDate';
+import { ImportMaterialStatus, ImportMaterialType } from '@/modules/imports/materials/interface';
+import { useAllImportMaterials, useImportMaterialByCode } from '@/modules/imports/materials/repository';
+import MaterialSearch from '@/components/MaterialSearch';
 
 const ExportMaterialSchema = object({});
 
@@ -53,6 +56,7 @@ interface FormValues {
     note: string;
     type: ExportMaterialType;
     materials: Material[];
+    receipt?: string;
 }
 
 const initialFormValues: FormValues = {
@@ -64,14 +68,18 @@ const initialFormValues: FormValues = {
 
 const MaterialTable = () => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
-    const [selectedMaterial, setSelectedMaterial] = useState<{ index: number, quantity: number, code: string } | null>(null);
+    const [selectedMaterial, setSelectedMaterial] = useState<{
+        index: number,
+        quantity: number,
+        code: string
+    } | null>(null);
     return (
         <>
             <TableCore className="mt-3">
                 <TableCore.Header>
                     <TableCore.RowHeader>
                         <TableCore.Head>Nguyên liệu</TableCore.Head>
-                        <TableCore.Head>Tồn kho khả dụng</TableCore.Head>
+                        <TableCore.Head>{values.type === ExportMaterialType.RETURN ? 'Số lượng đã nhập' : 'Tồn kho khả dụng'}</TableCore.Head>
                         <TableCore.Head>Số lượng</TableCore.Head>
                         <TableCore.Head>Vị trí lưu kho</TableCore.Head>
                         <TableCore.Head className="!max-w-8"></TableCore.Head>
@@ -141,7 +149,7 @@ const MaterialTable = () => {
                                                     onClick={() => setSelectedMaterial({
                                                         index,
                                                         quantity: material.quantity,
-                                                        code: material.sku
+                                                        code: material.sku,
                                                     })}
                                             >
                                                 {values.materials[index].locations.length > 0 ? 'Chỉnh sửa' : 'Chọn vị trí'}
@@ -174,12 +182,12 @@ const MaterialTable = () => {
             {
                 selectedMaterial && (
                     <ModalChooseExportLocation onClose={() => setSelectedMaterial(null)}
-                                         selectedLocations={values.materials[selectedMaterial.index].locations}
-                                         totalExportQuantity={selectedMaterial.quantity}
-                                         onSubmit={(allocations) => {
-                                             setFieldValue(`materials.${selectedMaterial.index}.locations`, allocations);
-                                         }}
-                                         materialCode={selectedMaterial.code}
+                                               selectedLocations={values.materials[selectedMaterial.index].locations}
+                                               totalExportQuantity={selectedMaterial.quantity}
+                                               onSubmit={(allocations) => {
+                                                   setFieldValue(`materials.${selectedMaterial.index}.locations`, allocations);
+                                               }}
+                                               materialCode={selectedMaterial.code}
                     />
                 )
             }
@@ -191,10 +199,11 @@ interface FormSelectionProps {
     isLoading: boolean;
 }
 
-const FormSelection = ({ isLoading } : FormSelectionProps) => {
+const FormSelection = ({ isLoading }: FormSelectionProps) => {
     const { values, setFieldValue } = useFormikContext<FormValues>();
     const [showListMaterial, setShowListMaterial] = useState<boolean>(false);
     const [materialSearchTerm, setMaterialSearchTerm] = useState<string>('');
+    const [importReceiptSearchTerm, setImportReceiptSearchTerm] = useState<string>('');
     const tomorrow = dayjs().add(1, 'day').toDate();
 
     const materialQuery = useAllMaterials({
@@ -202,12 +211,27 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
         status: MaterialStatus.ACTIVE,
     });
 
-    const typeOptions: SelectProps['options'] = Object.keys(ExportMaterialType).map(type => (
-        {
-            label: ExportMaterialTypeVietnamese[type as ExportMaterialType],
-            value: type,
-        }
-    ));
+    const importMaterialQuery = useAllImportMaterials({
+        code: importReceiptSearchTerm,
+        type: ImportMaterialType.NORMAL,
+        status: ImportMaterialStatus.COMPLETED,
+    });
+
+    const { data: importMaterial } = useImportMaterialByCode(values.receipt?.split(' - ')[0]);
+
+    const receiptOptions: SelectProps['options'] = (importMaterialQuery.data?.data || []).map(receipt => ({
+        label: `${receipt.code} - ${formatDateToLocalDate(receipt.createdAt)}`,
+        value: `${receipt.code} - ${receipt.id}`,
+    }));
+
+    const typeOptions: SelectProps['options'] = Object.keys(ExportMaterialType)
+        .filter(type => type !== ExportMaterialType.OTHER)
+        .map(type => (
+            {
+                label: ExportMaterialTypeVietnamese[type as ExportMaterialType],
+                value: type,
+            }
+        ));
 
     const statusOptions: SelectProps['options'] = Object.keys(ExportMaterialStatus).map(status => (
         {
@@ -223,6 +247,33 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
             return !values.materials.find(m => m.id === material.id);
         });
     }, [materialQuery.data, values.materials]);
+
+    useEffect(() => {
+        if (values.type === ExportMaterialType.RETURN) {
+            if (importMaterial) {
+                setFieldValue('materials', importMaterial.details.map(detail => ({
+                    id: detail.material.id,
+                    sku: detail.material.sku,
+                    quantity: detail.quantity,
+                    quantityAvailable: detail.quantity,
+                    name: detail.material.name,
+                    origin: detail.material.origin,
+                    packing: detail.material.packing,
+                    unit: detail.material.unit,
+                    weight: detail.material.weight,
+                    locations: [],
+                    expiryDate: detail.expiryDate,
+                })));
+            }
+        }
+    }, [values.type, values.receipt, importMaterial]);
+
+    useEffect(() => {
+        if (values.type !== ExportMaterialType.RETURN) {
+            setFieldValue('materials', []);
+            setFieldValue('receipt', '');
+        }
+    }, [values.type]);
 
     const handleAddMaterial = (material: MaterialOverview) => {
         const isExist = values.materials.find(m => m.id === material.id);
@@ -252,9 +303,22 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
                     <Typography.Title level={4}>Thông tin chung</Typography.Title>
                     <div className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 te">
                         <Select name="type"
+                                required
                                 label="Loại giao dịch"
                                 options={typeOptions}
                         />
+                        {
+                            values.type === ExportMaterialType.RETURN && (
+                                <Select name="receipt"
+                                        label="Hóa đơn nhập"
+                                        placeholder="Chọn hóa đơn nhập"
+                                        searchPlaceholder="Nhập mã hóa đơn..."
+                                        options={receiptOptions}
+                                        enableSearch
+                                        onSearch={setImportReceiptSearchTerm}
+                                />
+                            )
+                        }
                         <Select name="status"
                                 label="Trạng thái"
                                 options={statusOptions}
@@ -267,15 +331,19 @@ const FormSelection = ({ isLoading } : FormSelectionProps) => {
                 <Card className={`p-[18px] col-span-3`}>
                     <Typography.Title level={4}>Thông tin chi tiết</Typography.Title>
                     <div className="border p-2 rounded">
-                        <div>
-                            <MaterialSearch onSearchChange={setMaterialSearchTerm}
-                                            onSelect={handleAddMaterial}
-                                            onShowDropdownChange={setShowListMaterial}
-                                            materials={availableMaterials}
-                                            searchValue={materialSearchTerm}
-                                            showDropdown={showListMaterial}
-                            />
-                        </div>
+                        {
+                            values.type !== ExportMaterialType.RETURN && (
+                                <div>
+                                    <MaterialSearch onSearchChange={setMaterialSearchTerm}
+                                                    onSelect={handleAddMaterial}
+                                                    onShowDropdownChange={setShowListMaterial}
+                                                    materials={availableMaterials}
+                                                    searchValue={materialSearchTerm}
+                                                    showDropdown={showListMaterial}
+                                    />
+                                </div>
+                            )
+                        }
                         <MaterialTable />
                     </div>
                 </Card>
@@ -320,6 +388,7 @@ const NewExportMaterialPage = () => {
             await createExportMaterial.mutateAsync({
                 type: values.type,
                 note: values.note,
+                material_import_receipt_id: values.type !== ExportMaterialType.RETURN ? undefined : Number(values.receipt?.split(' - ')[1]),
                 materials: values.materials.flatMap(material =>
                     material.locations.map(location => ({
                         quantity: location.quantity,

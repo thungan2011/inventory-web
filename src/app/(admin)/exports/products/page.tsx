@@ -115,8 +115,8 @@ const ExportProductPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
-        exportToExcel<ExportProductOverview>(exportProducts, [], 'exportProducts.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<ExportProductOverview>(exportProducts, [], 'exportProducts.xlsx');
     };
 
     const typeOptions : SelectProps['options'] = [
@@ -133,7 +133,7 @@ const ExportProductPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/exports/products/new'} />
+                            <ButtonAction.Add href={'/exports/products/new'} text="Tạo phiếu xuất" />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
