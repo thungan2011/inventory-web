@@ -93,7 +93,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                         <Input name="representative_phone" label="Số điện thoại" placeholder="Số điện thoại"
                                required />
                         <Input name="representative_email" label="Email" placeholder="Email" />
-                        <TextArea name="note" label="Ghi chú" />
+                        <TextArea name="note" label="Ghi chú" placeholder="Nhập ghi chú (nếu có)"/>
                     </div>
                 </Card>
             </div>

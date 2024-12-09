@@ -14,12 +14,12 @@ const Dashboard = () => {
     return (
         <div>
             <div className="mt-3 grid grid-cols-1  gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
-                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Thu nhập" subtitle="$340.5"/>
-                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Số phim" subtitle="$340.5"/>
-                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Suất chiếu" subtitle="$340.5"/>
-                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Số rạp" subtitle="$340.5"/>
-                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Thu nhập" subtitle="$340.5"/>
-                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Thu nhập" subtitle="$340.5"/>
+                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Tổng doanh thu" subtitle="$340.5"/>
+                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Hóa đơn chờ duyệt" subtitle="$340.5"/>
+                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Tổng số thành phẩm" subtitle={'0'}/>
+                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Tổng số nguyên vật liệu" subtitle="$340.5"/>
+                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Tổng số nhân viên" subtitle="$340.5"/>
+                <Widget icon={<MdBarChart className="h-7 w-7" />} title="Tổng số khách hàng" subtitle="$340.5"/>
             </div>
 
             <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">

@@ -17,6 +17,7 @@ import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import GroupCustomerBadge from '@/components/Badge/GroupCustomerBadge';
 import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
+import { formatAddress } from '@/utils/formatString';
 
 interface CustomerFilter extends PaginationState {
     name: string;
@@ -24,6 +25,50 @@ interface CustomerFilter extends PaginationState {
     status: CustomerStatus | 'ALL';
     phone: string;
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'id',
+        header: 'Mã',
+    },
+    {
+        field: 'name',
+        header: 'Tên khách hàng',
+    },
+    {
+        field: 'birthday',
+        header: 'Sinh nhật',
+    },
+    {
+        field: 'phone',
+        header: 'Số điện thoại',
+    },
+    {
+        field: 'address',
+        header: 'Địa chỉ',
+    },
+    {
+        field: 'ward',
+        header: 'Xã/Phường',
+    },
+    {
+        field: 'district',
+        header: 'Quận/Huyện',
+    },
+    {
+        field: 'city',
+        header: 'Tỉnh/Thành phố',
+    },
+    {
+        field: 'email',
+        header: 'Email',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: CustomerStatus) => CustomerStatusVietnamese[value],
+    },
+];
 
 const CustomerPage = () => {
 
@@ -34,50 +79,6 @@ const CustomerPage = () => {
         status: 'ALL',
         phone: '',
     });
-
-    const exportColumns: ExcelColumn[] = [
-        {
-            field: 'id',
-            header: 'Mã',
-        },
-        {
-            field: 'name',
-            header: 'Tên khách hàng',
-        },
-        {
-            field: 'birthday',
-            header: 'Sinh nhật',
-        },
-        {
-            field: 'phone',
-            header: 'Số điện thoại',
-        },
-        {
-            field: 'address',
-            header: 'Địa chỉ',
-        },
-        {
-            field: 'ward',
-            header: 'Xã/Phường',
-        },
-        {
-            field: 'district',
-            header: 'Quận/Huyện',
-        },
-        {
-            field: 'city',
-            header: 'Tỉnh/Thành phố',
-        },
-        {
-            field: 'email',
-            header: 'Email',
-        },
-        {
-            field: 'status',
-            header: 'Trạng thái',
-            formatter: (value: CustomerStatus) => CustomerStatusVietnamese[value],
-        },
-    ];
 
     const customerQuery = useAllCustomers({
         page: filters.page,
@@ -144,7 +145,7 @@ const CustomerPage = () => {
                 header: 'Địa chỉ',
                 cell: ({ row }) => {
                     if (row.original.address) {
-                        return row.original.address + ', ' + row.original.ward + ', ' + row.original.district + ', ' + row.original.city;
+                        return formatAddress(row.original.address, row.original.ward, row.original.district, row.original.city);
                     } else {
                         return 'Chưa cập nhật';
                     }

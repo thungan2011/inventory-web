@@ -27,6 +27,54 @@ interface ProductFilter extends PaginationState {
     status: ProductStatus | 'ALL';
 }
 
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'sku',
+        header: 'SKU',
+    },
+    {
+        field: 'name',
+        header: 'Tên thành phẩm',
+    },
+    {
+        field: 'origin',
+        header: 'Xuất xứ',
+    },
+    {
+        field: 'weight',
+        header: 'Khối lượng',
+    },
+    {
+        field: 'unit',
+        header: 'Đơn vị',
+    },
+    {
+        field: 'packing',
+        header: 'Đóng gói',
+    },
+    {
+        field: 'prices.price',
+        header: 'Gía hiện tại',
+    },
+    {
+        field: 'minimumStockLevel',
+        header: 'Số lượng cảnh báo tối thiểu',
+    },
+    {
+        field: 'maximumStockLevel',
+        header: 'Số lượng cảnh báo tối đa',
+    },
+    {
+        field: 'description',
+        header: 'Mô tả',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: ProductStatus) => ProductStatusVietnamese[value],
+    },
+];
+
 const ProductPage = () => {
 
     const [filters, setFilters] = useState<ProductFilter>({
@@ -36,54 +84,6 @@ const ProductPage = () => {
         origin: '',
         status: 'ALL',
     });
-
-    const exportColumns: ExcelColumn[] = [
-        {
-            field: 'sku',
-            header: 'SKU',
-        },
-        {
-            field: 'name',
-            header: 'Tên thành phẩm',
-        },
-        {
-            field: 'origin',
-            header: 'Xuất xứ',
-        },
-        {
-            field: 'weight',
-            header: 'Khối lượng',
-        },
-        {
-            field: 'unit',
-            header: 'Đơn vị',
-        },
-        {
-            field: 'packing',
-            header: 'Đóng gói',
-        },
-        {
-            field: 'prices.price',
-            header: 'Gía hiện tại',
-        },
-        {
-            field: 'minimumStockLevel',
-            header: 'Số lượng cảnh báo tối thiểu',
-        },
-        {
-            field: 'maximumStockLevel',
-            header: 'Số lượng cảnh báo tối đa',
-        },
-        {
-            field: 'description',
-            header: 'Mô tả',
-        },
-        {
-            field: 'status',
-            header: 'Trạng thái',
-            formatter: (value: ProductStatus) => ProductStatusVietnamese[value],
-        },
-    ];
 
     const productQuery = useAllProducts({
         page: filters.page,

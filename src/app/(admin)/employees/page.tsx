@@ -9,7 +9,6 @@ import EmployeeStatusBadge, { EmployeeStatusVietnamese } from '@/components/Badg
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
 import { useAllEmployees } from '@/modules/employees/repository';
-import { formatDateToLocalDate } from '@/utils/formatDate';
 import Image from 'next/image';
 import { Form, Formik } from 'formik';
 import Typography from '@/components/Typography';
@@ -19,9 +18,14 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { useAuth } from '@/hook/useAuth';
+import { formatRole } from '@/utils/formatString';
+import { formatAddress } from '@/utils/formatString';
 
 interface EmployeeFilter extends PaginationState {
     search: string;
+    status: EmployeeStatus | 'ALL';
+    phone: string;
+    firstName: string;
 }
 
 const EmployeePage = () => {
@@ -30,10 +34,16 @@ const EmployeePage = () => {
     const [filters, setFilters] = useState<EmployeeFilter>({
         page: 1,
         search: '',
+        status: 'ALL',
+        phone: '',
+        firstName: '',
     });
 
     const employeeQuery = useAllEmployees({
         page: filters.page,
+        status: filters.status === 'ALL' ? undefined : filters.status,
+        phone: filters.phone,
+        first_name: filters.firstName,
     });
 
     const {
@@ -101,9 +111,9 @@ const EmployeePage = () => {
                 ),
             },
             {
-                accessorKey: 'birthday',
-                header: 'Sinh nhật',
-                cell: ({ row }) => row.original?.birthday ? formatDateToLocalDate(row.original.birthday) : 'Chưa cập nhật',
+                accessorKey: 'roleName',
+                cell: ({ row }) => formatRole(row.original.roleName),
+                header: 'Chức vụ',
             },
             {
                 accessorKey: 'address',
@@ -112,7 +122,7 @@ const EmployeePage = () => {
                     if (row.original.address) {
                         return (
                             <div className="max-w-96">
-                                {row.original.address + ', ' + row.original.ward + ', ' + row.original.district + ', ' + row.original.city}
+                                {formatAddress(row.original.address, row.original.ward, row.original.district, row.original.city)}
                             </div>
                         );
                     } else {
@@ -141,10 +151,9 @@ const EmployeePage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
-        exportToExcel<EmployeeOverview>(employees, [], 'employees.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<EmployeeOverview>(employees, [], 'employees.xlsx');
     };
-
 
     return (
         <>
@@ -153,8 +162,7 @@ const EmployeePage = () => {
                     <div className="flex items-center justify-end">
 
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/employees/new'} />
-                            <ButtonAction.Import />
+                            <ButtonAction.Add href={'/employees/new'} text="Cấp tài khoản" />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
@@ -165,8 +173,8 @@ const EmployeePage = () => {
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-3 gap-4">
-                                    <Input name="search" placeholder="Mã hoặc tên nhân viên" />
-                                    <Input name="country" placeholder="Số điện thoại" />
+                                    <Input name="firstName" placeholder="Tên nhân viên" />
+                                    <Input name="phone" placeholder="Số điện thoại" />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

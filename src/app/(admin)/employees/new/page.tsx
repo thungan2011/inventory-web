@@ -10,7 +10,7 @@ import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import Select, { SelectProps } from '@/components/Select';
-import { BaseStatus, BaseStatusVietnamese } from '@/modules/base/interface';
+import { BaseStatus, BaseStatusVietnamese, Gender, GenderVietnamese } from '@/modules/base/interface';
 import DatePicker from '@/components/DatePicker';
 import { EmployeeStatus } from '@/modules/employees/interface';
 import UploadImage, { ImageFile } from '@/components/UploadImage';
@@ -141,11 +141,12 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                             maxDate={dayjs().add(-1, 'day').toDate()} />
                             </div>
                             <div className="col-span-1">
-                                <Select name="gender" label="Giới tính" options={[
-                                    { value: '1', label: 'Nam' },
-                                    { value: '0', label: 'Nữ' },
-                                    { value: '2', label: 'Khác' },
-                                ]} />
+                                <Select name="gender" label="Giới tính" options={
+                                    Object.values(Gender).map(gender => ({
+                                        label: GenderVietnamese[gender],
+                                        value: gender,
+                                    }))
+                                } />
                             </div>
                         </div>
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />

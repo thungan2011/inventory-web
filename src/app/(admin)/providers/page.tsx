@@ -17,6 +17,7 @@ import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
+import { formatAddress } from '@/utils/formatString';
 
 interface ProviderFilter extends PaginationState {
     name: string;
@@ -137,7 +138,7 @@ const ProviderPage = () => {
                 header: 'Địa chỉ',
                 cell: ({ row }) => {
                     if (row.original.address) {
-                        return row.original.address + ', ' + row.original.ward + ', ' + row.original.district + ', ' + row.original.city;
+                        return formatAddress(row.original.address, row.original.ward, row.original.district, row.original.city);
                     } else {
                         return 'Chưa cập nhật';
                     }

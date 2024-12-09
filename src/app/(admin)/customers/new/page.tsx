@@ -17,7 +17,7 @@ import { useCreateCustomer } from '@/modules/customers/repository';
 import { CustomerStatus } from '@/modules/customers/interface';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
 import AddressForm from '@/components/AddressForm';
-import { Gender, GenderVietnamese } from '@/modules/base/interface';
+import { Gender, GenderVietnamese, IAddressForm } from '@/modules/base/interface';
 import { useGroupCustomerList } from '@/modules/group-customers/repository';
 import dayjs from 'dayjs';
 
@@ -31,15 +31,11 @@ const CustomerSchema = object({
     birthday: string().trim().nullable(),
 });
 
-interface FormValues {
+interface FormValues extends IAddressForm{
     code?: string;
     name: string;
     phone: string;
     birthday?: Date;
-    address: string;
-    ward: string;
-    district: string;
-    city: string;
     email?: string;
     gender: Gender;
     status: CustomerStatus;
@@ -54,9 +50,12 @@ const initialFormValues: FormValues = {
     birthday: new Date(),
     address: '',
     ward: '',
+    wardCode: '',
     district: '',
+    districtCode: '',
     gender: Gender.MALE,
     city: '',
+    cityCode: '',
     email: '',
     status: CustomerStatus.INACTIVE,
     note: '',
@@ -151,7 +150,10 @@ const NewCustomerPage = () => {
                 ...values,
                 birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
                 group_customer_id: values.groupCustomer,
-                gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 0 : 2
+                gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 0 : 2,
+                city: `${values.city} - ${values.cityCode}`,
+                district: `${values.district} - ${values.districtCode}`,
+                ward: `${values.ward} - ${values.wardCode}`,
 
             });
             router.push('/customers');

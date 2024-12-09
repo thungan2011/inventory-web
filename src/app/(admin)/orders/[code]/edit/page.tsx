@@ -9,7 +9,13 @@ import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
-import { OrderDetail, OrderStatus, PaymentMethod, PaymentMethodVietnamese } from '@/modules/orders/interface';
+import {
+    DeliveryType,
+    OrderDetail,
+    OrderStatus,
+    PaymentMethod,
+    PaymentMethodVietnamese,
+} from '@/modules/orders/interface';
 import InputCurrency from '@/components/InputCurrency';
 import TextArea from '@/components/TextArea';
 import Select, { SelectProps } from '@/components/Select';
@@ -21,7 +27,7 @@ import { MdRemoveCircleOutline } from 'react-icons/md';
 import useClickOutside from '@/hook/useClickOutside';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import AddressForm from '@/components/AddressForm';
-import { useCreateOrder, useOrderByCode } from '@/modules/orders/repository';
+import { useOrderByCode, useUpdateOrder, useUpdateOrderDetail } from '@/modules/orders/repository';
 import ButtonAction from '@/components/ButtonAction';
 import dayjs from 'dayjs';
 import DatePicker from '@/components/DatePicker';
@@ -30,6 +36,7 @@ import TableCore from '@/components/Tables/TableCore';
 import ProductSearch from '@/components/ProductSearch';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
+import { toast } from 'react-toastify';
 
 const DELIVERY_METHODS = {
     STORE_PICKUP: 'STORE_PICKUP',
@@ -66,7 +73,7 @@ interface FormValues {
     shippingFee: number;
     totalPayment: number;
     totalPrice: number;
-    deliveryType: string;
+    deliveryType: DeliveryType;
     deliveryDate: Date;
     discountPercent: number;
     status: OrderStatus;
@@ -439,7 +446,8 @@ const UpdateOrderPage = () => {
     const router = useRouter();
     const { code } = useParams<{ code: string }>();
     const { data: order, isLoading: isOrderLoading } = useOrderByCode(code);
-    const createOrder = useCreateOrder();
+    const updateOrder = useUpdateOrder();
+    const updateOrderDetail = useUpdateOrderDetail();
 
     useEffect(() => {
         document.title = 'Nut Garden - Cập nhật đơn hàng';
@@ -488,7 +496,29 @@ const UpdateOrderPage = () => {
         console.log(values);
         console.table(values);
         try {
-
+            await updateOrder.mutateAsync({
+                id: order.id,
+                payload: {
+                    city: `${values.city} - ${values.cityCode}`,
+                    district: `${values.district} - ${values.districtCode}`,
+                    ward: `${values.ward} - ${values.wardCode}`,
+                    address: values.receiverAddress,
+                    phone: values.receiverPhone,
+                    delivery_type: values.deliveryType,
+                    discount_percent: values.discountPercent,
+                    shipping_fee: values.shippingFee,
+                }
+            });
+            await updateOrderDetail.mutateAsync({
+                code: order.code,
+                payload: {
+                    products: values.products.map(product => ({
+                        product_id: product.id,
+                        quantity: product.quantity,
+                    })),
+                }
+            });
+            toast.success('Cập nhật đơn hàng thành công');
             router.push('/orders');
         } catch (error) {
             console.log(error);
@@ -499,7 +529,7 @@ const UpdateOrderPage = () => {
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
                     validationSchema={ProductSchema}>
-                <FormContent isLoading={createOrder.isPending} order={order} />
+                <FormContent isLoading={updateOrder.isPending} order={order} />
             </Formik>
         </div>
     );

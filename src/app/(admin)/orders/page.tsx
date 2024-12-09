@@ -25,6 +25,54 @@ interface OrderFilter extends PaginationState {
     status: 'ALL' | OrderStatus;
 }
 
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'code',
+        header: 'Mã đơn hàng',
+    },
+    {
+        field: 'orderDate',
+        header: 'Ngày đặt',
+    },
+    {
+        field: 'deliveryDate',
+        header: 'Ngày giao',
+    },
+    {
+        field: 'customer.name',
+        header: 'Tên khách hàng',
+    },
+    {
+        field: 'customer.phone',
+        header: 'Số điện thoại',
+    },
+    {
+        field: 'customer.address',
+        header: 'Địa chỉ',
+    },
+    {
+        field: 'customer.ward',
+        header: 'Phường/Xã',
+    },
+    {
+        field: 'customer.district',
+        header: 'Quận/Huyện',
+    },
+    {
+        field: 'customer.city',
+        header: 'Tỉnh/thành phố',
+    },
+    {
+        field: 'totalPrice',
+        header: 'Tổng tiền',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: OrderStatus) => OrderStatusVietnamese[value],
+    },
+];
+
 const OrderPage = () => {
 
     useEffect(() => {
@@ -38,54 +86,6 @@ const OrderPage = () => {
         phone: '',
         status: 'ALL',
     });
-
-    const exportColumns: ExcelColumn[] = [
-        {
-            field: 'code',
-            header: 'Mã đơn hàng',
-        },
-        {
-            field: 'orderDate',
-            header: 'Ngày đặt',
-        },
-        {
-            field: 'deliveryDate',
-            header: 'Ngày giao',
-        },
-        {
-            field: 'customer.name',
-            header: 'Tên khách hàng',
-        },
-        {
-            field: 'customer.phone',
-            header: 'Số điện thoại',
-        },
-        {
-            field: 'customer.address',
-            header: 'Địa chỉ',
-        },
-        {
-            field: 'customer.ward',
-            header: 'Phường/Xã',
-        },
-        {
-            field: 'customer.district',
-            header: 'Quận/Huyện',
-        },
-        {
-            field: 'customer.city',
-            header: 'Tỉnh/thành phố',
-        },
-        {
-            field: 'totalPrice',
-            header: 'Tổng tiền',
-        },
-        {
-            field: 'status',
-            header: 'Trạng thái',
-            formatter: (value: OrderStatus) => OrderStatusVietnamese[value],
-        },
-    ];
 
     const orderQuery = useAllOrders({
         page: filters.page,
