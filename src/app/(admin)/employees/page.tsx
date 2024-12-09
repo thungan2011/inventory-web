@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
 import Card from '../../../components/Card';
 import Table from '../../../components/Tables';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 import { EmployeeOverview, EmployeeStatus } from '@/modules/employees/interface';
 import EmployeeStatusBadge, { EmployeeStatusVietnamese } from '@/components/Badge/EmployeeStatusBadge';
 import ButtonAction from '@/components/ButtonAction';
@@ -18,8 +18,7 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { useAuth } from '@/hook/useAuth';
-import { formatGender, formatRole } from '@/utils/formatString';
-import { formatAddress } from '@/utils/formatString';
+import { formatAddress, formatGender, formatRole } from '@/utils/formatString';
 
 interface EmployeeFilter extends PaginationState {
     search: string;
@@ -27,6 +26,50 @@ interface EmployeeFilter extends PaginationState {
     phone: string;
     firstName: string;
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'id',
+        header: 'Mã',
+    },
+    {
+        field: 'firstName',
+        header: 'Họ đệm',
+    },
+    {
+        field: 'lastName',
+        header: 'Tên',
+    },
+    {
+        field: 'phone',
+        header: 'Số điện thoại',
+    },
+    {
+        field: 'address',
+        header: 'Địa chỉ',
+    },
+    {
+        field: 'ward',
+        header: 'Xã/Phường',
+    },
+    {
+        field: 'district',
+        header: 'Quận/Huyện',
+    },
+    {
+        field: 'city',
+        header: 'Tỉnh/Thành phố',
+    },
+    {
+        field: 'email',
+        header: 'Email',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: EmployeeStatus) => EmployeeStatusVietnamese[value],
+    },
+];
 
 const EmployeePage = () => {
     const { user } = useAuth();
@@ -64,11 +107,11 @@ const EmployeePage = () => {
             console.log(data);
         },
         canDelete: data => data.status !== EmployeeStatus.ACTIVE,
-        unableDeleteMessage: "Không thể xóa nhân viên đang hoạt động",
+        unableDeleteMessage: 'Không thể xóa nhân viên đang hoạt động',
         onSuccess: () => {
-            setFilters(prevState => ({...prevState, page: 1}));
-            console.log("Thành công");
-        }
+            setFilters(prevState => ({ ...prevState, page: 1 }));
+            console.log('Thành công');
+        },
     });
 
     useEffect(() => {
@@ -136,9 +179,9 @@ const EmployeePage = () => {
                 header: () => '',
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
-                        <ButtonAction.View href={`/employees/${row.original.id}`} />
-                        <ButtonAction.Update />
-                        <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)}/>
+                        <ButtonAction.View href={`/employees/${row.original.code}`} />
+                        <ButtonAction.Update href={`/employees/${row.original.code}/edit`}/>
+                        <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
                     </div>
                 ),
             },
@@ -147,8 +190,9 @@ const EmployeePage = () => {
     );
 
     const handleExportExcel = async () => {
-        await exportToExcel<EmployeeOverview>(employees, [], 'employees.xlsx');
+        await exportToExcel<EmployeeOverview>(employees, exportColumns, 'nhan-vien.xlsx');
     };
+
 
     return (
         <>
@@ -177,7 +221,7 @@ const EmployeePage = () => {
                                                 ...Object.values(EmployeeStatus).map(value => ({
                                                     label: EmployeeStatusVietnamese[value],
                                                     value,
-                                                }))
+                                                })),
                                             ]}
                                     />
                                 </div>
@@ -197,7 +241,9 @@ const EmployeePage = () => {
                               isOpen={deleteModal.showDeleteModal}
                               title="Xác nhận xóa?"
                               content={
-                                  <>Bạn có chắc chắn muốn xóa nhân viên {deleteModal.selectedData?.firstName} {deleteModal.selectedData?.lastName} này không?</>
+                                  <>Bạn có chắc chắn muốn xóa nhân
+                                      viên {deleteModal.selectedData?.firstName} {deleteModal.selectedData?.lastName} này
+                                      không?</>
                               }
             />
         </>

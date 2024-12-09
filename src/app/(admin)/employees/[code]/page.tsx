@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
-import { useEmployeeByID } from '@/modules/employees/repository';
+import { useEmployeeByCode } from '@/modules/employees/repository';
 import { formatDateToLocalDate } from '@/utils/formatDate';
 import { EmployeeStatusVietnamese } from '@/components/Badge/EmployeeStatusBadge';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
@@ -16,8 +16,8 @@ import { formatGender } from '@/utils/formatString';
 
 const EmployeeDetail = () => {
 
-    const { id } = useParams<{ id: string }>();
-    const { data: employee, isLoading } = useEmployeeByID(id);
+    const { code } = useParams<{ code: string }>();
+    const { data: employee, isLoading } = useEmployeeByCode(code);
 
     if (isLoading) {
         return <Loader />;
@@ -30,8 +30,8 @@ const EmployeeDetail = () => {
         <div className="flex flex-col gap-4 mt-4">
             <Card className="p-[18px]">
                 <div className="flex gap-1 text-xl font-nunito font-medium">
-                    <div>Mã nhân viên</div>
-                    <div className="text-brand-500">#{employee.id}</div>
+                    <div>Mã khách hàng</div>
+                    <div className="text-brand-500">#{employee.code}</div>
                 </div>
             </Card>
 
