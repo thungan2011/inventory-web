@@ -8,6 +8,7 @@ export const axiosClient: AxiosInstance = axios.create({
         'Content-Type': "application/json",
         Accept: "application/json"
     },
+    withCredentials: false,
     transformResponse: [
         ...(axios.defaults.transformResponse as any[]),
         (data) => {
@@ -32,7 +33,12 @@ export const setAccessTokenForAxios = (token: string | null) => {
 
 axiosClient.interceptors.request.use((config) => {
     if (accessToken) {
+        config.headers = config.headers || {};
         config.headers['Authorization'] = `Bearer ${accessToken}`;
+
+        config.headers['Access-Control-Allow-Origin'] = '*';
+        config.headers['Access-Control-Allow-Methods'] = 'GET,PUT,POST,DELETE,OPTIONS';
+        config.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization';
     }
     return config;
 }, (error) => Promise.reject(error));
