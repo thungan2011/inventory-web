@@ -17,7 +17,7 @@ import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import GroupCustomerBadge from '@/components/Badge/GroupCustomerBadge';
 import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
-import { formatAddress } from '@/utils/formatString';
+import { formatAddress, formatGender } from '@/utils/formatString';
 
 interface CustomerFilter extends PaginationState {
     name: string;
@@ -135,8 +135,10 @@ const CustomerPage = () => {
                 header: 'Tên',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div className="w-72 max-w-36 line-clamp-2">{row.original.name}</div>
-                        <div className="text-xs text-gray-700">{row.original.phone}</div>
+                        <div className="w-72 max-w-36 line-clamp-2">
+                            {row.original.name}
+                        </div>
+                        <div className="text-xs text-gray-700">{formatGender(row.original.gender)} | {row.original.phone}</div>
                     </div>
                 ),
             },

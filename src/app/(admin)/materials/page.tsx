@@ -128,7 +128,7 @@ const MaterialPage = () => {
                 header: 'Tên',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{row.original.name}</div>
+                        <div className="line-clamp-1">{row.original.name}</div>
                         <div className="text-xs text-gray-700">{row.original.origin}</div>
                     </div>
                 ),
@@ -146,21 +146,21 @@ const MaterialPage = () => {
                             </div>
                             {
                                 quantityAvailable === 0 && (
-                                    <div className="text-red-500 bg-red-50 rounded-full px-2 py-1 text-xs">
+                                    <div className="text-red-500 bg-red-50 rounded-full px-2 py-1 text-xs text-nowrap">
                                         Hết hàng
                                     </div>
                                 )
                             }
                             {
                                 minimumStockLevel && quantityAvailable !== 0 && quantityAvailable <= minimumStockLevel && (
-                                    <div className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs">
+                                    <div className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs text-nowrap">
                                         Cận tồn (Min: {minimumStockLevel})
                                     </div>
                                 )
                             }
                             {
                                 maximumStockLevel && quantityAvailable >= maximumStockLevel && (
-                                    <div className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs">Đã đủ (Max: {maximumStockLevel})</div>
+                                    <div className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs text-nowrap">Đã đủ (Max: {maximumStockLevel})</div>
                                 )
                             }
                         </div>
