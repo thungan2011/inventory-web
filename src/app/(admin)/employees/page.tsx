@@ -19,6 +19,7 @@ import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { useAuth } from '@/hook/useAuth';
 import { formatAddress, formatGender, formatRole } from '@/utils/formatString';
+import ModalEmployeeDetail from '@/components/Pages/Employee/ModalEmployeeDetail';
 
 interface EmployeeFilter extends PaginationState {
     search: string;
@@ -74,6 +75,7 @@ const exportColumns: ExcelColumn[] = [
 const EmployeePage = () => {
     const { user } = useAuth();
 
+    const [employeeDetail, setEmployeeDetail] = useState<EmployeeOverview | null>(null);
     const [filters, setFilters] = useState<EmployeeFilter>({
         page: 1,
         search: '',
@@ -179,8 +181,8 @@ const EmployeePage = () => {
                 header: () => '',
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
-                        <ButtonAction.View href={`/employees/${row.original.code}`} />
-                        <ButtonAction.Update href={`/employees/${row.original.code}/edit`}/>
+                        <ButtonAction.View onClick={() => setEmployeeDetail(row.original)} />
+                        <ButtonAction.Update href={`/employees/${row.original.code}/edit`} />
                         <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
                     </div>
                 ),
@@ -192,7 +194,6 @@ const EmployeePage = () => {
     const handleExportExcel = async () => {
         await exportToExcel<EmployeeOverview>(employees, exportColumns, 'nhan-vien.xlsx');
     };
-
 
     return (
         <>
@@ -246,6 +247,11 @@ const EmployeePage = () => {
                                       không?</>
                               }
             />
+            {
+                employeeDetail && (
+                    <ModalEmployeeDetail onClose={() => setEmployeeDetail(null)} employee={employeeDetail} />
+                )
+            }
         </>
     );
 };
