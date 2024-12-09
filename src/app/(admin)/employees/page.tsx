@@ -18,7 +18,7 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { useAuth } from '@/hook/useAuth';
-import { formatRole } from '@/utils/formatString';
+import { formatGender, formatRole } from '@/utils/formatString';
 import { formatAddress } from '@/utils/formatString';
 
 interface EmployeeFilter extends PaginationState {
@@ -78,35 +78,31 @@ const EmployeePage = () => {
     const columns = React.useMemo<ColumnDef<EmployeeOverview>[]>(
         () => [
             {
-                accessorKey: 'userId',
+                accessorKey: 'code',
                 header: 'Mã',
             },
             {
-                accessorKey: 'avatar',
-                cell: ({ row }) => {
-                    return (
-                        <div className="w-20 h-20 relative rounded shadow overflow-hidden">
+                accessorKey: 'name',
+                header: 'Họ tên',
+                cell: ({ row }) => (
+                    <div className="flex gap-3">
+                        <div className="w-16 h-16 relative rounded shadow overflow-hidden">
                             <Image src={'/img/avatar/avt.png'} alt={row.original.firstName} fill
                                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                    priority className="rounded-md object-cover w-20 h-20" />
                         </div>
-                    );
-                },
-                header: 'Ảnh',
-                enableSorting: false,
-            },
-            {
-                accessorKey: 'name',
-                header: () => <span>Tên</span>,
-                cell: ({ row }) => (
-                    <div className="flex flex-col gap-2">
-                        <div className="flex gap-3 text-nowrap">
-                            {`${row.original.firstName} ${row.original.lastName}`}
-                            {
-                                user?.id === row.original.id && (<div className="bg-brand-500 text-white rounded px-1 py-0.5 text-xs">ME</div>)
-                            }
+
+                        <div className="flex flex-col gap-2 justify-center">
+                            <div className="flex gap-3 text-nowrap">
+                                {`${row.original.firstName} ${row.original.lastName}`}
+                                {
+                                    user?.id === row.original.id && (
+                                        <div className="bg-brand-500 text-white rounded px-1 py-0.5 text-xs">ME</div>)
+                                }
+                            </div>
+                            <div
+                                className="text-xs text-gray-700">{formatGender(row.original.gender)} | {row.original.phone}</div>
                         </div>
-                        <div className="text-xs text-gray-700">{row.original.phone}</div>
                     </div>
                 ),
             },
@@ -117,7 +113,7 @@ const EmployeePage = () => {
             },
             {
                 accessorKey: 'address',
-                header:'Địa chỉ',
+                header: 'Địa chỉ',
                 cell: ({ row }) => {
                     if (row.original.address) {
                         return (
@@ -133,7 +129,7 @@ const EmployeePage = () => {
             {
                 accessorKey: 'status',
                 cell: ({ row }) => <EmployeeStatusBadge status={row.original.status} />,
-                header: () => <span>Trạng thái</span>,
+                header: 'Trạng thái',
             },
             {
                 accessorKey: 'actions',
@@ -145,7 +141,6 @@ const EmployeePage = () => {
                         <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)}/>
                     </div>
                 ),
-                enableSorting: false,
             },
         ],
         [deleteModal],

@@ -3,7 +3,7 @@ import Modal from '@/components/Modal';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import ButtonAction from '@/components/ButtonAction';
-import { Gender, GenderVietnamese } from '@/modules/base/interface';
+import { Gender, GenderVietnamese, getEnumGender } from '@/modules/base/interface';
 import Input from '@/components/Input';
 import { User } from '@/modules/authentication/interface';
 import Image from 'next/image';
@@ -77,7 +77,7 @@ const ModalProfile = ({ onClose, user }: ModalProfileProps) => {
         lastName: user.lastName,
         firstName: user.firstName,
         birthday: user.birthday,
-        gender: user.gender ? Gender.MALE : Gender.FEMALE,
+        gender: getEnumGender(user.gender),
         phone: user.phone,
         email: user.email,
     };

@@ -3,7 +3,7 @@ export enum BaseStatus {
     INACTIVE = 'INACTIVE'
 }
 
-export const BaseStatusVietnamese : Record<BaseStatus, string> = {
+export const BaseStatusVietnamese: Record<BaseStatus, string> = {
     [BaseStatus.ACTIVE]: 'Đang hoạt động',
     [BaseStatus.INACTIVE]: 'Ngưng hoạt động',
 };
@@ -14,10 +14,21 @@ export enum Gender {
     OTHER = 'OTHER',
 }
 
-export const GenderVietnamese : Record<Gender, string> = {
+export const GenderVietnamese: Record<Gender, string> = {
     [Gender.FEMALE]: 'Nữ',
     [Gender.MALE]: 'Nam',
-    [Gender.OTHER]: 'Khác'
+    [Gender.OTHER]: 'Khác',
+};
+
+export const getEnumGender = (value: number): Gender => {
+    switch (value) {
+        case 1:
+            return Gender.MALE;
+        case    2:
+            return Gender.FEMALE;
+        default:
+            return Gender.OTHER;
+    }
 };
 
 export interface IAddressForm {
