@@ -15,11 +15,12 @@ import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface MaterialFilter extends PaginationState {
     name: string;
     status: MaterialStatus | 'ALL';
-    origin: string
+    origin: string;
 }
 
 const MaterialPage = () => {
@@ -35,11 +36,59 @@ const MaterialPage = () => {
         status: 'ALL',
     });
 
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'sku',
+            header: 'SKU',
+        },
+        {
+            field: 'name',
+            header: 'Tên nguyên vật liệu',
+        },
+        {
+            field: 'origin',
+            header: 'Xuất xứ',
+        },
+        {
+            field: 'weight',
+            header: 'Khối lượng',
+        },
+        {
+            field: 'unit',
+            header: 'Đơn vị',
+        },
+        {
+            field: 'packing',
+            header: 'Đóng gói',
+        },
+        {
+            field: 'quantityAvailable',
+            header: 'Số lượng khả dụng',
+        },
+        {
+            field: 'minimumStockLevel',
+            header: 'Số lượng cảnh báo tối thiểu',
+        },
+        {
+            field: 'maximumStockLevel',
+            header: 'Số lượng cảnh báo tối đa',
+        },
+        {
+            field: 'note',
+            header: 'Ghi chú',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: MaterialStatus) => MaterialStatusVietnamese[value],
+        },
+    ];
+
     const materialQuery = useAllMaterials({
         page: filters.page,
         name: filters.name,
         origin: filters.origin,
-        status: filters.status === 'ALL' ? undefined : filters.status
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
     const deleteMaterial = useDeleteMaterial();
 
@@ -60,11 +109,11 @@ const MaterialPage = () => {
         onDelete: async (data) => {
             await deleteMaterial.mutateAsync(data.id);
         },
-        canDelete: data => data.status !== MaterialStatus.ACTIVE && data.status !== MaterialStatus.OUT_OF_STOCK,
-        unableDeleteMessage: "Không thể xóa nguyên vật liệu đang hoạt động hoặc hết hàng.",
+        canDelete: data => data.status !== MaterialStatus.ACTIVE,
+        unableDeleteMessage: 'Không thể xóa nguyên vật liệu đang hoạt động!',
         onSuccess: () => {
-            setFilters(prevState => ({...prevState, page: 1}));
-        }
+            setFilters(prevState => ({ ...prevState, page: 1 }));
+        },
     });
 
     const columns = React.useMemo<ColumnDef<MaterialOverview>[]>(
@@ -76,7 +125,7 @@ const MaterialPage = () => {
 
             {
                 accessorKey: 'name',
-                header:'Tên',
+                header: 'Tên',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{row.original.name}</div>
@@ -126,14 +175,14 @@ const MaterialPage = () => {
 
             {
                 accessorKey: 'quantityAvailable',
-                header: 'SL sẳn có',
+                header: 'SL khả dụng',
                 cell: ({ row }) => <div>{`${row.original.quantityAvailable} ${row.original.packing}`}</div>,
             },
-            {
-                accessorKey: 'minimum_stock_level',
-                header: 'Tối thiểu',
-                cell: ({ row }) => <div>{`${row.original.minimumStockLevel} ${row.original.packing}`}</div>,
-            },
+            // {
+            //     accessorKey: 'minimum_stock_level',
+            //     header: 'Tối thiểu',
+            //     cell: ({ row }) => <div>{`${row.original.minimumStockLevel} ${row.original.packing}`}</div>,
+            // },
             {
                 accessorKey: 'status',
                 cell: ({ row }) => <MaterialStatusBadge status={row.original.status} />,
@@ -146,7 +195,7 @@ const MaterialPage = () => {
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/materials/${row.original.sku}`} />
                         <ButtonAction.Update href={`/materials/${row.original.sku}/edit`} />
-                        <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)}/>
+                        <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
                     </div>
                 ),
                 enableSorting: false,
@@ -155,8 +204,8 @@ const MaterialPage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
-
+    const handleExportExcel = async () => {
+        await exportToExcel<MaterialOverview>(materials, exportColumns, 'nguyen-vat-lieu.xlsx');
     };
 
 
@@ -167,7 +216,6 @@ const MaterialPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add href={'/materials/new'} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
@@ -179,7 +227,7 @@ const MaterialPage = () => {
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-3 gap-4">
                                     <Input name="name" placeholder="Tên nguyên vật liệu" />
-                                    <Input name="quantityAvailable" placeholder="Số lượng sẳn có" />
+                                    <Input name="origin" placeholder="Xuất xứ" />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[
@@ -187,7 +235,7 @@ const MaterialPage = () => {
                                                 ...Object.values(MaterialStatus).map(value => ({
                                                     label: MaterialStatusVietnamese[value],
                                                     value,
-                                                }))
+                                                })),
                                             ]}
                                     />
                                 </div>
@@ -208,7 +256,8 @@ const MaterialPage = () => {
                               isOpen={deleteModal.showDeleteModal}
                               title="Xác nhận xóa?"
                               content={
-                                  <>Bạn có chắc chắn muốn xóa nguyên vật liệu {deleteModal.selectedData?.name} này không?</>
+                                  <>Bạn có chắc chắn muốn xóa nguyên vật liệu {deleteModal.selectedData?.name} này
+                                      không?</>
                               }
             />
         </>

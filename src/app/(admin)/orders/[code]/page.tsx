@@ -113,8 +113,8 @@ const OrderDetail = () => {
                                                            className="object-cover" />
                                                 </div>
                                                 <div className="flex-col flex justify-center">
-                                                    <div className="font-medium">Macca</div>
-                                                    <div className="text-gray-800">Hủ 300g</div>
+                                                    <div className="font-medium">{detail.product.name}</div>
+                                                    <div className="text-gray-800">{detail.product.weight}{detail.product.unit} - {detail.product.packing}</div>
                                                 </div>
                                             </div>
                                         </TableCore.Cell>

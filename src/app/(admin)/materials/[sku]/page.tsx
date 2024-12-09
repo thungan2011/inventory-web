@@ -46,7 +46,7 @@ const MaterialDetail = () => {
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Nhập khẩu" value={`${material.origin}`} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                  label="Số lượng sẳn có" value={`${material.quantityAvailable}`} />
+                                  label="Số lượng khả dụng" value={`${material.quantityAvailable}`} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Cảnh báo tồn kho tối thiểu"
                                   value={material.minimumStockLevel || 'Chưa cập nhật'} />
