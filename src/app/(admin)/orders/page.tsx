@@ -15,6 +15,7 @@ import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface OrderFilter extends PaginationState {
     customer_name: string;
@@ -36,6 +37,54 @@ const OrderPage = () => {
         phone: '',
         status: 'ALL',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'code',
+            header: 'Mã đơn hàng',
+        },
+        {
+            field: 'orderDate',
+            header: 'Ngày đặt',
+        },
+        {
+            field: 'deliveryDate',
+            header: 'Ngày giao',
+        },
+        {
+            field: 'customer.name',
+            header: 'Tên khách hàng',
+        },
+        {
+            field: 'customer.phone',
+            header: 'Số điện thoại',
+        },
+        {
+            field: 'customer.address',
+            header: 'Địa chỉ',
+        },
+        {
+            field: 'customer.ward',
+            header: 'Phường/Xã',
+        },
+        {
+            field: 'customer.district',
+            header: 'Quận/Huyện',
+        },
+        {
+            field: 'customer.city',
+            header: 'Tỉnh/thành phố',
+        },
+        {
+            field: 'totalPrice',
+            header: 'Tổng tiền',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: OrderStatus) => OrderStatusVietnamese[value],
+        },
+    ];
 
     const orderQuery = useAllOrders({
         page: filters.page,
@@ -117,7 +166,7 @@ const OrderPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/orders/${row.original.code}`} />
-                        <ButtonAction.Update href={`/orders/${row.original.code}/edit`}/>
+                        <ButtonAction.Update href={`/orders/${row.original.code}/edit`} />
                     </div>
                 ),
                 enableSorting: false,
@@ -126,8 +175,8 @@ const OrderPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
-
+    const handleExportExcel = async () => {
+        await exportToExcel<OrderOverview>(orders, exportColumns, 'don-hang.xlsx');
     };
 
     return (

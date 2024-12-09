@@ -49,9 +49,17 @@ const OrderDetail = () => {
                                           value={order.customer.name || 'Chưa cập nhật'} />
                                 <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                           label="Số điện thoại" value={`${order.customer.phone}`} />
-                                <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
-                                          label="Địa chỉ"
-                                          value={`${order.customer.address}, ${order.customer.ward}, ${order.customer.district}, ${order.customer.city}`} />
+                                <ItemInfo
+                                    gridColumns="grid-cols-5"
+                                    colSpan1="col-span-2"
+                                    colSpan2="col-span-3"
+                                    label="Địa chỉ"
+                                    value={
+                                        order.customer.address || order.customer.ward || order.customer.district || order.customer.city
+                                            ? `${order.customer.address || ''}, ${order.customer.ward || ''}, ${order.customer.district || ''}, ${order.customer.city || ''}`
+                                            : 'Chưa cập nhật'
+                                    }
+                                />
                                 <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                           label="Email"
                                           value={order.customer.email || 'Chưa cập nhật'} />
@@ -100,8 +108,8 @@ const OrderDetail = () => {
                                                     <Image src={LOGO_IMAGE_FOR_NOT_FOUND} alt={`Ảnh của sản phẩm `} fill className="object-cover" />
                                                 </div>
                                                 <div className="flex-col flex justify-center">
-                                                    <div className="font-medium">Macca</div>
-                                                    <div className="text-gray-800">Hủ 300g</div>
+                                                    <div className="font-medium">{detail.product.name}</div>
+                                                    <div className="text-gray-800">{detail.product.weight}{detail.product.unit} - {detail.product.packing}</div>
                                                 </div>
                                             </div>
                                         </TableCore.Cell>

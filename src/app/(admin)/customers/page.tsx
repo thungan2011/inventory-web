@@ -16,6 +16,7 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import GroupCustomerBadge from '@/components/Badge/GroupCustomerBadge';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface CustomerFilter extends PaginationState {
     name: string;
@@ -33,12 +34,57 @@ const CustomerPage = () => {
         status: 'ALL',
         phone: '',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'id',
+            header: 'Mã',
+        },
+        {
+            field: 'name',
+            header: 'Tên khách hàng',
+        },
+        {
+            field: 'birthday',
+            header: 'Sinh nhật',
+        },
+        {
+            field: 'phone',
+            header: 'Số điện thoại',
+        },
+        {
+            field: 'address',
+            header: 'Địa chỉ',
+        },
+        {
+            field: 'ward',
+            header: 'Xã/Phường',
+        },
+        {
+            field: 'district',
+            header: 'Quận/Huyện',
+        },
+        {
+            field: 'city',
+            header: 'Tỉnh/Thành phố',
+        },
+        {
+            field: 'email',
+            header: 'Email',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: CustomerStatus) => CustomerStatusVietnamese[value],
+        },
+    ];
+
     const customerQuery = useAllCustomers({
         page: filters.page,
         name: filters.name,
         code: filters.code,
         phone: filters.phone,
-        status: filters.status === 'ALL' ? undefined : filters.status
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
 
     const {
@@ -129,8 +175,8 @@ const CustomerPage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
-        // exportToExcel<CustomerOverview>(customers, 'customers.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<CustomerOverview>(customers, exportColumns, 'khach-hang.xlsx');
     };
 
 
@@ -141,7 +187,6 @@ const CustomerPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add href={'/customers/new'} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

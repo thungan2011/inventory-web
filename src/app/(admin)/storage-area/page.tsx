@@ -21,6 +21,7 @@ import ModalAddStorageArea from '@/components/Pages/Storage-area/ModalAddStorage
 import ModalUpdateStorageArea from '@/components/Pages/Storage-area/ModalUpdateStorageArea';
 import StorageAreaTypeBadge, { StorageAreaTypeVietnamese } from '@/components/Badge/StorageAreaTypeBadge';
 import { SelectProps } from '@/components/Select';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface StorageAreaFilter extends PaginationState {
     name: string;
@@ -40,6 +41,31 @@ const StorageAreaPage = () => {
         code: '',
         type: StorageAreaType.PRODUCT,
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'code',
+            header: 'Mã khu vực',
+        },
+        {
+            field: 'name',
+            header: 'Tên khu vực',
+        },
+        {
+            field: 'type',
+            header: 'Loại',
+            formatter: (value: StorageAreaType) => StorageAreaTypeVietnamese[value],
+        },
+        {
+            field: 'description',
+            header: 'Mô tả',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: StorageAreaStatus) => StorageAreaStatusVietnamese[value],
+        },
+    ];
 
     const storageAreaQuery = useAllStorageAreas({
         page: filters.page,
@@ -136,12 +162,13 @@ const StorageAreaPage = () => {
         [deleteModal],
     );
 
-    const typeOptions : SelectProps['options'] = Object.values(StorageAreaType).map(value => ({
+    const typeOptions: SelectProps['options'] = Object.values(StorageAreaType).map(value => ({
         label: StorageAreaTypeVietnamese[value],
         value: value,
     }));
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
+        await exportToExcel<StorageAreaOverview>(storageAreas, exportColumns, 'khu-vuc-luu-tru.xlsx');
     };
 
     return (
@@ -151,7 +178,6 @@ const StorageAreaPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add onClick={() => setShowModalAddStorageArea(true)} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

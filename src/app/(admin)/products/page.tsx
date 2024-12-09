@@ -18,6 +18,7 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface ProductFilter extends PaginationState {
     search: string;
@@ -35,6 +36,54 @@ const ProductPage = () => {
         origin: '',
         status: 'ALL',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'sku',
+            header: 'SKU',
+        },
+        {
+            field: 'name',
+            header: 'Tên thành phẩm',
+        },
+        {
+            field: 'origin',
+            header: 'Xuất xứ',
+        },
+        {
+            field: 'weight',
+            header: 'Khối lượng',
+        },
+        {
+            field: 'unit',
+            header: 'Đơn vị',
+        },
+        {
+            field: 'packing',
+            header: 'Đóng gói',
+        },
+        {
+            field: 'prices.price',
+            header: 'Gía hiện tại',
+        },
+        {
+            field: 'minimumStockLevel',
+            header: 'Số lượng cảnh báo tối thiểu',
+        },
+        {
+            field: 'maximumStockLevel',
+            header: 'Số lượng cảnh báo tối đa',
+        },
+        {
+            field: 'description',
+            header: 'Mô tả',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: ProductStatus) => ProductStatusVietnamese[value],
+        },
+    ];
 
     const productQuery = useAllProducts({
         page: filters.page,
@@ -62,8 +111,8 @@ const ProductPage = () => {
         onDelete: async (data) => {
             await deleteProduct.mutateAsync(data.id);
         },
-        canDelete: data => data.status !== ProductStatus.ACTIVE && data.status !== ProductStatus.OUT_OF_STOCK,
-        unableDeleteMessage: 'Không thể xóa sản phẩm đang hoạt động hoặc hết hàng.',
+        canDelete: data => data.status !== ProductStatus.ACTIVE,
+        unableDeleteMessage: 'Không thể xóa sản phẩm đang hoạt động!',
         onSuccess: () => {
             setFilters(prevState => ({ ...prevState, page: 1 }));
         },
@@ -98,7 +147,7 @@ const ProductPage = () => {
                             </div>
                         </div>
                     );
-                }
+                },
             },
             {
                 accessorKey: 'quantityAvailable',
@@ -113,21 +162,24 @@ const ProductPage = () => {
                             </div>
                             {
                                 quantityAvailable === 0 && (
-                                    <div className="text-red-500 bg-red-50 rounded-full px-2 py-1 text-xs">
+                                    <div className="text-red-500 bg-red-50 rounded-full px-2 py-1 text-xs text-nowrap">
                                         Hết hàng
                                     </div>
                                 )
                             }
                             {
                                 minimumStockLevel && quantityAvailable !== 0 && quantityAvailable <= minimumStockLevel && (
-                                    <div className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs">
+                                    <div
+                                        className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs text-nowrap">
                                         Cận tồn
                                     </div>
                                 )
                             }
                             {
                                 maximumStockLevel && quantityAvailable >= maximumStockLevel && (
-                                    <div className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs">Đã đủ</div>
+                                    <div
+                                        className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs text-nowrap">Đủ
+                                        hàng</div>
                                 )
                             }
                         </div>
@@ -172,8 +224,8 @@ const ProductPage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
-
+    const handleExportExcel = async () => {
+        await exportToExcel<ProductOverview>(products, exportColumns, 'thanh-pham.xlsx');
     };
 
 
@@ -184,7 +236,6 @@ const ProductPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add href={'/products/new'} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
