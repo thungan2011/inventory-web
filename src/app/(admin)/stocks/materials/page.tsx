@@ -22,6 +22,7 @@ import Select from '@/components/Filters/Select';
 import dayjs from 'dayjs';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface WarehouseAreaMaterialFilter extends PaginationState {
     materialSearch: string;
@@ -37,6 +38,54 @@ const WarehouseAreaMaterialPage = () => {
         search: '',
         status: 'ALL',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'material.sku',
+            header: 'SKU',
+        },
+        {
+            field: 'material.name',
+            header: 'Tên nguyên vật liệu',
+        },
+        {
+            field: 'storageArea.code',
+            header: 'Mã KVLT',
+        },
+        {
+            field: 'storageArea.name',
+            header: 'Tên KVLT',
+        },
+        {
+            field: 'material.origin',
+            header: 'Xuất xứ',
+        },
+        {
+            field: 'material.weight',
+            header: 'Khối lượng',
+        },
+        {
+            field: 'material.unit',
+            header: 'Đơn vị',
+        },
+        {
+            field: 'material.packing',
+            header: 'Đóng gói',
+        },
+        {
+            field: 'expiryDate',
+            header: 'Ngày hết hạn',
+        },
+        {
+            field: 'quantityAvailable',
+            header: 'Số lượng tồn',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: WarehouseAreaMaterialStatus) => WarehouseAreaMaterialStatusVietnamese[value],
+        },
+    ];
 
     const warehouseAreaMaterialQuery = useAllWarehouseAreaMaterials({
         page: filters.page,
@@ -80,7 +129,8 @@ const WarehouseAreaMaterialPage = () => {
                 cell: ({ row }) => (
                     <div className="flex gap-2">
                         <div className="relative h-16 w-16">
-                            <Image src={LOGO_IMAGE_FOR_NOT_FOUND} alt={`Ảnh nguyên vật liệu ${row.original.material.name}`} fill
+                            <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
+                                   alt={`Ảnh nguyên vật liệu ${row.original.material.name}`} fill
                                    className="object-cover rounded border shadow" />
                         </div>
                         <div className="flex flex-col gap-2 justify-center">
@@ -105,7 +155,9 @@ const WarehouseAreaMaterialPage = () => {
                             <div className={`text-xs`}>
                                 {
                                     isExpired ? (
-                                        <div className="text-red-500 bg-red-50 border w-fit border-red-500 rounded px-1 py-0.5">Đã hết hạn</div>
+                                        <div
+                                            className="text-red-500 bg-red-50 border w-fit border-red-500 rounded px-1 py-0.5">Đã
+                                            hết hạn</div>
                                     ) : (
                                         <div className={`${isNearExpiry ? 'text-yellow-500' : 'text-gray-800'}`}>
                                             Hết hạn trong {timeFromNow(row.original.expiryDate)}
@@ -115,7 +167,7 @@ const WarehouseAreaMaterialPage = () => {
                             </div>
                         </div>
                     );
-                }
+                },
             },
             {
                 accessorKey: 'quantityAvailable',
@@ -139,8 +191,8 @@ const WarehouseAreaMaterialPage = () => {
         ], [],
     );
 
-    const handleExportExcel = () => {
-
+    const handleExportExcel = async () => {
+        await exportToExcel<WarehouseAreaMaterialOverview>(warehouseAreaMaterials, exportColumns, 'ton-kho-nguyen-vat-lieu.xlsx');
     };
 
 
@@ -150,7 +202,6 @@ const WarehouseAreaMaterialPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

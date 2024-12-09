@@ -23,3 +23,10 @@ export const formatRole = (role: string) : string => {
             return role;
     }
 };
+
+export const formatAddress = (address?: string, ward?: string, district?: string, city?: string) : string => {
+    if (!address || !ward || !city || !district) {
+        return 'Chưa cập nhật';
+    }
+    return address + ', ' + ward.split(' - ')[0] + ', ' + district.split(' - ')[0] + ', ' + city.split(' - ')[0];
+};

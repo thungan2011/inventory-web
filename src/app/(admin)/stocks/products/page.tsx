@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 import Card from '@/components/Card';
 import Table from '@/components/Tables';
 import { WarehouseAreaProductOverview, WarehouseAreaProductStatus } from '@/modules/warehouse-area/products/interface';
@@ -26,6 +26,54 @@ interface WarehouseAreaProductFilter extends PaginationState {
     searchProduct: string;
     status: WarehouseAreaProductStatus | 'ALL';
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'product.sku',
+        header: 'SKU',
+    },
+    {
+        field: 'product.name',
+        header: 'Tên thành phẩm',
+    },
+    {
+        field: 'storageArea.code',
+        header: 'Mã KVLT',
+    },
+    {
+        field: 'storageArea.name',
+        header: 'Tên KVLT',
+    },
+    {
+        field: 'product.origin',
+        header: 'Xuất xứ',
+    },
+    {
+        field: 'product.weight',
+        header: 'Khối lượng',
+    },
+    {
+        field: 'product.unit',
+        header: 'Đơn vị',
+    },
+    {
+        field: 'product.packing',
+        header: 'Đóng gói',
+    },
+    {
+        field: 'expiryDate',
+        header: 'Ngày hết hạn',
+    },
+    {
+        field: 'quantityAvailable',
+        header: 'Số lượng tồn',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: WarehouseAreaProductStatus) => WarehouseAreaProductStatusVietnamese[value],
+    },
+];
 
 const WarehouseAreaProductPage = () => {
 
@@ -100,11 +148,13 @@ const WarehouseAreaProductPage = () => {
 
                     return (
                         <div className="flex flex-col gap-2">
-                        <div>{formatDateToLocalDate(row.original.expiryDate)}</div>
+                            <div>{formatDateToLocalDate(row.original.expiryDate)}</div>
                             <div className={`text-xs`}>
                                 {
                                     isExpired ? (
-                                        <div className="text-red-500 bg-red-50 border w-fit border-red-500 rounded px-1 py-0.5">Đã hết hạn</div>
+                                        <div
+                                            className="text-red-500 bg-red-50 border w-fit border-red-500 rounded px-1 py-0.5">Đã
+                                            hết hạn</div>
                                     ) : (
                                         <div className={`${isNearExpiry ? 'text-yellow-500' : 'text-gray-800'}`}>
                                             Hết hạn trong {timeFromNow(row.original.expiryDate)}
@@ -114,7 +164,7 @@ const WarehouseAreaProductPage = () => {
                             </div>
                         </div>
                     );
-                }
+                },
             },
             {
                 accessorKey: 'quantityAvailable',
@@ -139,8 +189,8 @@ const WarehouseAreaProductPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
-        exportToExcel<WarehouseAreaProductOverview>(warehouseAreaProducts, [], 'warehouseAreaProducts.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<WarehouseAreaProductOverview>(warehouseAreaProducts, exportColumns, 'ton-kho-thanh-pham.xlsx');
     };
 
     return (
@@ -149,7 +199,6 @@ const WarehouseAreaProductPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
