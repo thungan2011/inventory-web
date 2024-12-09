@@ -159,7 +159,7 @@ const NewCustomerPage = () => {
         email: customer.email,
         status: customer.status,
         note: customer.note || '',
-        gender: customer.gender == 0 ? Gender.FEMALE : Gender.MALE,
+        gender: customer.gender == 1 ? Gender.MALE : (customer.gender === 2 ? Gender.FEMALE : Gender.OTHER),
         groupCustomer: customer.groupCustomer.id
     };
 
@@ -172,7 +172,7 @@ const NewCustomerPage = () => {
                 payload: {
                     ...values,
                     birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
-                    gender: values.gender === Gender.MALE ? 2 : values.gender === Gender.FEMALE ? 1 : 3,
+                    gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 2 : 3,
                     city: `${values.city} - ${values.cityCode}`,
                     district: `${values.district} - ${values.districtCode}`,
                     ward: `${values.ward} - ${values.wardCode}`,

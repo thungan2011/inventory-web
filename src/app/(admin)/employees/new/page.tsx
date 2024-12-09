@@ -22,32 +22,32 @@ import { useRoleList } from '@/modules/roles/repository';
 import { formatRole } from '@/utils/formatString';
 
 const ProductSchema = object({
-    user_id: string().test('valid-code', 'Mã không hợp lệ', function(value) {
-        if (!value) return true;
-        if (value.length < 4) return this.createError({ message: 'Mã tối thiểu 4 ký tự' });
-        if (!/^[A-Z0-9]+$/.test(value)) return this.createError({ message: 'Mã phải chỉ chứa chữ in hoa và số' });
-        return true;
-    }),
-    last_name: string().required('Tên không được để trống'),
-    first_name: string().required('Tên không được để trống'),
-    phone: string().required('Số điện thoại không được để trống'),
-    address: string().required('Địa chỉ không được để trống'),
+    last_name: string()
+        .trim()
+        .required('Vui lòng nhập tên'),
+    first_name: string()
+        .trim()
+        .required('Vui lòng nhập họ'),
+    phone: string().trim()
+        .min(10, 'Số điện thoại tối thiểu 10 ký tự')
+        .max(10, 'Số điện thoại tối đa 10 ký tự')
+        .required('Vui lòng nhập số điện thoại'),
+    address: string().trim().required('Địa chỉ không được để trống'),
     ward: string().required('Chọn Phường/xã'),
     district: string().required('Chọn Quận/huyện'),
     city: string().required('Chọn Tỉnh/thành phố'),
-    password: string().required('Mật khẩu không đươc để trống'),
-    email: string().required('Email không đươc để trống'),
+    password: string().trim().required('Mật khẩu không đươc để trống'),
+    email: string().email('Email không hợp lệ').required('Vui lòng nhập email'),
 });
 
 interface FormValues {
-    user_id?: string;
     last_name: string;
     first_name: string;
     phone: string;
     password: string;
     birthday?: Date;
     avatar?: ImageFile[];
-    gender?: string;
+    gender?: Gender;
     address: string;
     ward: string;
     wardCode: string;
@@ -61,14 +61,13 @@ interface FormValues {
 }
 
 const initialFormValues: FormValues = {
-    user_id: '',
     last_name: '',
     first_name: '',
     phone: '',
     password: '',
     birthday: dayjs().add(-1, 'day').toDate(),
     avatar: [],
-    gender: '1',
+    gender: Gender.MALE,
     ward: '',
     wardCode: '',
     district: '',
@@ -205,7 +204,7 @@ const NewEmployeePage = () => {
                 ...values,
                 avatar: 'h.jpg',
                 birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
-                gender: Number(values.gender),
+                gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 2 : 3,
                 role_id: values.role,
                 city: `${values.city} - ${values.cityCode}`,
                 district: `${values.district} - ${values.districtCode}`,

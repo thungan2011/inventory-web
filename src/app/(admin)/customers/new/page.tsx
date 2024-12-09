@@ -150,7 +150,7 @@ const NewCustomerPage = () => {
                 ...values,
                 birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
                 group_customer_id: values.groupCustomer,
-                gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 0 : 2,
+                gender: values.gender === Gender.MALE ? 1 : values.gender === Gender.FEMALE ? 2 : 3,
                 city: `${values.city} - ${values.cityCode}`,
                 district: `${values.district} - ${values.districtCode}`,
                 ward: `${values.ward} - ${values.wardCode}`,
