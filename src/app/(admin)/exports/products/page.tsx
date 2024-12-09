@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 import { formatDateToLocalDate } from '@/utils/formatDate';
 import Card from '@/components/Card';
 import Table from '@/components/Tables';
@@ -30,7 +30,37 @@ interface ExportProductFilter extends PaginationState {
     status: ExportProductStatus | 'ALL';
 }
 
-const initialFilterValues : ExportProductFilter = {
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'id',
+        header: 'ID',
+    },
+    {
+        field: 'code',
+        header: 'Mã giao dịch',
+    },
+    {
+        field: 'type',
+        header: 'Loại',
+        formatter: (value: ExportProductType) => ExportProductTypeVietnamese[value],
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: ExportProductStatus) => ExportProductStatusVietnamese[value],
+    },
+    {
+        field: 'createdAt',
+        header: 'Ngày tạo',
+    },
+    {
+        field: 'note',
+        header: 'Ghi chú',
+    },
+
+];
+
+const initialFilterValues: ExportProductFilter = {
     page: 1,
     code: '',
     type: 'ALL',
@@ -116,10 +146,10 @@ const ExportProductPage = () => {
     );
 
     const handleExportExcel = async () => {
-        await exportToExcel<ExportProductOverview>(exportProducts, [], 'exportProducts.xlsx');
+        await exportToExcel<ExportProductOverview>(exportProducts, exportColumns, 'xuat-kho-thanh-pham.xlsx');
     };
 
-    const typeOptions : SelectProps['options'] = [
+    const typeOptions: SelectProps['options'] = [
         { label: 'Tất cả loại', value: 'ALL' },
         ...Object.values(ExportProductType).map(value => ({
             label: ExportProductTypeVietnamese[value],

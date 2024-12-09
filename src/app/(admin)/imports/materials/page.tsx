@@ -23,6 +23,7 @@ import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import ImportMaterialTypeBadge from '@/components/Badge/ImportMateriaTypeBadge';
 import { SelectProps } from '@/components/Select';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface ImportMaterialFilter extends PaginationState {
     code: string;
@@ -30,13 +31,55 @@ interface ImportMaterialFilter extends PaginationState {
     status: ImportMaterialStatus | 'ALL';
 }
 
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'id',
+        header: 'ID',
+    },
+    {
+        field: 'code',
+        header: 'Mã giao dịch',
+    },
+    {
+        field: 'provider.name',
+        header: 'Nhà cung cấp',
+    },
+    {
+        field: 'provider.phone',
+        header: 'Số điện thoại',
+    },
+    {
+        field: 'type',
+        header: 'Loại',
+        formatter: (value: ImportMaterialType) => ImportMaterialTypeVietnamese[value],
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: ImportMaterialStatus) => ImportMaterialStatusVietnamese[value],
+    },
+    {
+        field: 'createdAt',
+        header: 'Người tạo',
+    },
+    {
+        field: 'createdAt',
+        header: 'Ngày tạo',
+    },
+    {
+        field: 'note',
+        header: 'Ghi chú',
+    },
+];
+
 const ImportMaterialPage = () => {
-    const initialFilterValues : ImportMaterialFilter = {
+    const initialFilterValues: ImportMaterialFilter = {
         page: 1,
         code: '',
         type: 'ALL',
         status: 'ALL',
     };
+
     const [filters, setFilters] = useState<ImportMaterialFilter>(initialFilterValues);
     const importMaterialQuery = useAllImportMaterials({
         page: filters.page,
@@ -114,10 +157,10 @@ const ImportMaterialPage = () => {
     );
 
     const handleExportExcel = async () => {
-
+        await exportToExcel<ImportMaterialOverview>(importMaterials, exportColumns, 'nhap-kho-nguyen-vat-lieu.xlsx');
     };
 
-    const typeOptions : SelectProps['options'] = [
+    const typeOptions: SelectProps['options'] = [
         { label: 'Tất cả loại', value: 'ALL' },
         ...Object.values(ImportMaterialType).map(value => ({
             label: ImportMaterialTypeVietnamese[value],
@@ -125,7 +168,7 @@ const ImportMaterialPage = () => {
         })),
     ];
 
-    const statusOptions : SelectProps['options'] = [
+    const statusOptions: SelectProps['options'] = [
         { label: 'Tất cả trạng thái', value: 'ALL' },
         ...Object.values(ImportMaterialStatus).map(value => ({
             label: ImportMaterialStatusVietnamese[value],

@@ -28,6 +28,50 @@ interface ProductPriceFilter extends PaginationState {
     status: ProductPriceStatus | 'ALL';
 }
 
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'id',
+        header: 'Mã',
+    },
+    {
+        field: 'dateStart',
+        header: 'Ngày bắt đầu',
+    },
+    {
+        field: 'dateEnd',
+        header: 'Ngày kết thúc',
+    },
+    {
+        field: 'product.sku',
+        header: 'SKU',
+    },
+    {
+        field: 'product.name',
+        header: 'Tên sản phẩm',
+    },
+    {
+        field: 'product.weight',
+        header: 'Khối lượng',
+    },
+    {
+        field: 'product.unit',
+        header: 'Đơn vị',
+    },
+    {
+        field: 'product.packing',
+        header: 'Đóng gói',
+    },
+    {
+        field: 'prices',
+        header: 'Gía',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: ProductPriceStatus) => ProductPriceStatusVietnamese[value],
+    },
+];
+
 const ProductPricePage = () => {
 
     const [productPriceToUpdate, setProductPriceToUpdate] = useState<ProductPriceOverview | null>(null);
@@ -38,50 +82,6 @@ const ProductPricePage = () => {
         search: '',
         status: 'ALL',
     });
-
-    const exportColumns: ExcelColumn[] = [
-        {
-            field: 'id',
-            header: 'Mã',
-        },
-        {
-            field: 'dateStart',
-            header: 'Ngày bắt đầu',
-        },
-        {
-            field: 'dateEnd',
-            header: 'Ngày kết thúc',
-        },
-        {
-            field: 'product.sku',
-            header: 'SKU',
-        },
-        {
-            field: 'product.name',
-            header: 'Tên sản phẩm',
-        },
-        {
-            field: 'product.weight',
-            header: 'Khối lượng',
-        },
-        {
-            field: 'product.unit',
-            header: 'Đơn vị',
-        },
-        {
-            field: 'product.packing',
-            header: 'Đóng gói',
-        },
-        {
-            field: 'prices',
-            header: 'Gía',
-        },
-        {
-            field: 'status',
-            header: 'Trạng thái',
-            formatter: (value: ProductPriceStatus) => ProductPriceStatusVietnamese[value],
-        },
-    ];
 
     const productQuery = useAllProductsPrice({
         page: filters.page,

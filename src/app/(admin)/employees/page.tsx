@@ -19,6 +19,7 @@ import AutoSubmitForm from '@/components/AutoSubmitForm';
 import useDeleteModal from '@/hook/useDeleteModal';
 import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { useAuth } from '@/hook/useAuth';
+import { formatAddress } from '@/utils/formatString';
 
 interface EmployeeFilter extends PaginationState {
     search: string;
@@ -112,7 +113,7 @@ const EmployeePage = () => {
                     if (row.original.address) {
                         return (
                             <div className="max-w-96">
-                                {row.original.address + ', ' + row.original.ward + ', ' + row.original.district + ', ' + row.original.city}
+                                {formatAddress(row.original.address, row.original.ward, row.original.district, row.original.city)}
                             </div>
                         );
                     } else {

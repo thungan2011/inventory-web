@@ -6,7 +6,11 @@ import Table from '@/components/Tables';
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
 import { useAllMaterialHistories } from '@/modules/material-histories/repository';
-import { MaterialHistoryOverview } from '@/modules/material-histories/inteface';
+import {
+    MaterialActionType,
+    MaterialActionTypeVietnamese,
+    MaterialHistoryOverview,
+} from '@/modules/material-histories/inteface';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
@@ -18,11 +22,52 @@ import MaterialActionTypeBadge from '@/components/Badge/MaterialActionTypeBadge'
 import { useAllStorageAreas } from '@/modules/storage-area/repository';
 import { StorageAreaStatus, StorageAreaType } from '@/modules/storage-area/interface';
 import Select, { SelectProps } from '@/components/Select';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface MaterialHistoryFilter extends PaginationState {
     searchMaterial: string;
     storageAreaId: number | 'ALL';
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'materialStorageHistory.material.sku',
+        header: 'SKU',
+    },
+    {
+        field: 'materialStorageHistory.material.name',
+        header: 'Nguyên vật liệu',
+    },
+    {
+        field: 'materialStorageHistory.material.weight',
+        header: 'Khối lượng',
+    },
+    {
+        field: 'materialStorageHistory.material.unit',
+        header: 'Đơn vị',
+    },
+    {
+        field: 'materialStorageHistory.material.packing',
+        header: 'Đóng gói',
+    },
+    {
+        field: 'quantityBefore',
+        header: 'Số lượng trước',
+    },
+    {
+        field: 'quantityChange',
+        header: 'Số lượng thay đổi',
+    },
+    {
+        field: 'quantityAfter',
+        header: 'Số lượng sau',
+    },
+    {
+        field: 'actionType',
+        header: 'Loại',
+        formatter: (value: MaterialActionType) => MaterialActionTypeVietnamese[value],
+    },
+];
 
 const MaterialHistoryPage = () => {
     const [storageAreaSearchTerm, setStorageAreaSearchTerm] = useState<string>('');
@@ -155,7 +200,8 @@ const MaterialHistoryPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
+        await exportToExcel<MaterialHistoryOverview>(histories, exportColumns, 'lich-su-giao-dich-nguyen-vat-lieu.xlsx');
     };
 
 
