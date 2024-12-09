@@ -4,5 +4,7 @@ export interface Report {
         totalMaterial: number;
         todayRevenue: number;
         pendingImports: number;
+        totalEmployee: number;
+        totalCustomer: number;
     }
 }
