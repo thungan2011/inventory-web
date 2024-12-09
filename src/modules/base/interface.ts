@@ -19,3 +19,13 @@ export const GenderVietnamese : Record<Gender, string> = {
     [Gender.MALE]: 'Nam',
     [Gender.OTHER]: 'Khác'
 };
+
+export interface IAddressForm {
+    address: string;
+    ward: string;
+    wardCode: string;
+    district: string;
+    districtCode: string;
+    city: string;
+    cityCode: string;
+}

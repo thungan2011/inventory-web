@@ -29,5 +29,19 @@ export interface StorageAreaDetail extends StorageAreaOverview {
             unit: string;
             packing: string;
         }
-    } []
+    }[];
+    materialStorageHistories: {
+        id: number;
+        expiryDate: Date;
+        quantity: number;
+        quantityAvailable: number;
+        material: {
+            id: number;
+            sku: string;
+            name: string;
+            weight: number;
+            unit: string;
+            packing: string;
+        }
+    }[];
 }

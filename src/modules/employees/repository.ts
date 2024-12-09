@@ -44,8 +44,9 @@ interface AddEmployeePayload {
     ward: string;
     district: string;
     city: string;
-    email?: string;
+    email: string;
     status: EmployeeStatus;
+    role_id: number;
 }
 
 const createEmployee = (payload: AddEmployeePayload): Promise<void> => {

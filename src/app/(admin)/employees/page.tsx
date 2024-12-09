@@ -90,7 +90,7 @@ const EmployeePage = () => {
                 header: () => <span>Tên</span>,
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div className="flex gap-3">
+                        <div className="flex gap-3 text-nowrap">
                             {`${row.original.firstName} ${row.original.lastName}`}
                             {
                                 user?.id === row.original.id && (<div className="bg-brand-500 text-white rounded px-1 py-0.5 text-xs">ME</div>)
@@ -110,7 +110,11 @@ const EmployeePage = () => {
                 header:'Địa chỉ',
                 cell: ({ row }) => {
                     if (row.original.address) {
-                        return row.original.address + ', ' + row.original.ward + ', ' + row.original.district + ', ' + row.original.city;
+                        return (
+                            <div className="max-w-96">
+                                {row.original.address + ', ' + row.original.ward + ', ' + row.original.district + ', ' + row.original.city}
+                            </div>
+                        );
                     } else {
                         return 'Chưa cập nhật';
                     }

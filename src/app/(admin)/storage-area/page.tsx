@@ -26,7 +26,7 @@ interface StorageAreaFilter extends PaginationState {
     name: string;
     status: StorageAreaStatus | 'ALL';
     code: string;
-    type: StorageAreaType;
+    type: StorageAreaType | 'ALL';
 }
 
 const StorageAreaPage = () => {
@@ -38,7 +38,7 @@ const StorageAreaPage = () => {
         name: '',
         status: 'ALL',
         code: '',
-        type: StorageAreaType.PRODUCT,
+        type: 'ALL',
     });
 
     const storageAreaQuery = useAllStorageAreas({
@@ -46,7 +46,7 @@ const StorageAreaPage = () => {
         name: filters.name,
         code: filters.code,
         status: filters.status === 'ALL' ? undefined : filters.status,
-        type: filters.type,
+        type: filters.type === 'ALL' ? undefined : filters.type,
     });
 
     const {
@@ -136,10 +136,21 @@ const StorageAreaPage = () => {
         [deleteModal],
     );
 
-    const typeOptions : SelectProps['options'] = Object.values(StorageAreaType).map(value => ({
-        label: StorageAreaTypeVietnamese[value],
-        value: value,
-    }));
+    const typeOptions: SelectProps['options'] = [
+        { label: 'Tất cả loại', value: 'ALL' },
+        ...Object.values(StorageAreaType).map(value => ({
+            label: StorageAreaTypeVietnamese[value],
+            value: value,
+        })),
+    ];
+
+    const statusOptions: SelectProps['options'] = [
+        { label: 'Tất cả trạng thái', value: 'ALL' },
+        ...Object.values(StorageAreaStatus).map(value => ({
+            label: StorageAreaStatusVietnamese[value],
+            value,
+        })),
+    ];
 
     const handleExportExcel = () => {
     };
@@ -170,13 +181,7 @@ const StorageAreaPage = () => {
                                     />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
-                                            options={[
-                                                { label: 'Tất cả trạng thái', value: 'ALL' },
-                                                ...Object.values(StorageAreaStatus).map(value => ({
-                                                    label: StorageAreaStatusVietnamese[value],
-                                                    value,
-                                                })),
-                                            ]}
+                                            options={statusOptions}
                                     />
                                 </div>
                             </div>
