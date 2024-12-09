@@ -127,7 +127,7 @@ interface UpdateOrderDetailPayload {
 }
 
 const updateOrderDetail = ({ code, payload }: { payload: UpdateOrderDetailPayload, code: string }): Promise<void> => {
-    return httpRepository.put<void, UpdateOrderDetailPayload>(`/v1/orders/${code}/detail`, payload);
+    return httpRepository.put<void, UpdateOrderDetailPayload>(`/v1/orders/${code}/details`, payload);
 };
 
 export const useUpdateOrderDetail = () => {

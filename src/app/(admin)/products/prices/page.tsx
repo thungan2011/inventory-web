@@ -5,7 +5,7 @@ import Card from '@/components/Card';
 import Table from '@/components/Tables';
 import ButtonAction from '@/components/ButtonAction';
 import { ProductPriceOverview, ProductPriceStatus } from '@/modules/product-price/interface';
-import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
+import { formatDateToLocalDate, timeFromNow } from '@/utils/formatDate';
 
 import Image from 'next/image';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
@@ -129,7 +129,7 @@ const ProductPricePage = () => {
                 header: 'Ngày bắt đầu',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{formatDateInOrder(row.original.dateStart)}</div>
+                        <div>{formatDateToLocalDate(row.original.dateStart)}</div>
                         <div className="text-xs text-gray-700">{timeFromNow(row.original.dateStart)}</div>
                     </div>
                 ),
@@ -139,7 +139,7 @@ const ProductPricePage = () => {
                 header: 'Ngày kết thúc',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{formatDateInOrder(row.original.dateEnd)}</div>
+                        <div>{formatDateToLocalDate(row.original.dateEnd)}</div>
                         <div className="text-xs text-gray-700">{timeFromNow(row.original.dateEnd)}</div>
                     </div>
                 ),

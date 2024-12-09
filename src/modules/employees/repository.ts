@@ -71,16 +71,56 @@ export const useCreateEmployee = () => {
 };
 
 /**
- * get employee by ID
+ * get employee by Code
  */
-const getEmployeeByID = (id: string): Promise<EmployeeDetail> => {
-    return httpRepository.get<EmployeeDetail>(`/v1/profiles/${id}`);
+const getEmployeeByCode = (code: string): Promise<EmployeeDetail> => {
+    return httpRepository.get<EmployeeDetail>(`/v1/profiles/${code}`);
 };
 
-export const useEmployeeByID = (id: string) => {
+export const useEmployeeByCode = (code: string) => {
     return useDataFetching(
-        [EMPLOYEE_QUERY_KEY, id],
-        () => getEmployeeByID(id),
-        { enabled: !!id },
+        [EMPLOYEE_QUERY_KEY, code],
+        () => getEmployeeByCode(code),
+        { enabled: !!code },
     );
 };
+
+/**
+ * update customer
+ */
+interface UpdateCustomerPayload {
+    user_id?: string;
+    last_name: string;
+    first_name: string;
+    birthday?: string;
+    avatar?: string;
+    gender?: number;
+    phone: string;
+    password: string;
+    address: string;
+    ward: string;
+    district: string;
+    city: string;
+    email: string;
+    status: EmployeeStatus;
+    role_id: number;
+}
+
+const updateEmployee = ({id, payload} : {payload: UpdateCustomerPayload, id: number}): Promise<void> => {
+    return httpRepository.put<void>(`/v1/profiles/${id}`, payload);
+};
+
+export const useUpdateEmployee = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateEmployee,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [EMPLOYEE_QUERY_KEY] });
+            toast.success('Cập nhật nhân viên thành công');
+        },
+        onError: () => {
+            toast.error('Cập nhật nhân viên không thành công. Thử lại sau.');
+        },
+    });
+};
+

@@ -54,7 +54,7 @@ const validationSchema = Yup.object().shape({
     products: Yup.array().of(
         Yup.object().shape({
             price: Yup.number().required('Giá không được để trống')
-                .min(0, 'Giá phải lớn hơn 0')
+                .min(1, 'Giá phải lớn hơn 0')
                 .max(100000000000, 'Giá phải nhỏ hơn 100 tỷ'),
         }),
     ).min(1, 'Vui lòng chọn ít nhất 1 sản phẩm'),
@@ -81,8 +81,6 @@ const FormikContent = ({ onClose }: { onClose: () => void }) => {
     });
 
     const productQuery = useAllProducts({
-        origin: '', packing: '',
-        page: 1,
         search: search,
         status: filters.status
     });
@@ -112,7 +110,7 @@ const FormikContent = ({ onClose }: { onClose: () => void }) => {
             const newProduct = {
                 id: product.id,
                 sku: product.sku,
-                price: 0,
+                price: 1000,
                 name: product.name,
                 image: product.image,
                 weight: product.weight,
@@ -223,7 +221,7 @@ const FormikContent = ({ onClose }: { onClose: () => void }) => {
                                         </div>
                                         <div className="flex gap-2 items-center">
                                             <div className="w-60">
-                                                <InputCurrency name={`products.${index}.price`} placeholder="VND" />
+                                                <InputCurrency name={`products.${index}.price`} placeholder="Nhập giá" unit="VND" />
                                             </div>
                                             <div className="w-14 flex items-center justify-center">
                                                 <button type="button" onClick={() => arrayHelper.remove(index)}>
