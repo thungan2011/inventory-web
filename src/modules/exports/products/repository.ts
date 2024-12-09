@@ -60,6 +60,7 @@ interface AddExportProductPayload {
         quantity: number;
         product_history_id: number;
     }[];
+    order_code?: string;
 }
 
 const createExportProduct = (payload: AddExportProductPayload): Promise<void> => {

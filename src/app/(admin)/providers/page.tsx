@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
 import Card from '../../../components/Card';
 import Table from '../../../components/Tables';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 import { ProviderOverview } from '@/modules/providers/interface';
 import BaseStatusBadge from '@/components/Badge/BaseStatusBadge';
 import ButtonAction from '@/components/ButtonAction';
@@ -34,12 +34,52 @@ const ProviderPage = () => {
         status: 'ALL',
         phone: '',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'id',
+            header: 'Mã',
+        },
+        {
+            field: 'name',
+            header: 'Tên nhà cung cấp',
+        },
+        {
+            field: 'phone',
+            header: 'Số điện thoại',
+        },
+        {
+            field: 'address',
+            header: 'Địa chỉ',
+        },
+        {
+            field: 'ward',
+            header: 'Xã/Phường',
+        },
+        {
+            field: 'district',
+            header: 'Quận/Huyện',
+        },
+        {
+            field: 'city',
+            header: 'Tỉnh/Thành phố',
+        },
+        {
+            field: 'email',
+            header: 'Email',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: BaseStatus) => BaseStatusVietnamese[value],
+        },
+    ];
     const providerQuery = useAllProviders({
         page: filters.page,
         name: filters.name,
         code: filters.code,
         phone: filters.phone,
-        status: filters.status === 'ALL' ? undefined : filters.status
+        status: filters.status === 'ALL' ? undefined : filters.status,
     });
     const deleteProvider = useDeleteProvider();
 
@@ -124,8 +164,8 @@ const ProviderPage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
-        exportToExcel<ProviderOverview>(providers, [], 'providers.xlsx');
+    const handleExportExcel = async () => {
+        await exportToExcel<ProviderOverview>(providers, exportColumns, 'nha-cung-cap.xlsx');
     };
 
 
@@ -136,7 +176,6 @@ const ProviderPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add href={'/providers/new'} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

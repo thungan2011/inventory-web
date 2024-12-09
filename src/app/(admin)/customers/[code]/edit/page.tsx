@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import { Form, Formik, useFormikContext } from 'formik';
+import { Form, Formik } from 'formik';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
 import { object, string } from 'yup';
@@ -55,7 +55,6 @@ interface FormContentProps {
 }
 
 const FormContent = ({ isLoading, customer }: FormContentProps) => {
-    const { setFieldValue } = useFormikContext<FormValues>();
     const { data: groupCustomers } = useGroupCustomerList();
 
     return (
@@ -105,11 +104,7 @@ const FormContent = ({ isLoading, customer }: FormContentProps) => {
                             </div>
                         </div>
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                        <AddressForm city={customer.city || ''}
-                                     district={customer.district || ''}
-                                     ward={customer.ward || ''}
-                                     setFieldValue={setFieldValue}
-                        />
+                        <AddressForm />
                         <Select name="status" label="Trạng thái" options={[
                             ...Object.keys(CustomerStatus).map(status => (
                                 { label: CustomerStatusVietnamese[status as CustomerStatus], value: status }

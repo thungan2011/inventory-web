@@ -9,6 +9,9 @@ import { User } from '@/modules/authentication/interface';
 import Image from 'next/image';
 import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import Select from '@/components/Select';
+import { formatRole } from '@/utils/formatString';
+import DatePicker from '@/components/DatePicker';
+import dayjs from 'dayjs';
 
 type ModalProfileProps = {
     onClose: () => void;
@@ -30,33 +33,35 @@ const validationSchema = Yup.object().shape({});
 const FormikContent = ({ onClose, user }: { onClose: () => void; user: User }) => {
     return (
         <Form>
-            <div>
-                <div className="flex flex-col justify-center items-center">
-                    <div className="relative aspect-square rounded-full shadow overflow-hidden col-span-1 w-32">
+            <div className="grid grid-cols-4">
+                <div className="flex flex-col mt-16 items-center">
+                    <div className="relative aspect-square border rounded-full shadow overflow-hidden col-span-1 w-32">
                         <Image src={LOGO_IMAGE_FOR_NOT_FOUND} alt={`Ảnh nhân viên`} fill
                                className="object-cover" />
                     </div>
-                    <p className="mt-2">{user.role}</p>
+                    <p className="mt-2">{formatRole(user.role)}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 mt-6">
-                    <Input name="firstName" label="Họ đệm" placeholder="Họ đệm" />
-                    <Input name="lastName" label="Tên" placeholder="Tên" />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <Input name="birthday" label="Sinh nhật" placeholder="Sinh nhật" />
-                    <Select name="gender" label="Giới tính" options={[
-                        ...Object.keys(Gender).map(data => (
-                            { label: GenderVietnamese[data as Gender], value: data }
-                        )),
-                    ]} />
-                </div>
-                <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại" />
-                <Input name="email" label="Email" placeholder="Email" />
-            </div>
+                <div className="col-span-3">
+                    <div className="grid grid-cols-2 gap-4 mt-6">
+                        <Input name="firstName" label="Họ đệm" placeholder="Họ đệm" />
+                        <Input name="lastName" label="Tên" placeholder="Tên" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <DatePicker name="birthday" label="Sinh nhật" maxDate={dayjs().add(-1, 'day').toDate()} />
+                        <Select name="gender" label="Giới tính" options={[
+                            ...Object.keys(Gender).map(data => (
+                                { label: GenderVietnamese[data as Gender], value: data }
+                            )),
+                        ]} />
+                    </div>
+                    <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại" />
+                    <Input name="email" label="Email" placeholder="Email" />
 
-            <div className="flex justify-end items-center gap-3 mt-3">
-                <ButtonAction.Cancel onClick={onClose} />
-                <ButtonAction.Submit />
+                    <div className="flex justify-end items-center gap-3 mt-3">
+                        <ButtonAction.Cancel onClick={onClose} />
+                        <ButtonAction.Submit />
+                    </div>
+                </div>
             </div>
         </Form>
     );

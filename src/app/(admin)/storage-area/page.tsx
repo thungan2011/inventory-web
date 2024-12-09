@@ -21,12 +21,13 @@ import ModalAddStorageArea from '@/components/Pages/Storage-area/ModalAddStorage
 import ModalUpdateStorageArea from '@/components/Pages/Storage-area/ModalUpdateStorageArea';
 import StorageAreaTypeBadge, { StorageAreaTypeVietnamese } from '@/components/Badge/StorageAreaTypeBadge';
 import { SelectProps } from '@/components/Select';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface StorageAreaFilter extends PaginationState {
     name: string;
     status: StorageAreaStatus | 'ALL';
     code: string;
-    type: StorageAreaType;
+    type: StorageAreaType | 'ALL';
 }
 
 const StorageAreaPage = () => {
@@ -38,15 +39,40 @@ const StorageAreaPage = () => {
         name: '',
         status: 'ALL',
         code: '',
-        type: StorageAreaType.PRODUCT,
+        type: 'ALL',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'code',
+            header: 'Mã khu vực',
+        },
+        {
+            field: 'name',
+            header: 'Tên khu vực',
+        },
+        {
+            field: 'type',
+            header: 'Loại',
+            formatter: (value: StorageAreaType) => StorageAreaTypeVietnamese[value],
+        },
+        {
+            field: 'description',
+            header: 'Mô tả',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: StorageAreaStatus) => StorageAreaStatusVietnamese[value],
+        },
+    ];
 
     const storageAreaQuery = useAllStorageAreas({
         page: filters.page,
         name: filters.name,
         code: filters.code,
         status: filters.status === 'ALL' ? undefined : filters.status,
-        type: filters.type,
+        type: filters.type === 'ALL' ? undefined : filters.type,
     });
 
     const {
@@ -136,12 +162,24 @@ const StorageAreaPage = () => {
         [deleteModal],
     );
 
-    const typeOptions : SelectProps['options'] = Object.values(StorageAreaType).map(value => ({
-        label: StorageAreaTypeVietnamese[value],
-        value: value,
-    }));
+    const typeOptions: SelectProps['options'] = [
+        { label: 'Tất cả loại', value: 'ALL' },
+        ...Object.values(StorageAreaType).map(value => ({
+            label: StorageAreaTypeVietnamese[value],
+            value: value,
+        })),
+    ];
 
-    const handleExportExcel = () => {
+    const statusOptions: SelectProps['options'] = [
+        { label: 'Tất cả trạng thái', value: 'ALL' },
+        ...Object.values(StorageAreaStatus).map(value => ({
+            label: StorageAreaStatusVietnamese[value],
+            value,
+        })),
+    ];
+
+    const handleExportExcel = async () => {
+        await exportToExcel<StorageAreaOverview>(storageAreas, exportColumns, 'khu-vuc-luu-tru.xlsx');
     };
 
     return (
@@ -151,7 +189,6 @@ const StorageAreaPage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add onClick={() => setShowModalAddStorageArea(true)} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
@@ -170,13 +207,7 @@ const StorageAreaPage = () => {
                                     />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
-                                            options={[
-                                                { label: 'Tất cả trạng thái', value: 'ALL' },
-                                                ...Object.values(StorageAreaStatus).map(value => ({
-                                                    label: StorageAreaStatusVietnamese[value],
-                                                    value,
-                                                })),
-                                            ]}
+                                            options={statusOptions}
                                     />
                                 </div>
                             </div>

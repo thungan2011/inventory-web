@@ -21,6 +21,7 @@ import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import ModalUpdateProductPrice from '@/components/Pages/ProductPrice/ModalUpdateProductPrice';
 import ModalAddProductPrice from '@/components/Pages/ProductPrice/ModalAddProductPrice';
 import ProductPriceStatusBadge, { ProductPriceStatusVietnamese } from '@/components/Badge/ProductPriceStatusBadge';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface ProductPriceFilter extends PaginationState {
     search: string;
@@ -37,6 +38,50 @@ const ProductPricePage = () => {
         search: '',
         status: 'ALL',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'id',
+            header: 'Mã',
+        },
+        {
+            field: 'dateStart',
+            header: 'Ngày bắt đầu',
+        },
+        {
+            field: 'dateEnd',
+            header: 'Ngày kết thúc',
+        },
+        {
+            field: 'product.sku',
+            header: 'SKU',
+        },
+        {
+            field: 'product.name',
+            header: 'Tên sản phẩm',
+        },
+        {
+            field: 'product.weight',
+            header: 'Khối lượng',
+        },
+        {
+            field: 'product.unit',
+            header: 'Đơn vị',
+        },
+        {
+            field: 'product.packing',
+            header: 'Đóng gói',
+        },
+        {
+            field: 'prices',
+            header: 'Gía',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: ProductPriceStatus) => ProductPriceStatusVietnamese[value],
+        },
+    ];
 
     const productQuery = useAllProductsPrice({
         page: filters.page,
@@ -143,7 +188,8 @@ const ProductPricePage = () => {
         [deleteModal],
     );
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
+        await exportToExcel<ProductPriceOverview>(productPrice, exportColumns, 'bang-gia.xlsx');
     };
 
 
@@ -154,7 +200,6 @@ const ProductPricePage = () => {
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
                             <ButtonAction.Add onClick={() => setShowModalAddProductPrice(true)} />
-                            <ButtonAction.Import />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
@@ -166,8 +211,6 @@ const ProductPricePage = () => {
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
                                 <div className="grid grid-cols-4 gap-x-3">
                                     <Input name="search" placeholder="SKU hoặc tên thành phẩm" />
-                                    <Input name="dateStart" placeholder="Ngày bắt đầu" />
-                                    <Input name="dateEnd" placeholder="Ngày kết thúc" />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
                                             options={[

@@ -13,7 +13,11 @@ import {
     useImportMaterialByCode,
     useRejectImportMaterial,
 } from '@/modules/imports/materials/repository';
-import { ImportMaterialStatusVietnamese, ImportMaterialTypeVietnamese } from '@/modules/imports/materials/interface';
+import {
+    ImportMaterialStatus,
+    ImportMaterialStatusVietnamese,
+    ImportMaterialTypeVietnamese,
+} from '@/modules/imports/materials/interface';
 import { formatDateToLocalDate } from '@/utils/formatDate';
 import TableCore from '@/components/Tables/TableCore';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
@@ -129,24 +133,28 @@ const ImportMaterialDetail = () => {
     return (
         <div className="flex flex-col gap-4 mt-4">
             <Card className="p-[18px]">
-                <div className="flex justify-between items-center">
+                <div className={`flex items-center`}>
                     <div className="flex gap-1 text-xl font-nunito font-medium">
                         <div>Mã phiếu nhập</div>
                         <div className="text-brand-500">#{importMaterial.code}</div>
                     </div>
 
-                    <div className="flex gap-3">
-                        <button
-                            className="bg-red-400 py-2 px-4 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80"
-                            onClick={handleRejectReceipt}
-                            type="button">Từ chối
-                        </button>
-                        <button
-                            className="bg-brand-500 py-2 px-4 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80"
-                            onClick={handleApproveReceipt}
-                            type="button">Phê duyệt
-                        </button>
-                    </div>
+                    {
+                        importMaterial.status === ImportMaterialStatus.PENDING_APPROVED && (
+                            <div className="flex gap-3 ml-auto">
+                                <button
+                                    className="bg-red-400 py-2 px-4 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80"
+                                    onClick={handleRejectReceipt}
+                                    type="button">Từ chối
+                                </button>
+                                <button
+                                    className="bg-brand-500 py-2 px-4 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80"
+                                    onClick={handleApproveReceipt}
+                                    type="button">Phê duyệt
+                                </button>
+                            </div>
+                        )
+                    }
                 </div>
             </Card>
 

@@ -184,7 +184,10 @@ const CategoryPage = () => {
                     <div className="flex items-center justify-end">
 
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add disabled={user && (user.role !== ROLE_ADMIN && user.role !== ROLE_WAREHOUSE_KEEPER)}  onClick={() => setShowModalAddCategory(true)} />
+                            <ButtonAction.Add
+                                disabled={!(user && (user.role === ROLE_ADMIN || user.role === ROLE_WAREHOUSE_KEEPER))}
+                                onClick={() => setShowModalAddCategory(true)}
+                            />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

@@ -119,7 +119,7 @@ const ButtonAction = {
             <button type="button"
                     onClick={onClick}
                     className="bg-brand-500 py-1.5 px-2 rounded flex items-center justify-center text-white gap-x-2 text-sm hover:opacity-80">
-                <RiFileExcel2Line className="h-5 w-5" /> Export
+                <RiFileExcel2Line className="h-5 w-5" /> Xuất Excel
             </button>
         );
     },

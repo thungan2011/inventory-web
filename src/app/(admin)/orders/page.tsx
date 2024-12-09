@@ -5,7 +5,7 @@ import Card from '@/components/Card';
 import Table from '@/components/Tables';
 import { OrderOverview, OrderStatus } from '@/modules/orders/interface';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
-import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
+import { formatDateInOrder, formatDateToLocalDate, timeFromNow } from '@/utils/formatDate';
 import OrderStatusBadge, { OrderStatusVietnamese } from '@/components/Badge/OrderStatusBadge';
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
@@ -15,6 +15,8 @@ import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
+import dayjs from 'dayjs';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface OrderFilter extends PaginationState {
     customer_name: string;
@@ -36,6 +38,54 @@ const OrderPage = () => {
         phone: '',
         status: 'ALL',
     });
+
+    const exportColumns: ExcelColumn[] = [
+        {
+            field: 'code',
+            header: 'Mã đơn hàng',
+        },
+        {
+            field: 'orderDate',
+            header: 'Ngày đặt',
+        },
+        {
+            field: 'deliveryDate',
+            header: 'Ngày giao',
+        },
+        {
+            field: 'customer.name',
+            header: 'Tên khách hàng',
+        },
+        {
+            field: 'customer.phone',
+            header: 'Số điện thoại',
+        },
+        {
+            field: 'customer.address',
+            header: 'Địa chỉ',
+        },
+        {
+            field: 'customer.ward',
+            header: 'Phường/Xã',
+        },
+        {
+            field: 'customer.district',
+            header: 'Quận/Huyện',
+        },
+        {
+            field: 'customer.city',
+            header: 'Tỉnh/thành phố',
+        },
+        {
+            field: 'totalPrice',
+            header: 'Tổng tiền',
+        },
+        {
+            field: 'status',
+            header: 'Trạng thái',
+            formatter: (value: OrderStatus) => OrderStatusVietnamese[value],
+        },
+    ];
 
     const orderQuery = useAllOrders({
         page: filters.page,
@@ -82,7 +132,7 @@ const OrderPage = () => {
             },
             {
                 accessorKey: 'orderDate',
-                header: 'Ngày đặt',
+                header: 'Thời gian đặt',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{formatDateInOrder(row.original.orderDate)}</div>
@@ -95,8 +145,27 @@ const OrderPage = () => {
                 header: 'Ngày giao',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{formatDateInOrder(row.original.orderDate)}</div>
-                        <div className="text-xs text-gray-700">{timeFromNow(row.original.orderDate)}</div>
+                        <div>{formatDateToLocalDate(row.original.orderDate)}</div>
+                        {row.original.status === OrderStatus.PENDING && (
+                            <div className={`text-xs ${
+                                dayjs(row.original.orderDate).isSame(dayjs(), 'day')
+                                    ? 'text-yellow-500'
+                                    : dayjs(row.original.orderDate).isAfter(dayjs())
+                                        ? 'text-gray-600'
+                                        : 'text-red-600'
+                            }`}>
+                                {(() => {
+                                    const orderDate = dayjs(row.original.orderDate);
+                                    if (orderDate.isSame(dayjs(), 'day')) {
+                                        return 'Giao trong ngày';
+                                    }
+                                    if (orderDate.isAfter(dayjs())) {
+                                        return `${timeFromNow(row.original.orderDate)}`;
+                                    }
+                                    return `Quá hạn giao`;
+                                })()}
+                            </div>
+                        )}
                     </div>
                 ),
             },
@@ -117,7 +186,7 @@ const OrderPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/orders/${row.original.code}`} />
-                        <ButtonAction.Update href={`/orders/${row.original.code}/edit`}/>
+                        <ButtonAction.Update href={`/orders/${row.original.code}/edit`} />
                     </div>
                 ),
                 enableSorting: false,
@@ -126,8 +195,8 @@ const OrderPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
-
+    const handleExportExcel = async () => {
+        await exportToExcel<OrderOverview>(orders, exportColumns, 'don-hang.xlsx');
     };
 
     return (

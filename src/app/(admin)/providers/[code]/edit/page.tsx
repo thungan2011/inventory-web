@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import { Form, Formik, useFormikContext } from 'formik';
+import { Form, Formik } from 'formik';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
 import { object, string } from 'yup';
@@ -10,7 +10,7 @@ import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import Select from '@/components/Select';
-import { BaseStatus, BaseStatusVietnamese } from '@/modules/base/interface';
+import { BaseStatus, BaseStatusVietnamese, IAddressForm } from '@/modules/base/interface';
 import TextArea from '@/components/TextArea';
 import { useProviderByCode, useUpdateProvider } from '@/modules/providers/repository';
 import { useParams, useRouter } from 'next/navigation';
@@ -19,7 +19,7 @@ import { ProviderOverview } from '@/modules/providers/interface';
 import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
 
-const ProductSchema = object({
+const ProviderSchema = object({
     name: string().required('Tên không được để trống'),
     phone: string().required('Số điện thoại không được để trống'),
     address: string().required('Địa chỉ không được để trống'),
@@ -30,14 +30,10 @@ const ProductSchema = object({
     representative_phone: string().required('Số điện thoại người liên hệ không được để trống'),
 });
 
-interface FormValues {
+interface FormValues extends IAddressForm{
     code?: string;
     name: string;
     phone: string;
-    address: string;
-    ward: string;
-    district: string;
-    city: string;
     website?: string;
     email?: string;
     representative_name: string;
@@ -53,8 +49,6 @@ interface FormContentProps {
 }
 
 const FormContent = ({ isLoading, provider }: FormContentProps) => {
-    const { setFieldValue } = useFormikContext<FormValues>();
-
     return (
         <Form>
             <div className="mt-5">
@@ -73,11 +67,7 @@ const FormContent = ({ isLoading, provider }: FormContentProps) => {
                                required />
                         <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại" required />
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                        <AddressForm city={provider.city || ''}
-                                     district={provider.district || ''}
-                                     ward={provider.ward || ''}
-                                     setFieldValue={setFieldValue}
-                        />
+                        <AddressForm />
                         <Input name="email" label="Email" placeholder="Nhập Email nhà cung cấp" />
                         <Input name="website" label="Website" placeholder="Nhập Website nhà cung cấp" />
                         <Select name="status" label="Trạng thái" options={[
@@ -140,9 +130,12 @@ const NewProviderPage = () => {
         name: provider.name,
         phone: provider.phone,
         address: provider.address,
-        ward: provider.ward,
-        district: provider.district,
-        city: provider.city,
+        ward: provider.ward.split(' - ')[0],
+        wardCode: provider.ward.split(' - ')[1],
+        district: provider.ward.split(' - ')[0],
+        districtCode: provider.district.split(' - ')[1],
+        city: provider.ward.split(' - ')[0],
+        cityCode: provider.city.split(' - ')[1],
         email: provider.email,
         website: provider.website,
         representative_name: provider.representativeName,
@@ -171,7 +164,7 @@ const NewProviderPage = () => {
     return (
         <div className="mt-5">
             <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
-                    validationSchema={ProductSchema}>
+                    validationSchema={ProviderSchema}>
                 <FormContent isLoading={updateProvider.isPending} provider={provider} />
             </Formik>
         </div>
