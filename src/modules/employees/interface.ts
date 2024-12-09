@@ -19,6 +19,7 @@ export interface EmployeeOverview {
     district: string;
     ward: string;
     status: EmployeeStatus,
+    roleName: string;
 }
 
 export type EmployeeDetail = EmployeeOverview

@@ -13,6 +13,8 @@ export const EMPLOYEE_QUERY_KEY = 'employees';
 interface FetchAllEmployeeParams {
     page?: number;
     first_name?: string;
+    status?: EmployeeStatus;
+    phone?: string;
 }
 
 const getAllEmployees = (params: FetchAllEmployeeParams): Promise<PageObject<EmployeeOverview>> => {

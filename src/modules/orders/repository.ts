@@ -19,7 +19,7 @@ interface FetchAllOrderParams {
 }
 
 const getAllOrders = (params: FetchAllOrderParams): Promise<PageObject<OrderOverview>> => {
-    return httpRepository.get<PageObject<OrderOverview>>('/v1/orders', {...params});
+    return httpRepository.get<PageObject<OrderOverview>>('/v1/orders', { ...params });
 };
 
 export const useAllOrders = (params: FetchAllOrderParams) => {
@@ -89,23 +89,18 @@ export const useCreateOrder = () => {
  * update order
  */
 interface UpdateOrderPayload {
-    customer_id: number;
-    status: OrderStatus;
     phone: string;
     address: string;
     city: string;
     district: string;
     ward: string;
-    delivery_date: string;
-    payment_method: PaymentMethod;
-    products: {
-        product_id: number;
-        quantity: number;
-    }[];
+    delivery_type: DeliveryType;
+    discount_percent: number;
+    shipping_fee: number;
 }
 
 const updateOrder = ({ id, payload }: { payload: UpdateOrderPayload, id: number }): Promise<void> => {
-    return httpRepository.put<void>(`/v1/orders/${id}`, payload);
+    return httpRepository.put<void, UpdateOrderPayload>(`/v1/orders/${id}`, payload);
 };
 
 export const useUpdateOrder = () => {
@@ -114,7 +109,33 @@ export const useUpdateOrder = () => {
         mutationFn: updateOrder,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY] });
-            toast.success('Cập nhật đơn hàng thành công');
+        },
+        onError: () => {
+            toast.error('Cập nhật đơn hàng không thành công. Thử lại sau.');
+        },
+    });
+};
+
+/**
+ * update order details
+ */
+interface UpdateOrderDetailPayload {
+    products: {
+        product_id: number;
+        quantity: number;
+    }[];
+}
+
+const updateOrderDetail = ({ code, payload }: { payload: UpdateOrderDetailPayload, code: string }): Promise<void> => {
+    return httpRepository.put<void, UpdateOrderDetailPayload>(`/v1/orders/${code}/detail`, payload);
+};
+
+export const useUpdateOrderDetail = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: updateOrderDetail,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [ORDER_QUERY_KEY] });
         },
         onError: () => {
             toast.error('Cập nhật đơn hàng không thành công. Thử lại sau.');

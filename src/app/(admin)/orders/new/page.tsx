@@ -39,7 +39,7 @@ const DELIVERY_METHODS = {
 
 const DELIVERY_METHOD_OPTIONS: SelectProps['options'] = [
     { label: 'Tự đến lấy', value: DELIVERY_METHODS.STORE_PICKUP },
-    { label: 'Giao hàng', value: DELIVERY_METHODS.SHIPPING },
+    { label: 'Giao hàng tận nơi', value: DELIVERY_METHODS.SHIPPING },
 ];
 
 interface Product {
