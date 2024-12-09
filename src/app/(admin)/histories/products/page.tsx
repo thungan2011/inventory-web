@@ -18,11 +18,53 @@ import ProductActionTypeBadge from '@/components/Badge/ProductActionTypeBadge';
 import { useAllStorageAreas } from '@/modules/storage-area/repository';
 import { StorageAreaStatus, StorageAreaType } from '@/modules/storage-area/interface';
 import Select, { SelectProps } from '@/components/Select';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
+import { MaterialActionType, MaterialActionTypeVietnamese } from '@/modules/material-histories/inteface';
 
 interface MaterialHistoryFilter extends PaginationState {
     searchProduct: string;
     storageAreaId: number | 'ALL';
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'productStorageHistory.product.sku',
+        header: 'SKU',
+    },
+    {
+        field: 'productStorageHistory.product.name',
+        header: 'Thành phẩm',
+    },
+    {
+        field: 'productStorageHistory.product.weight',
+        header: 'Khối lượng',
+    },
+    {
+        field: 'productStorageHistory.product.unit',
+        header: 'Đơn vị',
+    },
+    {
+        field: 'quantityBefore',
+        header: 'Số lượng trước',
+    },
+    {
+        field: 'quantityChange',
+        header: 'Số lượng thay đổi',
+    },
+    {
+        field: 'quantityAfter',
+        header: 'Số lượng sau',
+    },
+    {
+        field: 'productStorageHistory.product.packing',
+        header: 'Đóng gói',
+    },
+    {
+        field: 'actionType',
+        header: 'Loại',
+        formatter: (value: MaterialActionType) => MaterialActionTypeVietnamese[value],
+    },
+];
 
 const ProductHistoryPage = () => {
     const [storageAreaSearchTerm, setStorageAreaSearchTerm] = useState<string>('');
@@ -155,7 +197,8 @@ const ProductHistoryPage = () => {
         [],
     );
 
-    const handleExportExcel = () => {
+    const handleExportExcel = async () => {
+        await exportToExcel<ProductHistoryOverview>(histories, exportColumns, 'lich-su-giao-dich-thanh-pham.xlsx');
     };
 
 

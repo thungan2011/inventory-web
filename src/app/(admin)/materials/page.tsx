@@ -23,6 +23,54 @@ interface MaterialFilter extends PaginationState {
     origin: string;
 }
 
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'sku',
+        header: 'SKU',
+    },
+    {
+        field: 'name',
+        header: 'Tên nguyên vật liệu',
+    },
+    {
+        field: 'origin',
+        header: 'Xuất xứ',
+    },
+    {
+        field: 'weight',
+        header: 'Khối lượng',
+    },
+    {
+        field: 'unit',
+        header: 'Đơn vị',
+    },
+    {
+        field: 'packing',
+        header: 'Đóng gói',
+    },
+    {
+        field: 'quantityAvailable',
+        header: 'Số lượng khả dụng',
+    },
+    {
+        field: 'minimumStockLevel',
+        header: 'Số lượng cảnh báo tối thiểu',
+    },
+    {
+        field: 'maximumStockLevel',
+        header: 'Số lượng cảnh báo tối đa',
+    },
+    {
+        field: 'note',
+        header: 'Ghi chú',
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: MaterialStatus) => MaterialStatusVietnamese[value],
+    },
+];
+
 const MaterialPage = () => {
 
     useEffect(() => {
@@ -35,54 +83,6 @@ const MaterialPage = () => {
         origin: '',
         status: 'ALL',
     });
-
-    const exportColumns: ExcelColumn[] = [
-        {
-            field: 'sku',
-            header: 'SKU',
-        },
-        {
-            field: 'name',
-            header: 'Tên nguyên vật liệu',
-        },
-        {
-            field: 'origin',
-            header: 'Xuất xứ',
-        },
-        {
-            field: 'weight',
-            header: 'Khối lượng',
-        },
-        {
-            field: 'unit',
-            header: 'Đơn vị',
-        },
-        {
-            field: 'packing',
-            header: 'Đóng gói',
-        },
-        {
-            field: 'quantityAvailable',
-            header: 'Số lượng khả dụng',
-        },
-        {
-            field: 'minimumStockLevel',
-            header: 'Số lượng cảnh báo tối thiểu',
-        },
-        {
-            field: 'maximumStockLevel',
-            header: 'Số lượng cảnh báo tối đa',
-        },
-        {
-            field: 'note',
-            header: 'Ghi chú',
-        },
-        {
-            field: 'status',
-            header: 'Trạng thái',
-            formatter: (value: MaterialStatus) => MaterialStatusVietnamese[value],
-        },
-    ];
 
     const materialQuery = useAllMaterials({
         page: filters.page,

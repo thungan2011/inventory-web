@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { ColumnDef } from '@tanstack/table-core';
-import { exportToExcel } from '@/utils/exportToExcel';
+import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 import { formatDateToLocalDate } from '@/utils/formatDate';
 import Card from '@/components/Card';
@@ -30,6 +30,36 @@ interface ExportMaterialFilter extends PaginationState {
     type: ExportMaterialType | 'ALL';
     status: ExportMaterialStatus | 'ALL';
 }
+
+const exportColumns: ExcelColumn[] = [
+    {
+        field: 'id',
+        header: 'ID',
+    },
+    {
+        field: 'code',
+        header: 'Mã giao dịch',
+    },
+    {
+        field: 'type',
+        header: 'Loại',
+        formatter: (value: ExportMaterialType) => ExportMaterialTypeVietnamese[value],
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: ExportMaterialStatus) => ExportMaterialStatusVietnamese[value],
+    },
+    {
+        field: 'createdAt',
+        header: 'Ngày tạo',
+    },
+    {
+        field: 'note',
+        header: 'Ghi chú',
+    },
+
+];
 
 const ExportMaterialPage = () => {
     const initialFilterValues: ExportMaterialFilter = {
@@ -116,7 +146,7 @@ const ExportMaterialPage = () => {
     );
 
     const handleExportExcel = async () => {
-        await exportToExcel<ExportMaterialOverview>(exportMaterials, [], 'importMaterials.xlsx');
+        await exportToExcel<ExportMaterialOverview>(exportMaterials, exportColumns, 'xuat-kho-nguyen-vat-lieu.xlsx');
     };
 
     const typeOptions : SelectProps['options'] = [

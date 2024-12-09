@@ -9,6 +9,7 @@ import Loader from '@/components/Loader';
 import NotFound from '@/components/NotFound';
 import { useProviderByCode } from '@/modules/providers/repository';
 import { BaseStatusVietnamese } from '@/modules/base/interface';
+import { formatAddress } from '@/utils/formatString';
 
 const ProviderDetail = () => {
     const { code } = useParams<{ code: string }>();
@@ -41,7 +42,7 @@ const ProviderDetail = () => {
                                   label="Số điện thoại"
                                   value={provider.phone || 'Chưa cập nhật'} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3" label="Địa chỉ"
-                                  value={`${provider.address}, ${provider.ward}, ${provider.district}, ${provider.city}`} />
+                                  value={formatAddress(provider.address, provider.ward, provider.district, provider.city)} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3" label="Email"
                                   value={provider.email || 'Chưa cập nhật'} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3" label="Website"

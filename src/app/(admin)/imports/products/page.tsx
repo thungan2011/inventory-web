@@ -31,16 +31,40 @@ interface ImportProductFilter extends PaginationState {
 }
 
 const exportColumns: ExcelColumn[] = [
-    { field: 'code', header: 'Mã phiếu nhập' },
+    {
+        field: 'id',
+        header: 'ID',
+    },
+    {
+        field: 'code',
+        header: 'Mã giao dịch',
+    },
+    {
+        field: 'type',
+        header: 'Loại',
+        formatter: (value: ImportProductType) => ImportMaterialTypeVietnamese[value],
+    },
+    {
+        field: 'status',
+        header: 'Trạng thái',
+        formatter: (value: ImportProductStatus) => ImportProductStatusVietnamese[value],
+    },
     {
         field: 'createdAt',
-        header: 'Ngày lập phiếu',
-        formatter: (value: Date) => formatDateToLocalDate(value),
+        header: 'Ngày tạo',
     },
-    { field: 'type', header: 'Loại giao dịch' },
-    { field: 'status', header: 'Trạng thái' },
-    { field: 'note', header: 'Ghi chú' },
-    { field: 'creator.fullName', header: 'Người lập phiếu' },
+    {
+        field: 'creator.fullName',
+        header: 'Người tạo',
+    },
+    {
+        field: 'receiver.fullName',
+        header: 'Người nhận',
+    },
+    {
+        field: 'note',
+        header: 'Ghi chú',
+    },
 ];
 
 const ImportProductPage = () => {
@@ -51,6 +75,7 @@ const ImportProductPage = () => {
         type: 'ALL',
         status: 'ALL',
     };
+
     const [filters, setFilters] = useState<ImportProductFilter>(initialFilterValues);
     const importProductQuery = useAllImportProducts({
         page: filters.page,
@@ -119,7 +144,6 @@ const ImportProductPage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/imports/products/${row.original.code}`} />
-                        {/*<ButtonAction.Update />*/}
                     </div>
                 ),
                 enableSorting: false,
@@ -129,7 +153,7 @@ const ImportProductPage = () => {
     );
 
     const handleExportExcel = async () => {
-        await exportToExcel<ImportProductOverview>(importProducts, exportColumns, 'ds-nhap-kho-nguyen-lieu.xlsx');
+        await exportToExcel<ImportProductOverview>(importProducts, exportColumns, 'nhap-kho-thanh-pham.xlsx');
     };
 
 

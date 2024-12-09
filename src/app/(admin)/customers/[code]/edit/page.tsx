@@ -20,7 +20,7 @@ import NotFound from '@/components/NotFound';
 import AddressForm from '@/components/AddressForm';
 import dayjs from 'dayjs';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
-import { Gender, GenderVietnamese } from '@/modules/base/interface';
+import { Gender, GenderVietnamese, IAddressForm } from '@/modules/base/interface';
 import { useGroupCustomerList } from '@/modules/group-customers/repository';
 
 const CustomerSchema = object({
@@ -33,16 +33,12 @@ const CustomerSchema = object({
     birthday: string().nullable(),
 });
 
-interface FormValues {
+interface FormValues extends IAddressForm {
     code?: string;
     name: string;
     phone: string;
     gender: Gender;
     birthday?: Date;
-    address?: string;
-    ward?: string;
-    district?: string;
-    city?: string;
     email?: string;
     status: CustomerStatus;
     note: string;
@@ -149,19 +145,22 @@ const NewCustomerPage = () => {
     }
 
     const initialFormValues: FormValues = {
+        cityCode: customer.city ? customer.city.split(' - ')[1] : '',
+        districtCode: customer.district ? customer.district.split(' - ')[1] : '',
+        wardCode: customer.ward ? customer.ward.split(' - ')[1] : '',
         code: customer.code,
         name: customer.name,
         phone: customer.phone,
         birthday: dayjs(customer.birthday).toDate() || undefined,
-        address: customer.address,
-        ward: customer.ward,
-        district: customer.district,
-        city: customer.city,
+        address: customer.address || '',
+        ward: customer.ward ? customer.ward.split(' - ')[0] : '',
+        district: customer.district ? customer.district.split(' - ')[0] : '',
+        city: customer.city ? customer.city.split(' - ')[0] : '',
         email: customer.email,
         status: customer.status,
         note: customer.note || '',
         gender: customer.gender == 0 ? Gender.FEMALE : Gender.MALE,
-        groupCustomer: customer.groupCustomer.id,
+        groupCustomer: customer.groupCustomer.id
     };
 
     const handleSubmit = async (values: FormValues) => {
@@ -173,7 +172,10 @@ const NewCustomerPage = () => {
                 payload: {
                     ...values,
                     birthday: values.birthday ? dayjs(values.birthday).format('YYYY-MM-DD') : undefined,
-                    gender: values.gender === Gender.MALE ? 2 : values.gender === Gender.FEMALE ? 1 : 3
+                    gender: values.gender === Gender.MALE ? 2 : values.gender === Gender.FEMALE ? 1 : 3,
+                    city: `${values.city} - ${values.cityCode}`,
+                    district: `${values.district} - ${values.districtCode}`,
+                    ward: `${values.ward} - ${values.wardCode}`,
                 },
             });
             router.push('/customers');

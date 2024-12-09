@@ -10,7 +10,7 @@ import NotFound from '@/components/NotFound';
 import { useCustomerByCode } from '@/modules/customers/repository';
 import { CustomerStatusVietnamese } from '@/components/Badge/CustomerStatusBadge';
 import { formatDateToLocalDate } from '@/utils/formatDate';
-import { formatGender } from '@/utils/formatString';
+import { formatAddress, formatGender } from '@/utils/formatString';
 
 const CustomerDetail = () => {
 
@@ -57,11 +57,7 @@ const CustomerDetail = () => {
                             colSpan1="col-span-2"
                             colSpan2="col-span-3"
                             label="Địa chỉ"
-                            value={
-                                customer.address || customer.ward || customer.district || customer.city
-                                    ? `${customer.address || ''}, ${customer.ward || ''}, ${customer.district || ''}, ${customer.city || ''}`
-                                    : 'Chưa cập nhật'
-                            }
+                            value={formatAddress(customer.address, customer.ward, customer.district, customer.city)}
                         />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3" label="Email"
                                   value={customer.email || 'Chưa cập nhật'} />
