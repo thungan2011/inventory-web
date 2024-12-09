@@ -11,7 +11,6 @@ export interface EmployeeOverview {
     lastName: string;
     firstName: string;
     gender: number;
-    email: string;
     phone: string;
     birthday: Date;
     address: string;
@@ -20,6 +19,10 @@ export interface EmployeeOverview {
     ward: string;
     status: EmployeeStatus,
     roleName: string;
+    user: {
+        roleId: number;
+        email: string;
+    }
 }
 
 export type EmployeeDetail = EmployeeOverview

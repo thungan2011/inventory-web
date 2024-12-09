@@ -138,6 +138,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                         <AddressForm />
                         <div className="grid grid-cols-2 gap-3">
                             <Select name="role"
+                                    disabled
                                     required
                                     label="Chức vụ"
                                     options={roleOptions}
@@ -167,7 +168,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                     </ButtonIcon>
                 </Link>
                 <ButtonIcon icon={<FaSave />} type="submit">
-                    {isLoading ? 'Đang tạo...' : 'Tạo mới'}
+                    {isLoading ? 'Đang cập nhật...' : 'Cập nhật'}
                 </ButtonIcon>
             </div>
         </Form>
@@ -209,8 +210,8 @@ const UpdateEmployeePage = () => {
         address: employee.address,
         city: employee.city ? employee.city.split(' - ')[0] : '',
         cityCode: employee.city ? employee.city.split(' - ')[1] : '',
-        email: employee.email,
-        role: 2,
+        email: employee.user.email,
+        role: employee.user.roleId,
         status: employee.status,
     };
 

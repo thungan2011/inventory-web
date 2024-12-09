@@ -45,6 +45,7 @@ type SubmitDeleteButtonProps = {
 }
 
 type CancelButtonProps = {
+    text?: string;
     onClick?: MouseEventHandler<HTMLButtonElement>
 }
 
@@ -141,13 +142,13 @@ const ButtonAction = {
                 onClick={onClick} type="button">Xóa</button>
         );
     },
-    Cancel: ({ onClick }: CancelButtonProps) => {
+    Cancel: ({ onClick, text = "Hủy" }: CancelButtonProps) => {
         return (
             <button
                 className="bg-smoke-300 py-1.5 px-2 rounded flex items-center justify-center text-gray-800 gap-x-2 text-sm"
                 onClick={onClick} type="button"
             >
-                Hủy
+                {text}
             </button>
         );
     },

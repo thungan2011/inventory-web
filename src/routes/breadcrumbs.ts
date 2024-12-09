@@ -365,11 +365,11 @@ export const breadcrumbs: IBreadcrumb[] = [
     },
     {
         label: 'Chi tiết nhân viên',
-        link: '^/employees/[^/]+$',
+        link: '^/employees/[^/]+/edit$',
         breadcrumbTrail: [
             { label: 'Nhân viên' },
             { label: 'Danh sách nhân viên', link: "/employees" },
-            { label: 'Chi tiết' },
+            { label: 'Cập nhật' },
         ],
     },
     {
