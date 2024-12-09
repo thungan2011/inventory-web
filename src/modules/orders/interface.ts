@@ -29,7 +29,7 @@ export enum DeliveryType {
 }
 
 export interface OrderOverview {
-    id: string;
+    id: number;
     code: string;
     phone: string;
     address: string;
