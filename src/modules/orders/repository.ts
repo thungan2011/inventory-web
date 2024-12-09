@@ -59,6 +59,7 @@ interface AddOrderPayload {
     district: string;
     ward: string;
     delivery_date: string;
+    note?: string;
     payment_method: PaymentMethod;
     products: {
         product_id: number;

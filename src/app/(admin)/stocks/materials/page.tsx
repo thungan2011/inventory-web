@@ -97,7 +97,7 @@ const WarehouseAreaMaterialPage = () => {
                 header: 'Ngày hết hạn',
                 cell: ({ row }) => {
                     const isExpired = dayjs(row.original.expiryDate).isBefore(dayjs());
-                    const isNearExpiry = dayjs(row.original.expiryDate).isBefore(dayjs().add(1, 'month'));
+                    const isNearExpiry = dayjs(row.original.expiryDate).isBefore(dayjs().add(3, 'month'));
 
                     return (
                         <div className="flex flex-col gap-2">
