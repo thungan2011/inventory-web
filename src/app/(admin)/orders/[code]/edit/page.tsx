@@ -58,8 +58,11 @@ interface FormValues {
     receiverPhone: string;
     receiverAddress: string;
     ward: string;
+    wardCode: string;
     district: string;
+    districtCode: string;
     city: string;
+    cityCode: string;
     shippingFee: number;
     totalPayment: number;
     totalPrice: number;
@@ -338,11 +341,7 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
                                                placeholder="Nhập địa chỉ"
                                                required
                                         />
-                                        <AddressForm city={values.city}
-                                                     district={values.district}
-                                                     ward={values.ward}
-                                                     setFieldValue={setFieldValue}
-                                        />
+                                        <AddressForm />
                                     </>
                                 )
                             }
@@ -409,8 +408,8 @@ const FormContent = ({ isLoading, order }: FormContentProps) => {
                                 />
                                 <Input name="discountPercent"
                                        label="Chiết khấu"
-                                       placeholder="Nhập thuế GTGT"
-                                       tooltip="Nếu không nhập thuế GTGT sẽ tự động tính toán với tỷ lệ 10% trên tổng hóa đơn."
+                                       placeholder="Nhập chiết khấu"
+                                       unit="%"
                                 />
                                 <InputCurrency name="totalPayment"
                                                label="Thanh toán"
@@ -458,9 +457,12 @@ const UpdateOrderPage = () => {
         receiverName: order.customer.name,
         receiverPhone: order.phone,
         receiverAddress: order.address,
-        ward: order.ward,
-        district: order.district,
-        city: order.city,
+        ward: order.ward.split(' - ')[0],
+        wardCode: order.ward.split(' - ')[1],
+        district: order.district.split(' - ')[0],
+        districtCode: order.district.split(' - ')[1],
+        city: order.city.split(' - ')[0],
+        cityCode: order.city.split(' - ')[1],
         shippingFee: order.shippingFee,
         totalPayment: 0,
         totalPrice: order.totalPrice,

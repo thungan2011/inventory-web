@@ -46,6 +46,7 @@ interface Product {
     id: number;
     name: string;
     quantity: number;
+    quantityAvailable: number;
     price: number;
     sku: string;
     weight: number;
@@ -60,8 +61,11 @@ interface FormValues {
     receiverPhone: string;
     receiverAddress: string;
     ward: string;
+    wardCode: string;
     district: string;
+    districtCode: string;
     city: string;
+    cityCode: string;
     shippingFee: number;
     totalPayment: number;
     totalPrice: number;
@@ -79,8 +83,11 @@ const initialFormValues: FormValues = {
     receiverPhone: '',
     receiverAddress: '',
     ward: '',
+    wardCode: '',
     district: '',
+    districtCode: '',
     city: '',
+    cityCode: '',
     shippingFee: 0,
     totalPayment: 0,
     totalPrice: 0,
@@ -192,6 +199,8 @@ const ProductTable = ({ products }: ProductTableProps) => {
                                     <TableCore.Cell>
                                         <InputCurrency name={`products.${index}.quantity`}
                                                        placeholder="Nhập số lượng"
+                                                       max={product.quantityAvailable}
+                                                       min={0}
                                                        step={1}
                                                        wrapperClassName="mb-0"
                                                        onChange={(value) => handleQuantityChange(index, value)}
@@ -266,7 +275,8 @@ const FormContent = ({ isLoading }: FormContentProps) => {
         return productQuery.data.data.filter(product => {
             const hasValidPrice = product.prices && product.prices.length > 0;
             const isNotInCart = !values.products.find(p => p.id === product.id);
-            return hasValidPrice && isNotInCart;
+            const hasAvailableStock = product.quantityAvailable > 0;
+            return hasValidPrice && isNotInCart && hasAvailableStock;
         });
     }, [productQuery.data, values.products]);
 
@@ -307,6 +317,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                 id: product.id,
                 sku: product.sku,
                 quantity: 1,
+                quantityAvailable: product.quantityAvailable,
                 price: product.prices[0].price,
                 name: product.name,
                 image: product.image,
@@ -331,6 +342,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                     <Select name="customerId" label="Khách hàng"
                                             options={customerOptions}
                                             placeholder="Chọn khách hàng"
+                                            searchPlaceholder="Tìm theo tên..."
                                             enableSearch={true}
                                             onSearch={setCustomerSearchTerm}
                                     />
@@ -370,11 +382,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                                placeholder="Nhập địa chỉ"
                                                required
                                         />
-                                        <AddressForm city={values.city}
-                                                     district={values.district}
-                                                     ward={values.ward}
-                                                     setFieldValue={setFieldValue}
-                                        />
+                                        <AddressForm />
                                     </>
                                 )
                             }
@@ -444,6 +452,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                        label="Chiết khấu"
                                        placeholder="Nhập chiếc khấu"
                                        tooltip="Nếu không nhập thuế GTGT sẽ tự động tính toán với tỷ lệ 10% trên tổng hóa đơn."
+                                       unit="%"
                                 />
                                 <InputCurrency name="totalPayment"
                                                label="Thanh toán"
@@ -491,10 +500,11 @@ const NewOrderPage = () => {
                 phone: values.receiverPhone,
                 products: values.products.map(product => ({ product_id: product.id, quantity: product.quantity })),
                 customer_id: values.customerId || 1,
-                city: values.city,
-                district: values.district,
-                ward: values.ward,
+                city: `${values.city} - ${values.cityCode}`,
+                district: `${values.district} - ${values.districtCode}`,
+                ward: `${values.ward} - ${values.wardCode}`,
                 status: OrderStatus.PENDING,
+                note: values.note,
             });
             router.push('/orders');
         } catch (error) {

@@ -96,7 +96,7 @@ const WarehouseAreaProductPage = () => {
                 header: 'Ngày hết hạn',
                 cell: ({ row }) => {
                     const isExpired = dayjs(row.original.expiryDate).isBefore(dayjs());
-                    const isNearExpiry = dayjs(row.original.expiryDate).isBefore(dayjs().add(1, 'month'));
+                    const isNearExpiry = dayjs(row.original.expiryDate).isBefore(dayjs().add(3, 'month'));
 
                     return (
                         <div className="flex flex-col gap-2">
@@ -142,7 +142,6 @@ const WarehouseAreaProductPage = () => {
     const handleExportExcel = () => {
         exportToExcel<WarehouseAreaProductOverview>(warehouseAreaProducts, [], 'warehouseAreaProducts.xlsx');
     };
-
 
     return (
         <>

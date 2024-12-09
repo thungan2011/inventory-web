@@ -5,7 +5,7 @@ import Card from '@/components/Card';
 import Table from '@/components/Tables';
 import { OrderOverview, OrderStatus } from '@/modules/orders/interface';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
-import { formatDateInOrder, timeFromNow } from '@/utils/formatDate';
+import { formatDateInOrder, formatDateToLocalDate, timeFromNow } from '@/utils/formatDate';
 import OrderStatusBadge, { OrderStatusVietnamese } from '@/components/Badge/OrderStatusBadge';
 import ButtonAction from '@/components/ButtonAction';
 import useFilterPagination, { PaginationState } from '@/hook/useFilterPagination';
@@ -15,6 +15,7 @@ import Typography from '@/components/Typography';
 import Input from '@/components/Filters/Input';
 import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
+import dayjs from 'dayjs';
 import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 
 interface OrderFilter extends PaginationState {
@@ -131,7 +132,7 @@ const OrderPage = () => {
             },
             {
                 accessorKey: 'orderDate',
-                header: 'Ngày đặt',
+                header: 'Thời gian đặt',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
                         <div>{formatDateInOrder(row.original.orderDate)}</div>
@@ -144,8 +145,27 @@ const OrderPage = () => {
                 header: 'Ngày giao',
                 cell: ({ row }) => (
                     <div className="flex flex-col gap-2">
-                        <div>{formatDateInOrder(row.original.orderDate)}</div>
-                        <div className="text-xs text-gray-700">{timeFromNow(row.original.orderDate)}</div>
+                        <div>{formatDateToLocalDate(row.original.orderDate)}</div>
+                        {row.original.status === OrderStatus.PENDING && (
+                            <div className={`text-xs ${
+                                dayjs(row.original.orderDate).isSame(dayjs(), 'day')
+                                    ? 'text-yellow-500'
+                                    : dayjs(row.original.orderDate).isAfter(dayjs())
+                                        ? 'text-gray-600'
+                                        : 'text-red-600'
+                            }`}>
+                                {(() => {
+                                    const orderDate = dayjs(row.original.orderDate);
+                                    if (orderDate.isSame(dayjs(), 'day')) {
+                                        return 'Giao trong ngày';
+                                    }
+                                    if (orderDate.isAfter(dayjs())) {
+                                        return `${timeFromNow(row.original.orderDate)}`;
+                                    }
+                                    return `Quá hạn giao`;
+                                })()}
+                            </div>
+                        )}
                     </div>
                 ),
             },

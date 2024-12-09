@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect } from 'react';
-import { Form, Formik, useFormikContext } from 'formik';
+import { Form, Formik } from 'formik';
 import Input from '@/components/Input';
 import Card from '@/components/Card';
 import { object, string } from 'yup';
@@ -10,7 +10,7 @@ import { FaSave } from 'react-icons/fa';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
 import Select from '@/components/Select';
-import { BaseStatus, BaseStatusVietnamese } from '@/modules/base/interface';
+import { BaseStatus, BaseStatusVietnamese, IAddressForm } from '@/modules/base/interface';
 import TextArea from '@/components/TextArea';
 import { useCreateProvider } from '@/modules/providers/repository';
 import { useRouter } from 'next/navigation';
@@ -27,13 +27,9 @@ const ProductSchema = object({
     representative_phone: string().required('Số điện thoại người liên hệ không được để trống'),
 });
 
-interface FormValues {
+interface FormValues extends IAddressForm{
     name: string;
     phone: string;
-    address: string;
-    ward: string;
-    district: string;
-    city: string;
     website?: string;
     email?: string;
     representative_name: string;
@@ -48,8 +44,11 @@ const initialFormValues: FormValues = {
     phone: '',
     address: '',
     ward: '',
+    wardCode: '',
     district: '',
+    districtCode: '',
     city: '',
+    cityCode: '',
     email: '',
     website: '',
     representative_name: '',
@@ -64,8 +63,6 @@ interface FormContentProps {
 }
 
 const FormContent = ({ isLoading }: FormContentProps) => {
-    const { setFieldValue } = useFormikContext<FormValues>();
-
     return (
         <Form>
             <div className="grid grid-cols-6 gap-x-3 mt-5">
@@ -76,7 +73,7 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                                required />
                         <Input name="phone" label="Số điện thoại" placeholder="Số điện thoại" required />
                         <Input name="address" label="Địa chỉ" placeholder="Địa chỉ" required />
-                        <AddressForm city="" district="" ward="" setFieldValue={setFieldValue} />
+                        <AddressForm />
                         <Input name="email" label="Email" placeholder="Nhập Email nhà cung cấp" />
                         <Input name="website" label="Website" placeholder="Nhập Website nhà cung cấp" />
                         <Select name="status" label="Trạng thái" options={[
@@ -127,6 +124,9 @@ const NewProviderPage = () => {
         try {
             await createProvider.mutateAsync({
                 ...values,
+                city: `${values.city} - ${values.cityCode}`,
+                district: `${values.district} - ${values.districtCode}`,
+                ward: `${values.ward} - ${values.wardCode}`,
             });
             router.push('/providers');
         } catch (error) {

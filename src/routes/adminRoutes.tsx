@@ -40,11 +40,6 @@ const adminRoutes: IAdminRoute[] = [
             { name: 'Bảng giá', path: '/products/prices' },
         ]
     },
-    // {
-    //     name: 'Combos',
-    //     path: '/combos',
-    //     icon: <FiShoppingBag />,
-    // },
     {
         name: 'Nguyên vật liệu',
         path: '/materials',

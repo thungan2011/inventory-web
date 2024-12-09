@@ -228,7 +228,7 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
         code: orderSearchTerm,
     });
 
-    const { data: order } = useOrderByCode(values.order?.split(' - ')[0]);
+    const { data: order } = useOrderByCode(values.order);
 
     const typeOptions: SelectProps['options'] = Object.keys(ExportProductType)
         .filter(type => type !== ExportProductType.OTHER)
@@ -241,7 +241,7 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
 
     const orderOptions : SelectProps['options'] = (orderQuery.data?.data || []).map(order => ({
         label: `${order.code} - ${order.customer.name} - Đặt ngày ${formatDateToLocalDate(order.orderDate)}`,
-        value: `${order.code} - ${order.id}`,
+        value: `${order.code}`,
     }));
 
     const statusOptions: SelectProps['options'] = Object.keys(ExportMaterialStatus).map(status => (
@@ -257,7 +257,8 @@ const FormSelection = ({ isLoading }: FormSelectionProps) => {
         return productQuery.data.data.filter(product => {
             const hasValidPrice = product.prices && product.prices.length > 0;
             const isNotInCart = !values.products.find(p => p.id === product.id);
-            return hasValidPrice && isNotInCart;
+            const hasAvailableStock = product.quantityAvailable > 0;
+            return hasValidPrice && isNotInCart && hasAvailableStock;
         });
     }, [productQuery.data, values.products]);
 
@@ -404,6 +405,7 @@ const NewProductPage = () => {
                         product_history_id: location.id,
                     })),
                 ),
+                order_code: values.order,
             });
             router.push('/exports/products');
         } catch (error) {

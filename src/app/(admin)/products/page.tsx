@@ -169,17 +169,16 @@ const ProductPage = () => {
                             }
                             {
                                 minimumStockLevel && quantityAvailable !== 0 && quantityAvailable <= minimumStockLevel && (
-                                    <div
-                                        className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs text-nowrap">
-                                        Cận tồn
+                                    <div className="text-yellow-500 bg-yellow-50 rounded-full px-2 py-1 text-xs">
+                                        Cận tồn (Min: {minimumStockLevel})
                                     </div>
                                 )
                             }
                             {
                                 maximumStockLevel && quantityAvailable >= maximumStockLevel && (
-                                    <div
-                                        className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs text-nowrap">Đủ
-                                        hàng</div>
+                                    <div className="text-green-500 bg-green-50 rounded-full px-2 py-1 text-xs">
+                                        Đã đủ (Max: {maximumStockLevel})
+                                    </div>
                                 )
                             }
                         </div>
