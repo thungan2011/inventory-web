@@ -6,7 +6,8 @@ export const axiosClient: AxiosInstance = axios.create({
     baseURL: CONFIG.API_BASE_URL,
     headers: {
         'Content-Type': "application/json",
-        Accept: "application/json"
+        Accept: "application/json",
+        'ngrok-skip-browser-warning': 'true'
     },
     withCredentials: false,
     transformResponse: [
