@@ -9,7 +9,7 @@ import Typography from '@/components/Typography';
 import { ButtonIcon } from '@/components/Button';
 import { TiArrowBackOutline } from 'react-icons/ti';
 import Link from '@/components/Link';
-import { DeliveryType, OrderStatus, PaymentMethod, PaymentMethodVietnamese } from '@/modules/orders/interface';
+import { DeliveryType, OrderStatus, PaymentMethod } from '@/modules/orders/interface';
 import InputCurrency from '@/components/InputCurrency';
 import TextArea from '@/components/TextArea';
 import Select, { SelectProps } from '@/components/Select';
@@ -304,9 +304,17 @@ const FormContent = ({ isLoading }: FormContentProps) => {
             setFieldValue('receiverName', selectedCustomer.name);
             setFieldValue('receiverPhone', selectedCustomer.phone);
             setFieldValue('receiverAddress', selectedCustomer.address || '');
-            setFieldValue('city', selectedCustomer.city || '');
-            setFieldValue('district', selectedCustomer.district || '');
-            setFieldValue('ward', selectedCustomer.ward || '');
+            setFieldValue('cityCode', selectedCustomer?.city?.split(' - ')[1] || '');
+
+            setTimeout(() => {
+                setFieldValue('districtCode', selectedCustomer?.district?.split(' - ')[1] || '');
+
+                // Đợi thêm 1s nữa rồi set ward
+                setTimeout(() => {
+                    setFieldValue('wardCode', selectedCustomer?.ward?.split(' - ')[1] || '');
+                }, 1000);
+
+            }, 1000);
         }
     }, [values.customerId, setFieldValue, customerQuery.data]);
 
@@ -411,25 +419,25 @@ const FormContent = ({ isLoading }: FormContentProps) => {
                             <ProductTable products={values.products} />
                         </div>
                     </Card>
-                    <Card className={`p-[18px] mt-5`}>
-                        <Typography.Title level={4}>Hình thức thanh toán</Typography.Title>
-                        <div
-                            className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 grid grid-cols-2 gap-x-3">
-                            <Select label="Đã thanh toán" name="paymentMethod" placeholder="Chọn hình thức thanh toán"
-                                    options={
-                                        Object.values(PaymentMethod).map(method => ({
-                                            label: PaymentMethodVietnamese[method],
-                                            value: method,
-                                        }))
-                                    }
-                            />
-                            <InputCurrency name="paymentAmount"
-                                           placeholder="Nhập số tiền thanh toán"
-                                           label="Số tiền đã thanh toán"
-                                           unit="VND"
-                            />
-                        </div>
-                    </Card>
+                    {/*<Card className={`p-[18px] mt-5`}>*/}
+                    {/*    <Typography.Title level={4}>Hình thức thanh toán</Typography.Title>*/}
+                    {/*    <div*/}
+                    {/*        className="border rounded-[6px] border-[rgb(236, 243, 250)] py-4 px-4.5 grid grid-cols-2 gap-x-3">*/}
+                    {/*        <Select label="Đã thanh toán" name="paymentMethod" placeholder="Chọn hình thức thanh toán"*/}
+                    {/*                options={*/}
+                    {/*                    Object.values(PaymentMethod).map(method => ({*/}
+                    {/*                        label: PaymentMethodVietnamese[method],*/}
+                    {/*                        value: method,*/}
+                    {/*                    }))*/}
+                    {/*                }*/}
+                    {/*        />*/}
+                    {/*        <InputCurrency name="paymentAmount"*/}
+                    {/*                       placeholder="Nhập số tiền thanh toán"*/}
+                    {/*                       label="Số tiền đã thanh toán"*/}
+                    {/*                       unit="VND"*/}
+                    {/*        />*/}
+                    {/*    </div>*/}
+                    {/*</Card>*/}
                 </div>
 
                 <div className="col-span-2 relative">
