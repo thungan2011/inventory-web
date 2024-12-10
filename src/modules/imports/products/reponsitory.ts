@@ -59,6 +59,7 @@ export const useImportProductByCode = (code: string) => {
  */
 interface AddImportProductPayload {
     type: ImportProductType;
+    export_receipt_id?: number;
     note: string;
     receiver_id?: number;
     products: {
