@@ -404,6 +404,7 @@ const NewProductPage = () => {
             await createImportProduct.mutateAsync({
                 type: values.type,
                 note: values.note,
+                export_receipt_id: values.type === ImportProductType.RETURN && values.receipt ? parseInt(values.receipt?.split(' - ')[1]) : undefined,
                 receiver_id: values.receiver,
                 products: values.products.flatMap(product =>
                     product.locations.map(location => ({

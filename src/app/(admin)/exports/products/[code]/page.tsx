@@ -104,7 +104,7 @@ const ExportProductDetail = () => {
                 </div>
             </Card>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid grid-cols-1 gap-4`}>
                 <Card className="p-[18px]">
                     <Typography.Title level={3}>Thông tin chung</Typography.Title>
                     <div className="flex flex-col gap-3">
@@ -121,15 +121,6 @@ const ExportProductDetail = () => {
                                   value={ExportProductStatusVietnamese[exportProduct.status]} />
                         <ItemInfo gridColumns="grid-cols-5" colSpan1="col-span-2" colSpan2="col-span-3"
                                   label="Ghi chú" value={exportProduct.note || ''} />
-                    </div>
-                </Card>
-                <Card className="p-[18px]">
-                    <Typography.Title level={3}>Thông tin khách hàng</Typography.Title>
-                    <div className="flex flex-col gap-3">
-                        <ItemInfo label="Mã khách hàng" value="NCC001" />
-                        <ItemInfo label="Tên khách hàng" value="Việt Tâm Anh" />
-                        <ItemInfo label="Số điện thoại" value="0891234567" />
-                        <ItemInfo label="Địa chỉ" value="A75/18 Bạch Đằng, phường 2, quận Tân Bình, TP Hồ Chí Minh" />
                     </div>
                 </Card>
             </div>
