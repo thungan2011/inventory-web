@@ -6,6 +6,15 @@ const formatNumberToCurrency = (num: number) => {
     return formatter + ' VND';
 };
 
+const formatNumber = (num: number): string => {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'decimal',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(num);
+};
+
 export {
     formatNumberToCurrency,
+    formatNumber,
 };
