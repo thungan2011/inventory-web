@@ -1,9 +1,6 @@
 "use client";
 import React, { useEffect } from 'react';
 import Widget from '../../../components/Widget';
-import MiniCalendar from '@/components/Calendar/MiniCalendar';
-import WeeklyRevenue from '@/components/DashBoard/WeeklyRevenue';
-import PieChartCard from '@/components/DashBoard/PieChartCard';
 import { useReport } from '@/modules/reports/repository';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
 import { IoReceiptOutline, IoStatsChartOutline } from 'react-icons/io5';
@@ -11,6 +8,7 @@ import { LuUsers } from 'react-icons/lu';
 import { RiCustomerService2Line } from 'react-icons/ri';
 import { PiGrainsLight } from 'react-icons/pi';
 import { TfiPackage } from 'react-icons/tfi';
+import ProductRevenueChart from '@/components/DashBoard/ProductRevenueChart';
 
 const Dashboard = () => {
     const { data: report } = useReport();
@@ -31,10 +29,11 @@ const Dashboard = () => {
             </div>
 
             <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
-                <WeeklyRevenue/>
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                    <PieChartCard/>
-                    <MiniCalendar/>
+                <div>
+                    <ProductRevenueChart />
+                </div>
+                <div>
+                    <ProductRevenueChart />
                 </div>
             </div>
         </div>
