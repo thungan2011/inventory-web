@@ -3,7 +3,7 @@ import React from 'react';
 import { RiMapPinUserLine, RiRoadMapLine } from 'react-icons/ri';
 import { FiCalendar, FiUsers } from 'react-icons/fi';
 import { TbPackageExport, TbPackageImport, TbShoppingBagEdit, TbShoppingBagSearch } from 'react-icons/tb';
-import { MdOutlineCategory } from 'react-icons/md';
+import { MdOutlineCategory, MdOutlineInventory } from 'react-icons/md';
 import { FaCartFlatbedSuitcase } from 'react-icons/fa6';
 import { PiWarehouse } from 'react-icons/pi';
 import { AiOutlineContainer } from 'react-icons/ai';
@@ -87,15 +87,11 @@ const adminRoutes: IAdminRoute[] = [
             { name: 'Thành phẩm', path: '/exports/products' },
         ],
     },
-    // {
-    //     name: 'Kiểm kê kho',
-    //     path: '/stock-inventorys',
-    //     icon: <MdOutlineInventory />,
-    //     children: [
-    //         { name: 'Nguyên vật liệu', path: '/stock-inventorys/materials' },
-    //         { name: 'Thành phẩm', path: '/stock-inventorys/products' },
-    //     ],
-    // },
+    {
+        name: 'Kiểm kê kho',
+        path: '/inventory-checks',
+        icon: <MdOutlineInventory />,
+    },
     {
         name: 'Lịch sử kho',
         path: '/histories',
