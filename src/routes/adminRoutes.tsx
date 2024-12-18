@@ -17,7 +17,7 @@ export type IAdminRoute = {
 
 const adminRoutes: IAdminRoute[] = [
     {
-        name: 'Dashboard',
+        name: 'Tổng quan',
         path: '/dashboard',
         icon: <LuLayoutGrid />,
     },

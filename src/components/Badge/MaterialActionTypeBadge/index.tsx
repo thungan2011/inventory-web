@@ -4,9 +4,11 @@ import { MaterialActionType, MaterialActionTypeVietnamese } from '@/modules/mate
 
 const typesColors: Record<MaterialActionType, string> = {
     [MaterialActionType.EXPORT_NORMAL]: 'text-blue-700 bg-blue-100',
-    [MaterialActionType.EXPORT_RETURN]: 'text-red-700 bg-red-100',
+    [MaterialActionType.EXPORT_CANCEL]: 'text-red-700 bg-red-100',
+    [MaterialActionType.EXPORT_RETURN]: 'text-yellow-700 bg-yellow-100',
     [MaterialActionType.IMPORT_NORMAL]: 'text-green-700 bg-green-100',
     [MaterialActionType.IMPORT_RETURN]: 'text-orange-700 bg-orange-100',
+    [MaterialActionType.CHECK]: 'text-purple-700 bg-purple-100',
 };
 
 type MaterialActionTypeBadgeProps = {

@@ -531,4 +531,13 @@ export const breadcrumbs: IBreadcrumb[] = [
             { label: 'Danh sách phiếu kiểm kho' },
         ],
     },
+    {
+        label: 'Kiểm kê kho',
+        link: '^/inventory-checks/[^/]+$',
+        breadcrumbTrail: [
+            { label: 'Kiểm kê kho' },
+            { label: 'Danh sách phiếu kiểm kho', link: '/inventory-checks' },
+            { label: 'Kiểm kê' },
+        ],
+    },
 ];
