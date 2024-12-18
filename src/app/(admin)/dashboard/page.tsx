@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Widget from '../../../components/Widget';
 import { useReport } from '@/modules/reports/repository';
 import { formatNumberToCurrency } from '@/utils/formatNumber';
@@ -9,6 +9,7 @@ import { RiCustomerService2Line } from 'react-icons/ri';
 import { PiGrainsLight } from 'react-icons/pi';
 import { TfiPackage } from 'react-icons/tfi';
 import ProductRevenueChart from '@/components/DashBoard/ProductRevenueChart';
+import WeeklyRevenueChart from '@/components/DashBoard/WeeklyRevenueChart';
 
 const Dashboard = () => {
     const { data: report } = useReport();
@@ -16,6 +17,11 @@ const Dashboard = () => {
     useEffect(() => {
         document.title = 'Nut Garden - Dashboard';
     }, []);
+
+    const dailyRevenueData = useMemo(() => ({
+        categories: report?.revenue?.map(r => r.date.slice(0, -5)) || [],
+        data: report?.revenue?.map(r => r.totalRevenue) || []
+    }), [report?.revenue]);
 
     return (
         <div>
@@ -30,7 +36,9 @@ const Dashboard = () => {
 
             <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-2">
                 <div>
-                    <ProductRevenueChart />
+                    <WeeklyRevenueChart categories={dailyRevenueData.categories}
+                                        data={dailyRevenueData.data}
+                    />
                 </div>
                 <div>
                     <ProductRevenueChart />

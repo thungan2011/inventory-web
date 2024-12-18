@@ -16,6 +16,7 @@ export interface WarehouseAreaMaterialOverview {
         description: string;
     }
     material: {
+        id: number;
         sku: string;
         name: string;
         packing: string;

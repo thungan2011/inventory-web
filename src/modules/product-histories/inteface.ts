@@ -3,6 +3,7 @@ export enum ProductActionType {
     EXPORT_CANCEL = 'EXPORT_CANCEL',
     IMPORT_NORMAL = 'IMPORT_NORMAL',
     IMPORT_RETURN = 'IMPORT_RETURN',
+    CHECK = 'CHECK'
 }
 
 export const ProductActionTypeVietnamese : Record<ProductActionType, string> = {
@@ -10,6 +11,7 @@ export const ProductActionTypeVietnamese : Record<ProductActionType, string> = {
     [ProductActionType.EXPORT_CANCEL]: 'Xuất hủy',
     [ProductActionType.IMPORT_NORMAL]: 'Nhập từ sản xuất',
     [ProductActionType.IMPORT_RETURN]: 'Nhập hoàn trả từ bán hàng',
+    [ProductActionType.CHECK]: 'Kiểm kê kho',
 };
 
 import { StorageAreaType } from '@/modules/storage-area/interface';

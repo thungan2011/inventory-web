@@ -405,7 +405,7 @@ const NewProductPage = () => {
                         product_history_id: location.id,
                     })),
                 ),
-                order_code: values.order,
+                order_code: values.type === ExportProductType.NORMAL ? values.order : undefined,
             });
             router.push('/exports/products');
         } catch (error) {

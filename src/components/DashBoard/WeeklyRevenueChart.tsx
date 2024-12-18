@@ -26,7 +26,12 @@ interface FormValues {
     dateFilter: DateFilter;
 }
 
-const ProductRevenueChart = () => {
+type WeeklyRevenueChartProps = {
+    categories: string[];
+    data: number[]
+}
+
+const WeeklyRevenueChart = ({ data, categories }: WeeklyRevenueChartProps) => {
     const today = dayjs();
     const [, setFilter] = useState<Filter>({
         startDate: today.startOf('week').format('YYYY-MM-DD'),
@@ -52,24 +57,24 @@ const ProductRevenueChart = () => {
         },
         plotOptions: {
             bar: {
-                horizontal: true,
                 borderRadius: 3,
                 borderRadiusApplication: 'end',
-                barHeight: '50%',
+                columnWidth: '50%',
+                dataLabels: {
+                    position: 'top',
+                },
             },
         },
         colors: ['#5E37FF'],
         xaxis: {
-            categories: ['Macca', 'Hạnh nhân', 'Xoài', 'Rượu', 'Mít'],
-            labels: {
-                formatter(value: string): string {
-                    return formatNumber(Number(value));
-                },
-            },
+            categories: categories,
         },
         yaxis: {
             labels: {
                 maxWidth: 100,
+                formatter(value: number): string {
+                    return formatNumber(value);
+                },
             },
         },
         grid: {
@@ -79,11 +84,11 @@ const ProductRevenueChart = () => {
 
     const series = [{
         name: 'Doanh thu',
-        data: [10000, 20000, 30000, 50000, 100000],
+        data: data,
     }];
 
     const dateFilterOptions: SelectProps['options'] = [
-        { value: DateFilter.DAY , label: 'Theo ngày' },
+        { value: DateFilter.DAY, label: 'Theo ngày' },
         { value: DateFilter.WEEK, label: 'Theo tuần' },
     ];
 
@@ -103,7 +108,8 @@ const ProductRevenueChart = () => {
 
     return (
         <Card extra="w-full py-6 px-2 text-center">
-            <div className="mb-auto flex items-center justify-between px-6 sm-max:flex-col sm-max:items-start sm-max:px-0">
+            <div
+                className="mb-auto flex items-center justify-between px-6 sm-max:flex-col sm-max:items-start sm-max:px-0">
                 <h2 className="text-lg font-bold text-navy-700 dark:text-white">
                     Top 10 doanh thu theo thành phẩm
                 </h2>
@@ -111,7 +117,7 @@ const ProductRevenueChart = () => {
                     <Formik initialValues={{ dateFilter: DateFilter.WEEK }} onSubmit={handleFilterChange}>
                         <Form>
                             <Select name="dateFilter" options={dateFilterOptions} />
-                            <AutoSubmitForm/>
+                            <AutoSubmitForm />
                         </Form>
                     </Formik>
                 </div>
@@ -123,4 +129,4 @@ const ProductRevenueChart = () => {
     );
 };
 
-export default ProductRevenueChart;
+export default WeeklyRevenueChart;

@@ -1,8 +1,29 @@
+import { StorageAreaType } from '@/modules/storage-area/interface';
+
 export interface InventoryCheckOverview {
     id: number;
     checkDate: Date;
     note: string;
     status: InventoryCheckStatus;
+    storageArea: {
+        id: number;
+        code: string;
+        name: string;
+        type: StorageAreaType;
+    };
+}
+
+export interface InventoryCheckDetail {
+    id: number;
+    checkDate: Date;
+    note: string;
+    status: InventoryCheckStatus;
+    storageArea: {
+        id: number;
+        code: string;
+        name: string;
+        type: StorageAreaType;
+    };
 }
 
 export enum InventoryCheckStatus {

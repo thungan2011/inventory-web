@@ -7,6 +7,7 @@ const typesColors: Record<ProductActionType, string> = {
     [ProductActionType.EXPORT_CANCEL]: 'text-red-700 bg-red-100',
     [ProductActionType.IMPORT_NORMAL]: 'text-green-700 bg-green-100',
     [ProductActionType.IMPORT_RETURN]: 'text-orange-700 bg-orange-100',
+    [ProductActionType.CHECK]: 'text-purple-700 bg-purple-100',
 };
 
 type ProductActionTypeBadgeProps = {
