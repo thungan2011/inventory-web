@@ -19,8 +19,11 @@ import Select from '@/components/Filters/Select';
 import AutoSubmitForm from '@/components/AutoSubmitForm';
 import { ImportMaterialTypeVietnamese } from '@/modules/imports/materials/interface';
 import { useAllInventoryCheck } from '@/modules/inventory-checks/repository';
-import { InventoryCheckOverview } from '@/modules/inventory-checks/interface';
+import { InventoryCheckOverview, InventoryCheckStatus } from '@/modules/inventory-checks/interface';
 import InventoryCheckStatusBadge from '@/components/Badge/InventoryCheckStatusBadge';
+import ModalAddInventoryCheck from '@/components/Pages/InventoryCheck/ModalAddInventoryCheck';
+import ModalApproveInventoryCheck from '@/components/Pages/InventoryCheck/ModalApproveInventoryCheck';
+import { SelectProps } from '@/components/Select';
 
 interface InventoryCheckFilter extends PaginationState {
     code: string;
@@ -66,6 +69,8 @@ const exportColumns: ExcelColumn[] = [
 ];
 
 const InventoryCheckPage = () => {
+    const [showModalAddInventoryCheck, setShowModalAddInventoryCheck] = useState<boolean>(false);
+    const [inventoryCheckToApprove, setInventoryCheckApprove] = useState<InventoryCheckOverview | null>(null);
 
     const initialFilterValues: InventoryCheckFilter = {
         page: 1,
@@ -113,6 +118,21 @@ const InventoryCheckPage = () => {
                 cell: ({ row }) => formatDateToLocalDate(row.original.checkDate),
             },
             {
+                accessorKey: 'storageArea',
+                header: 'Khu vực kiểm kê',
+                cell: ({ row }) => (
+                    <div className="space-y-2">
+                        <div className="text-nowrap text-ellipsis overflow-hidden max-w-80"
+                             title={row.original.storageArea.name}>
+                            {row.original.storageArea.name}
+                        </div>
+                        <div className="text-xs text-gray-800">
+                            Mã: {row.original.storageArea.code}
+                        </div>
+                    </div>
+                ),
+            },
+            {
                 accessorKey: 'note',
                 header: 'Ghi chú',
                 cell: ({ row }) => (
@@ -121,36 +141,45 @@ const InventoryCheckPage = () => {
                     </div>
                 ),
             },
-            // {
-            //     accessorKey: 'createdAt',
-            //     header: 'Ngày lập phiếu',
-            //     cell: ({ row }) => {
-            //         return formatDateToLocalDate(row.original.createdAt);
-            //     },
-            // },
-            // {
-            //     accessorKey: 'type',
-            //     header: 'Loại giao dịch',
-            //     cell: ({ row }) => <ImportProductTypesBadge type={row.original.type} />,
-            // },
             {
                 accessorKey: 'status',
                 header: 'Trạng thái',
                 cell: ({ row }) => <InventoryCheckStatusBadge status={row.original.status} />,
             },
-            // {
-            //     accessorKey: 'actions',
-            //     header: () => '',
-            //     cell: ({ row }) => (
-            //         <div className="inline-flex gap-2 items-center">
-            //             <ButtonAction.View href={`/imports/products/${row.original.code}`} />
-            //         </div>
-            //     ),
-            //     enableSorting: false,
-            // },
+            {
+                accessorKey: 'actions',
+                header: '',
+                cell: ({ row }) => (
+                    <div className="inline-flex gap-2 items-center">
+                        {
+                            row.original.status === InventoryCheckStatus.PENDING ? (
+                                <ButtonAction.View onClick={() => setInventoryCheckApprove(row.original)} />
+                            ) : (
+                                <ButtonAction.View href={`/inventory-checks/${row.original.id}`} />
+                            )
+                        }
+                    </div>
+                ),
+            },
         ],
         [],
     );
+
+    const typeOptions : SelectProps['options'] = [
+        { label: 'Tất cả loại', value: 'ALL' },
+        ...Object.values(ImportProductType).map(value => ({
+            label: ImportMaterialTypeVietnamese[value],
+            value,
+        })),
+    ];
+
+    const statusOptions : SelectProps['options'] = [
+        { label: 'Tất cả trạng thái', value: 'ALL' },
+        ...Object.values(ImportProductStatus).map(value => ({
+            label: ImportProductStatusVietnamese[value],
+            value,
+        })),
+    ];
 
     const handleExportExcel = async () => {
         await exportToExcel<InventoryCheckOverview>(checks, exportColumns, 'nhap-kho-thanh-pham.xlsx');
@@ -162,7 +191,8 @@ const InventoryCheckPage = () => {
                 <Card extra={`mb-5 h-full w-full px-6 py-4`}>
                     <div className="flex items-center justify-end">
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add text="Tạo phiếu kiểm kê" href={'/inventory-checks/new'} />
+                            <ButtonAction.Add text="Tạo phiếu kiểm kê"
+                                              onClick={() => setShowModalAddInventoryCheck(true)} />
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>
@@ -172,27 +202,15 @@ const InventoryCheckPage = () => {
                         <Form>
                             <div className="px-4 pb-3">
                                 <Typography.Title level={4}>Bộ lọc</Typography.Title>
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                                     <Input name="code" placeholder="Mã phiếu nhập" />
                                     <Select name="type"
                                             placeholder="Lọc theo loại"
-                                            options={[
-                                                { label: 'Tất cả loại', value: 'ALL' },
-                                                ...Object.values(ImportProductType).map(value => ({
-                                                    label: ImportMaterialTypeVietnamese[value],
-                                                    value,
-                                                })),
-                                            ]}
+                                            options={typeOptions}
                                     />
                                     <Select name="status"
                                             placeholder="Lọc theo trạng thái"
-                                            options={[
-                                                { label: 'Tất cả trạng thái', value: 'ALL' },
-                                                ...Object.values(ImportProductStatus).map(value => ({
-                                                    label: ImportProductStatusVietnamese[value],
-                                                    value,
-                                                })),
-                                            ]}
+                                            options={statusOptions}
                                     />
                                 </div>
                             </div>
@@ -200,11 +218,22 @@ const InventoryCheckPage = () => {
                         </Form>
                     </Formik>
                     <Table<InventoryCheckOverview> data={checks} columns={columns} currentPage={currentPage}
-                                                  totalPages={totalPages}
-                                                  isLoading={isLoading}
-                                                  onChangePage={onPageChange} />
+                                                   totalPages={totalPages}
+                                                   isLoading={isLoading}
+                                                   onChangePage={onPageChange} />
                 </Card>
             </div>
+
+            {
+                showModalAddInventoryCheck && (
+                    <ModalAddInventoryCheck onClose={() => setShowModalAddInventoryCheck(false)} />
+                )
+            }
+            {
+                inventoryCheckToApprove && (
+                    <ModalApproveInventoryCheck onClose={() => setInventoryCheckApprove(null)} data={inventoryCheckToApprove} />
+                )
+            }
         </>
     );
 };

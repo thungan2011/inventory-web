@@ -6,5 +6,9 @@ export interface Report {
         pendingImports: number;
         totalEmployee: number;
         totalCustomer: number;
-    }
+    };
+    revenue: {
+        totalRevenue: number;
+        date: string;
+    }[];
 }

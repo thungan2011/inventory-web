@@ -16,6 +16,7 @@ export interface WarehouseAreaProductOverview {
         description: string;
     }
     product: {
+        id: number;
         sku: string;
         name: string;
         packing: string;
