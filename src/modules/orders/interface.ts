@@ -5,7 +5,8 @@ export enum OrderStatus {
     DELIVERED = 'DELIVERED',
     CANCELLED = 'CANCELLED',
     RETURNED = 'RETURNED',
-    DRAFT = 'DRAFT'
+    DRAFT = 'DRAFT',
+    PARTIAL_SHIPPING = 'PARTIAL_SHIPPING'
 }
 
 export enum PaymentStatus {

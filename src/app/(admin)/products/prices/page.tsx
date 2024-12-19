@@ -22,6 +22,7 @@ import ModalUpdateProductPrice from '@/components/Pages/ProductPrice/ModalUpdate
 import ModalAddProductPrice from '@/components/Pages/ProductPrice/ModalAddProductPrice';
 import ProductPriceStatusBadge, { ProductPriceStatusVietnamese } from '@/components/Badge/ProductPriceStatusBadge';
 import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
+import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 
 interface ProductPriceFilter extends PaginationState {
     search: string;
@@ -150,7 +151,7 @@ const ProductPricePage = () => {
                 cell: ({ row }) => (
                     <div className="flex gap-2">
                         <div className="relative border shadow w-14 h-14 rounded overflow-hidden">
-                            <Image src={'/img/avatar/logo.png'}
+                            <Image src={row.original.product.image || LOGO_IMAGE_FOR_NOT_FOUND}
                                    alt={`Ảnh của sản phẩm ${row.original.product.name}`} fill
                                    className="object-cover" />
                         </div>

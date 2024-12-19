@@ -15,5 +15,6 @@ export interface ProductPriceOverview {
         weight: number;
         packing: string;
         unit: string;
+        image: string;
     }
 }
