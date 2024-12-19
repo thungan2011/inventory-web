@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import SidebarLink from "@/components/Layouts/Sidebar/SidebarLink";
 import routes from '@/routes/adminRoutes';
 import SidebarLinkDropdown from "@/components/Layouts/Sidebar/SidebarLinkDropdown";
+import { Can } from '@/components/Permission/Can';
 
 const Sidebar = () => {
     const [openDropdown, setOpenDropdown] = useState<string | null>(null);
@@ -33,14 +34,18 @@ const Sidebar = () => {
                             routes.map((route) => {
                                 if (route.children) {
                                     return (
-                                        <SidebarLinkDropdown route={route} key={route.path}
-                                                             open={openDropdown === route.path}
-                                                             onToggle={() => handleToggle(route.path)}/>
+                                        <Can key={route.path} I={"read"} a={route.subject || "all"}>
+                                            <SidebarLinkDropdown route={route}
+                                                                 open={openDropdown === route.path}
+                                                                 onToggle={() => handleToggle(route.path)}/>
+                                        </Can>
                                     );
                                 } else {
                                     return (
-                                        <SidebarLink key={route.path} name={route.name} path={route.path}
-                                                     icon={route.icon}/>
+                                        <Can key={route.path} I={"read"} a={route.subject || "all"}>
+                                            <SidebarLink name={route.name} path={route.path}
+                                                         icon={route.icon}/>
+                                        </Can>
                                     );
                                 }
                             })
