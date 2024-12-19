@@ -85,7 +85,7 @@ const NewProductPage = () => {
                 ...values,
                 category_id: values.categories,
                 minimum_stock_level: values?.minimum_stock_level ? values.minimum_stock_level : 0,
-                image: 'h.jpg',
+                image: 'https://firebasestorage.googleapis.com/v0/b/kitchen-images.appspot.com/o/inventory%2Fproducts%2Flogo.png?alt=media&token=bbed937a-4a9d-4f10-a742-fd66c5c6033e',
             });
             router.push('/products');
         } catch (error) {

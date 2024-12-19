@@ -3,7 +3,7 @@ import { InventoryCheckStatus, InventoryCheckStatusVietnamese } from '@/modules/
 
 const statusColors: Record<InventoryCheckStatus, string> = {
     [InventoryCheckStatus.PENDING]: 'text-yellow-500 bg-yellow-100',
-    [InventoryCheckStatus.APPROVED]: 'text-green-600 bg-green-100',
+    [InventoryCheckStatus.APPROVED]: 'text-blue-600 bg-blue-100',
     [InventoryCheckStatus.COMPLETED]: 'text-green-600 bg-green-100',
 };
 
