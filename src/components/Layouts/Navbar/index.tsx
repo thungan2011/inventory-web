@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Link from '@/components/Link';
 import { RiMoonFill, RiSunFill } from 'react-icons/ri';
 import { FiAlignJustify } from 'react-icons/fi';
 import Dropdown from '@/components/Layouts/Navbar/Dropdown';
@@ -8,10 +7,12 @@ import avatar from '/public/img/avatar/avt.png';
 import Breadcrumb from '../../Breadcrumb';
 import { useAuth } from '@/hook/useAuth';
 import ModalProfile from '@/components/Pages/Profile/ModalProfile';
+import ModalChangePassword from '@/components/Pages/Profile/ModalChangePassword';
 
 function Navbar() {
     const [darkMode, setDarkMode] = useState<boolean>(false);
     const [showModalProfile, setShowModalProfile] = useState<boolean>(false);
+    const [showModalChangePassword, setShowModalChangePassword] = useState<boolean>(false);
     const { user, logout } = useAuth();
 
     useEffect(() => {
@@ -67,7 +68,10 @@ function Navbar() {
 
                             <div className="ml-4 mt-3 flex flex-col gap-y-3 mb-3">
                                 <button onClick={() => setShowModalProfile(true)} className="text-sm text-gray-800 dark:text-white text-start">Thông tin cá nhân</button>
-                                <Link href="#" className="text-sm text-gray-800 dark:text-white">Cài đặt</Link>
+                                <button onClick={() => setShowModalChangePassword(true)}
+                                        className="text-sm text-start text-gray-800 dark:text-white">
+                                    Đổi mật khẩu
+                                </button>
                                 <button onClick={logout}
                                         className="text-sm text-start font-medium text-red-500 dark:text-white">Đăng
                                     xuất
@@ -80,6 +84,11 @@ function Navbar() {
             {
                 showModalProfile && user && (
                     <ModalProfile onClose={() => setShowModalProfile(false)} user={user} />
+                )
+            }
+            {
+                showModalChangePassword && (
+                    <ModalChangePassword onClose={() => setShowModalChangePassword(false)} />
                 )
             }
         </>

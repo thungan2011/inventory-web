@@ -20,6 +20,7 @@ import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import { useAuth } from '@/hook/useAuth';
 import { formatAddress, formatGender, formatRole } from '@/utils/formatString';
 import ModalEmployeeDetail from '@/components/Pages/Employee/ModalEmployeeDetail';
+import { Can } from '@/components/Permission/Can';
 
 interface EmployeeFilter extends PaginationState {
     search: string;
@@ -182,8 +183,12 @@ const EmployeePage = () => {
                 cell: ({ row }) => (
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View onClick={() => setEmployeeDetail(row.original)} />
-                        <ButtonAction.Update href={`/employees/${row.original.code}/edit`} />
-                        <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
+                        <Can I="create" a="Employee">
+                            <ButtonAction.Update href={`/employees/${row.original.code}/edit`} />
+                        </Can>
+                        <Can I="delete" a="Employee">
+                            <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
+                        </Can>
                     </div>
                 ),
             },
@@ -202,7 +207,9 @@ const EmployeePage = () => {
                     <div className="flex items-center justify-end">
 
                         <div className="flex gap-2 h-9">
-                            <ButtonAction.Add href={'/employees/new'} text="Cấp tài khoản" />
+                            <Can I="create" a="Employee">
+                                <ButtonAction.Add href={'/employees/new'} text="Cấp tài khoản" />
+                            </Can>
                             <ButtonAction.Export onClick={handleExportExcel} />
                         </div>
                     </div>

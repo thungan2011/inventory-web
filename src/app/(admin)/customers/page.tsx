@@ -18,6 +18,7 @@ import ModalDeleteAlert from '@/components/ModalDeleteAlert';
 import GroupCustomerBadge from '@/components/Badge/GroupCustomerBadge';
 import { ExcelColumn, exportToExcel } from '@/utils/exportToExcel';
 import { formatAddress, formatGender } from '@/utils/formatString';
+import { Can } from '@/components/Permission/Can';
 
 interface CustomerFilter extends PaginationState {
     name: string;
@@ -170,7 +171,9 @@ const CustomerPage = () => {
                     <div className="inline-flex gap-2 items-center">
                         <ButtonAction.View href={`/customers/${row.original.code}`} />
                         <ButtonAction.Update href={`/customers/${row.original.code}/edit`} />
-                        <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
+                        <Can I="delete" a="Customer">
+                            <ButtonAction.Delete onClick={() => deleteModal.openDeleteModal(row.original)} />
+                        </Can>
                     </div>
                 ),
             },

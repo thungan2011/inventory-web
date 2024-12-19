@@ -9,6 +9,8 @@ import 'dayjs/locale/vi';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { useAuth } from '@/hook/useAuth';
+import AbilityProvider from '@/context/AbilityContext';
 
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
@@ -23,19 +25,23 @@ export default function AdminLayout({
                                     }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const { user } = useAuth();
+
     return (
-        <div className="w-full h-full flex bg-background-100 dark:bg-background-900">
-            <Sidebar />
-            <div className="h-full w-full font-dm dark:bg-navy-900">
-                <main className="mx-2.5 flex-none transition-all dark:bg-navy-900 md:pr-2 xl:ml-[240px] xl:mr-0">
-                    <div>
-                        <Navbar />
-                        <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
-                            {children}
+        <AbilityProvider role={user?.role || ''}>
+            <div className="w-full h-full flex bg-background-100 dark:bg-background-900">
+                <Sidebar />
+                <div className="h-full w-full font-dm dark:bg-navy-900">
+                    <main className="mx-2.5 flex-none transition-all dark:bg-navy-900 md:pr-2 xl:ml-[240px] xl:mr-0">
+                        <div>
+                            <Navbar />
+                            <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
+                                {children}
+                            </div>
                         </div>
-                    </div>
-                </main>
+                    </main>
+                </div>
             </div>
-        </div>
+        </AbilityProvider>
     );
 }
