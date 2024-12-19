@@ -1,37 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Card from '@/components/Card';
 import { ApexOptions } from 'apexcharts';
 import { formatNumber, formatNumberToCurrency } from '@/utils/formatNumber';
-import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
-import { Form, Formik } from 'formik';
-import Select, { SelectProps } from '@/components/Select';
-import AutoSubmitForm from '@/components/AutoSubmitForm';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
     ssr: false,
 });
 
-interface Filter {
-    startDate: string;
-    endDate: string;
+// interface Filter {
+//     startDate: string;
+//     endDate: string;
+// }
+//
+// enum DateFilter {
+//     DAY = 'DAY',
+//     WEEK = 'WEEK'
+// }
+
+// interface FormValues {
+//     dateFilter: DateFilter;
+// }
+
+interface ProductRevenueChartProps {
+    categories: string[];
+    data: number[];
 }
 
-enum DateFilter {
-    DAY = 'DAY',
-    WEEK = 'WEEK'
-}
-
-interface FormValues {
-    dateFilter: DateFilter;
-}
-
-const ProductRevenueChart = () => {
-    const today = dayjs();
-    const [, setFilter] = useState<Filter>({
-        startDate: today.startOf('week').format('YYYY-MM-DD'),
-        endDate: today.format('YYYY-MM-DD'),
-    });
+const ProductRevenueChart = ({ categories, data }: ProductRevenueChartProps) => {
+    // const today = dayjs();
+    // const [, setFilter] = useState<Filter>({
+    //     startDate: today.startOf('week').format('YYYY-MM-DD'),
+    //     endDate: today.format('YYYY-MM-DD'),
+    // });
 
     const options: ApexOptions = {
         chart: {
@@ -60,7 +61,7 @@ const ProductRevenueChart = () => {
         },
         colors: ['#5E37FF'],
         xaxis: {
-            categories: ['Macca', 'Hạnh nhân', 'Xoài', 'Rượu', 'Mít'],
+            categories: categories,
             labels: {
                 formatter(value: string): string {
                     return formatNumber(Number(value));
@@ -79,42 +80,43 @@ const ProductRevenueChart = () => {
 
     const series = [{
         name: 'Doanh thu',
-        data: [10000, 20000, 30000, 50000, 100000],
+        data: data,
     }];
 
-    const dateFilterOptions: SelectProps['options'] = [
-        { value: DateFilter.DAY , label: 'Theo ngày' },
-        { value: DateFilter.WEEK, label: 'Theo tuần' },
-    ];
+    // const dateFilterOptions: SelectProps['options'] = [
+    //     { value: DateFilter.DAY, label: 'Theo ngày' },
+    //     { value: DateFilter.WEEK, label: 'Theo tuần' },
+    // ];
 
-    const handleFilterChange = (values: FormValues) => {
-        if (values.dateFilter === DateFilter.DAY) {
-            setFilter({
-                startDate: today.format('YYYY-MM-DD'),
-                endDate: today.format('YYYY-MM-DD'),
-            });
-        } else {
-            setFilter({
-                startDate: today.startOf('week').format('YYYY-MM-DD'),
-                endDate: today.format('YYYY-MM-DD'),
-            });
-        }
-    };
+    // const handleFilterChange = (values: FormValues) => {
+    //     if (values.dateFilter === DateFilter.DAY) {
+    //         setFilter({
+    //             startDate: today.format('YYYY-MM-DD'),
+    //             endDate: today.format('YYYY-MM-DD'),
+    //         });
+    //     } else {
+    //         setFilter({
+    //             startDate: today.startOf('week').format('YYYY-MM-DD'),
+    //             endDate: today.format('YYYY-MM-DD'),
+    //         });
+    //     }
+    // };
 
     return (
         <Card extra="w-full py-6 px-2 text-center">
-            <div className="mb-auto flex items-center justify-between px-6 sm-max:flex-col sm-max:items-start sm-max:px-0">
+            <div
+                className="mb-auto flex items-center justify-between px-6 sm-max:flex-col sm-max:items-start sm-max:px-0">
                 <h2 className="text-lg font-bold text-navy-700 dark:text-white">
-                    Top 10 doanh thu theo thành phẩm
+                    Top 10 doanh thu thành phẩm có doanh thu cao nhất tuần
                 </h2>
-                <div className="w-60">
-                    <Formik initialValues={{ dateFilter: DateFilter.WEEK }} onSubmit={handleFilterChange}>
-                        <Form>
-                            <Select name="dateFilter" options={dateFilterOptions} />
-                            <AutoSubmitForm/>
-                        </Form>
-                    </Formik>
-                </div>
+                {/*<div className="w-60">*/}
+                {/*    <Formik initialValues={{ dateFilter: DateFilter.WEEK }} onSubmit={handleFilterChange}>*/}
+                {/*        <Form>*/}
+                {/*            /!*<Select name="dateFilter" options={dateFilterOptions} />*!/*/}
+                {/*            <AutoSubmitForm />*/}
+                {/*        </Form>*/}
+                {/*    </Formik>*/}
+                {/*</div>*/}
             </div>
             <div className="mt-4">
                 <ReactApexChart options={options} series={series} type="bar" height={400} />
