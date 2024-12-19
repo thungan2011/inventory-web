@@ -22,7 +22,7 @@ import { LOGO_IMAGE_FOR_NOT_FOUND } from '@/variables/images';
 import Image from 'next/image';
 import { MdRemoveCircleOutline } from 'react-icons/md';
 import InputCurrency from '@/components/InputCurrency';
-import { InventoryCheckDetail } from '@/modules/inventory-checks/interface';
+import { InventoryCheckDetail, InventoryCheckStatus } from '@/modules/inventory-checks/interface';
 import { StorageAreaType } from '@/modules/storage-area/interface';
 import Search from '@/components/Search';
 import { useAllWarehouseAreaMaterials } from '@/modules/warehouse-area/materials/repository';
@@ -398,6 +398,8 @@ const UpdateEmployeePage = () => {
         }
     };
 
+    const isProduct = inventoryChecks.storageArea.type === StorageAreaType.PRODUCT;
+
     return (
         <div className="mt-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -419,10 +421,104 @@ const UpdateEmployeePage = () => {
                 </Card>
             </div>
 
-            <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
-                    validationSchema={inventoryCheckSchema}>
-                <FormContentProduct isLoading={false} inventoryCheck={inventoryChecks} />
-            </Formik>
+            {
+                inventoryChecks.status === InventoryCheckStatus.COMPLETED ? (
+                    <Card className={`p-[18px] mt-3`}>
+                        <Typography.Title level={4}>Chi tiết kiểm kho</Typography.Title>
+                        <TableCore className="mt-3">
+                            <TableCore.Header>
+                                <TableCore.RowHeader>
+                                    <TableCore.Head>
+                                        {isProduct ? 'Thành phẩm' : 'Nguyên vật liệu'}
+                                    </TableCore.Head>
+                                    <TableCore.Head>Tồn kho hệ thống</TableCore.Head>
+                                    <TableCore.Head>Tồn kho thực tế</TableCore.Head>
+                                    <TableCore.Head>Lý do</TableCore.Head>
+                                </TableCore.RowHeader>
+                            </TableCore.Header>
+                            <TableCore.Body>
+                                {
+                                    inventoryChecks.details.length > 0 ? (
+                                        inventoryChecks.details.map(detail => (
+                                            <TableCore.RowBody key={`detail-${detail.id}`}>
+                                                <TableCore.Cell>
+                                                    {
+                                                        isProduct ? (
+                                                            <div className="flex gap-2">
+                                                                <div
+                                                                    className="relative w-14 h-14 border rounded overflow-hidden">
+                                                                    <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
+                                                                           alt={`Ảnh của`}
+                                                                           fill
+                                                                           className="object-cover" />
+                                                                </div>
+                                                                <div
+                                                                    className="flex-1 flex flex-col justify-center max-w-96">
+                                                                    <div
+                                                                        className="text-sm font-medium line-clamp-1"
+                                                                        title={`${detail.productHistory?.product?.sku} - ${detail.productHistory?.product?.name}`}
+                                                                    >
+                                                                        {detail.productHistory?.product?.sku} - {detail.productHistory?.product?.name}
+                                                                    </div>
+                                                                    <div
+                                                                        className="text-xs line-clamp-1">{detail.productHistory?.product?.weight}{detail.productHistory?.product?.unit} - {detail.productHistory?.product?.packing}</div>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex gap-2">
+                                                                <div
+                                                                    className="relative w-14 h-14 border rounded overflow-hidden">
+                                                                    <Image src={LOGO_IMAGE_FOR_NOT_FOUND}
+                                                                           alt={`Ảnh của ${detail.materialHistory?.material?.name}`}
+                                                                           fill
+                                                                           className="object-cover" />
+                                                                </div>
+                                                                <div
+                                                                    className="flex-1 flex flex-col justify-center max-w-96">
+                                                                    <div
+                                                                        className="text-sm font-medium line-clamp-1"
+                                                                        title={`${detail.materialHistory?.material?.sku} - ${detail.materialHistory?.material?.name}`}
+                                                                    >
+                                                                        {detail.materialHistory?.material?.sku} - {detail.materialHistory?.material?.name}
+                                                                    </div>
+                                                                    <div
+                                                                        className="text-xs line-clamp-1">{detail.materialHistory?.material?.weight}{detail.materialHistory?.material?.unit} - {detail.materialHistory?.material?.packing}</div>
+                                                                </div>
+                                                            </div>
+                                                        )
+                                                    }
+                                                </TableCore.Cell>
+                                                <TableCore.Cell>
+                                                    {detail.systemQuantity}
+                                                </TableCore.Cell>
+                                                <TableCore.Cell>
+                                                    {detail.actualQuantity}
+                                                </TableCore.Cell>
+                                                <TableCore.Cell>
+                                                    {detail.reason || 'Không rõ'}
+                                                </TableCore.Cell>
+                                            </TableCore.RowBody>
+                                        ))
+                                    ) : (
+                                        <TableCore.RowBody>
+                                            <TableCore.Cell colSpan={3}>
+                                                <div className="text-center text-gray-400 py-10">
+                                                    Chưa có sản phẩm nào
+                                                </div>
+                                            </TableCore.Cell>
+                                        </TableCore.RowBody>
+                                    )
+                                }
+                            </TableCore.Body>
+                        </TableCore>
+                    </Card>
+                ) : (
+                    <Formik initialValues={initialFormValues} onSubmit={handleSubmit}
+                            validationSchema={inventoryCheckSchema}>
+                        <FormContentProduct isLoading={false} inventoryCheck={inventoryChecks} />
+                    </Formik>
+                )
+            }
         </div>
     );
 };

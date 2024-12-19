@@ -24,6 +24,34 @@ export interface InventoryCheckDetail {
         name: string;
         type: StorageAreaType;
     };
+    details: {
+        id: number;
+        actualQuantity: number;
+        systemQuantity: number;
+        reason?: string;
+        productHistory?: {
+            id: number;
+            product: {
+                id: number;
+                sku: string;
+                name: string;
+                weight: number;
+                unit: string;
+                packing: string;
+            }
+        };
+        materialHistory?: {
+            id: number;
+            material: {
+                id: number;
+                sku: string;
+                name: string;
+                weight: number;
+                unit: string;
+                packing: string;
+            }
+        }
+    } []
 }
 
 export enum InventoryCheckStatus {
