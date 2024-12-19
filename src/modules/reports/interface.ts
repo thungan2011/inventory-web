@@ -11,4 +11,8 @@ export interface Report {
         totalRevenue: number;
         date: string;
     }[];
+    productStats: {
+        name: string;
+        totalRevenue: number;
+    }[];
 }
